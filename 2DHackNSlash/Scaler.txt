@@ -1,0 +1,11 @@
+HP:10
+Mana:10
+AD:1
+MD:1
+AttkSpd:0.25%
+MoveSpd:0.25%
+Defense:0.5%
+CC:0.25%
+CrictDMG: 5% or 2.5%
+LPH: 1
+MPH: 1
