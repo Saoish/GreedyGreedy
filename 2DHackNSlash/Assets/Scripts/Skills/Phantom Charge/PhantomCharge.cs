@@ -58,6 +58,7 @@ public class PhantomCharge : ActiveSkill {
         ADScale = PCL.ADScale;
         Force = PCL.Force;
         OC = transform.parent.parent.GetComponent<ObjectController>();
+        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());
     }
 
     public override bool Ready() {
@@ -98,7 +99,8 @@ public class PhantomCharge : ActiveSkill {
         SmokePS.enableEmission = true;
         transform.GetComponent<Collider2D>().enabled = true;
         OC.rb.drag = 0;
-        OC.rb.AddForce(charge_direction*Force,ForceMode2D.Impulse);
+        OC.rb.AddForce(charge_direction * Force, ForceMode2D.Impulse);
+        //Debug.Log(OC.rb.velocity);
         AudioSource.PlayClipAtPoint(SFX, transform.position, GameManager.SFX_Volume);
 
         OC.ON_MANA_UPDATE += OC.DeductMana;
@@ -135,22 +137,60 @@ public class PhantomCharge : ActiveSkill {
 
     void OnTriggerEnter2D(Collider2D collider) {
         if (collider.gameObject.layer == LayerMask.NameToLayer("Melee")) {//Ignore melee collider)
-            return;
-        }
-        if (collider.tag == "Enemy") {
-            if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+            if (!collider.transform.IsChildOf(OC.transform))
                 return;
-            }
-            EnemyController Enemy = collider.GetComponent<EnemyController>();
-            Enemy.rb.mass = 1000;
-            OC.ON_DMG_DEAL += DealSkillDmg;
-            OC.ON_DMG_DEAL(Enemy);
-            OC.ON_DMG_DEAL -= DealSkillDmg;
-            HittedStack.Push(collider);
-            AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
-        } else if (collider.tag == "Player") {
-            //Debug.Log(collider);
         }
+        if (OC.GetType() == typeof(PlayerController)) {
+            if (collider.tag == "Enemy") {
+                if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                    return;
+                }
+                ObjectController target = collider.GetComponent<ObjectController>();
+                target.rb.mass = 1000;
+                OC.ON_DMG_DEAL += DealSkillDmg;
+                OC.ON_DMG_DEAL(target);
+                OC.ON_DMG_DEAL -= DealSkillDmg;
+                HittedStack.Push(collider);
+                AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
+            } else if (collider.tag == "Player") {
+                if (collider.transform.parent.name == "FriendlyPlayer") {
+                    OC.rb.drag = 10;
+                    transform.GetComponent<Collider2D>().enabled = false;
+                    HittedStack.Clear();
+                    OC.ActiveVFXParticalWithStayTime("Phantom Charge End", EndStayTime);
+                    StartCoroutine(DisableSmokePS(SmokeStayTime));
+                    return;
+                }
+                else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                    return;
+                }
+                ObjectController target = collider.GetComponent<ObjectController>();
+                target.rb.mass = 1000;
+                OC.ON_DMG_DEAL += DealSkillDmg;
+                OC.ON_DMG_DEAL(target);
+                OC.ON_DMG_DEAL -= DealSkillDmg;
+                HittedStack.Push(collider);
+                AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
+            }
+        }
+
+
+        else {
+            if (collider.tag == "Player") {
+                if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                    return;
+                }
+                ObjectController target = collider.GetComponent<ObjectController>();
+                target.rb.mass = 1000;
+                OC.ON_DMG_DEAL += DealSkillDmg;
+                OC.ON_DMG_DEAL(target);
+                OC.ON_DMG_DEAL -= DealSkillDmg;
+                HittedStack.Push(collider);
+                AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
+            } 
+        }
+
+
         OC.rb.drag = 10;
         transform.GetComponent<Collider2D>().enabled = false;
         HittedStack.Clear();
@@ -162,4 +202,5 @@ public class PhantomCharge : ActiveSkill {
         yield return new WaitForSeconds(time);
         SmokePS.enableEmission = false;
     }
+
 }

@@ -34,4 +34,8 @@ public abstract class Skill : MonoBehaviour {
     protected virtual void Update () {
 	
 	}
+
+    public Sprite GetSkillIcon() {
+        return GetComponent<Image>().sprite;
+    }
 }

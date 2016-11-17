@@ -161,28 +161,7 @@ public class PlayerController : ObjectController {
         SLM.SaveCurrentPlayerInfo();
     }
 
-
-    //Combat Method
-    public override bool HasBuff(System.Type buff) {
-        Buff[] buffs = Buffs.GetComponentsInChildren<Buff>();
-        if (buffs.Length == 0)
-            return false;
-        foreach (Buff _buff in buffs)
-            if (_buff.GetType() == buff)
-                return true;
-        return false;
-    }
-
-    public override bool HasDebuff(System.Type debuff) {
-        Debuff[] debuffs = Debuffs.GetComponentsInChildren<Debuff>();
-        if (debuffs.Length == 0)
-            return false;
-        foreach (Debuff _debuff in debuffs)
-            if (_debuff.GetType() == debuff)
-                return true;
-        return false;
-    }
-
+    //Combat
     override public Value AutoAttackDamageDeal(float TargetDefense) {
         Value dmg = Value.CreateValue();
         if (UnityEngine.Random.value < (CurrCritChance / 100)) {
@@ -263,15 +242,15 @@ public class PlayerController : ObjectController {
 
 
     //Animation Handling
-    public float GetMovementAnimSpeed() {
+    override public float GetMovementAnimSpeed() {
         return (CurrMoveSpd/100) / (movement_animation_interval);
     }
 
-    public float GetAttackAnimSpeed() {
+    override public float GetAttackAnimSpeed() {
         return (CurrAttkSpd/100) / (attack_animation_interval);
     }
 
-    public float GetPhysicsSpeedFactor() {
+    override public float GetPhysicsSpeedFactor() {
         if (!Attacking) {
             if (CurrMoveSpd < 100)
                 return 1 + CurrMoveSpd / 100;
@@ -389,9 +368,9 @@ public class PlayerController : ObjectController {
             if (STC.SkillTree[i] != null && PlayerData.SkillTreelvls[i] != 0) {//Does lvl+skill check here
                 GameObject SkillObject = Instantiate(Resources.Load("SkillPrefabs/" + STC.SkillTree[i].Name)) as GameObject;
                 if (SkillObject.transform.GetComponent<Skill>().GetType().IsSubclassOf(typeof(ActiveSkill)))
-                    SkillObject.transform.parent = Actives;
+                    SkillObject.transform.SetParent(Actives);
                 else if (SkillObject.transform.GetComponent<Skill>().GetType().IsSubclassOf(typeof(PassiveSkill))) {
-                    SkillObject.transform.parent = Passives;
+                    SkillObject.transform.SetParent(Passives);
                 }
                 SkillObject.name = STC.SkillTree[i].Name;
                 SkillObject.GetComponent<Skill>().InitSkill(PlayerData.SkillTreelvls[i]);
@@ -574,11 +553,6 @@ public class PlayerController : ObjectController {
             Destroy(gameObject);
         }
     }
-
-
-
-
-
 
 
 

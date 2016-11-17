@@ -37,9 +37,9 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
         Transform T_AttackCollider = animator.transform.Find("MeleeAttackCollider");
         EC.Attacking = true;
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
-        float AttackRange = T_AttackCollider.GetComponent<MeleeEnemeyAttackCollider>().AttackRange;
-        float AttackBoxWidth = T_AttackCollider.GetComponent<MeleeEnemeyAttackCollider>().AttackBoxWidth;
-        float AttackBoxHeight = T_AttackCollider.GetComponent<MeleeEnemeyAttackCollider>().AttackBoxHeight;
+        float AttackRange = T_AttackCollider.GetComponent<MeleeAttackCollider>().AttackRange;
+        float AttackBoxWidth = T_AttackCollider.GetComponent<MeleeAttackCollider>().AttackBoxWidth;
+        float AttackBoxHeight = T_AttackCollider.GetComponent<MeleeAttackCollider>().AttackBoxHeight;
         if (stateInfo.IsName("attack_left")) {
             AttackCollider.size = new Vector2(AttackBoxWidth, AttackBoxHeight);
             AttackCollider.offset = new Vector2(-AttackRange, 0);
@@ -62,7 +62,7 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
         Transform T_AttackCollider = animator.transform.Find("MeleeAttackCollider");
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         AttackCollider.enabled = false;
-        Stack<Collider2D> HittedStack = T_AttackCollider.GetComponent<MeleeEnemeyAttackCollider>().HittedStack;
+        Stack<Collider2D> HittedStack = T_AttackCollider.GetComponent<MeleeAttackCollider>().HittedStack;
         if (HittedStack.Count != 0)
             HittedStack.Clear();
     }

@@ -14,6 +14,7 @@ public class ActiveSkillButtonController : MonoBehaviour {
     private KeyCode K_Key;
     private string J_Key;
 
+    private Image IconImage;
     private Image CD_Mask;
     private GameObject Red_Mask_OJ;
     private Transform BG;
@@ -27,6 +28,7 @@ public class ActiveSkillButtonController : MonoBehaviour {
         } else
             CM = FindObjectOfType<ControllerManager>();
         Slot = int.Parse(gameObject.name);
+        IconImage = GetComponent<Image>();
         CD_Mask = transform.Find("CD_Mask").GetComponent<Image>();
         Red_Mask_OJ = transform.Find("Red_Mask").gameObject;
         BG = transform.parent;
@@ -51,6 +53,7 @@ public class ActiveSkillButtonController : MonoBehaviour {
         }
         PC = GameObject.Find("MainPlayer/PlayerController").transform.GetComponent<PlayerController>();
         Skill = PC.GetActiveSlotSkillTransform(Slot);
+        LoadSkillIcon();
     }
 	
 	// Update is called once per frame
@@ -90,5 +93,20 @@ public class ActiveSkillButtonController : MonoBehaviour {
             BG.GetComponent<Animator>().Play("bg_blank");
         }
         CD_Mask.fillAmount = Skill.GetCDPortion();
+    }
+
+    void LoadSkillIcon() {
+        if (!Skill) {
+            IconImage.sprite = null;
+            Color ImageIconColor = IconImage.color;
+            ImageIconColor.a = 0;
+            IconImage.color = ImageIconColor;
+        }
+        if (Skill != null) {
+            IconImage.sprite = Resources.Load<Sprite>("SkillIcons/"+Skill.SD.Name);
+            Color ImageIconColor = IconImage.color;
+            ImageIconColor.a = 255;
+            IconImage.color = ImageIconColor;
+        }
     }
 }

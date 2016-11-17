@@ -5,7 +5,7 @@ public class Ruin : PassiveSkill {
     [HideInInspector]
     public float TriggerChance;
     [HideInInspector]
-    public float ModMoveSpd;
+    public float MOVESPD_DEC_Percentage;
 
     public AudioClip TriggerSFX;
     public float Duration = 5;
@@ -39,7 +39,7 @@ public class Ruin : PassiveSkill {
                 break;
         }
         TriggerChance = RL.TriggerChance;
-        ModMoveSpd = RL.ModMoveSpd;
+        MOVESPD_DEC_Percentage = RL.MOVESPD_DEC_Percentage;
         OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
@@ -71,13 +71,13 @@ public class Ruin : PassiveSkill {
         ModData RuinDebuffMod =  ScriptableObject.CreateInstance<ModData>();
         RuinDebuffMod.Name = SD.Name+"Debuff";
         RuinDebuffMod.Duration = Duration;
-        RuinDebuffMod.ModMoveSpd = ModMoveSpd;
+        RuinDebuffMod.ModMoveSpd = MOVESPD_DEC_Percentage;
         GameObject RuinDebuffObject =  Instantiate(Resources.Load("DebuffPrefabs/" + RuinDebuffMod.Name)) as GameObject;
         RuinDebuffObject.GetComponent<Debuff>().ApplyDebuff(RuinDebuffMod, target);
     }
 
     void ApplyRuinPassive(ObjectController target) {
-        if(Random.value < (TriggerChance / 100)) {
+        if(UnityEngine.Random.value < (TriggerChance / 100)) {
             if (!target.HasDebuff(typeof(RuinDebuff))) {
                 ApllyRuinDebuff(target);
                 AudioSource.PlayClipAtPoint(TriggerSFX, target.transform.position, GameManager.SFX_Volume);

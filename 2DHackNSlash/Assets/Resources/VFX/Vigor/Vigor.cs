@@ -5,7 +5,6 @@ using System;
 public class Vigor : PassiveSkill {
 
     float AD_INC_Percentage;
-    PlayerController PC;
 
     public override void InitSkill(int lvl) {
         base.InitSkill(lvl);
@@ -30,11 +29,11 @@ public class Vigor : PassiveSkill {
                 break;
         }
         AD_INC_Percentage = VL.AD_INC_Perentage;
-        PC = transform.parent.parent.GetComponent<PlayerController>();
+        OC = transform.parent.parent.GetComponent<PlayerController>();
     }
 
     public override void ApplyPassive() {
-        PC.SetMaxAD(PC.GetMaxAD() + PC.GetMaxAD() * (AD_INC_Percentage / 100));
+        OC.SetMaxAD(OC.GetMaxAD() + OC.GetMaxAD() * (AD_INC_Percentage / 100));
     }
 
 }

@@ -3,6 +3,8 @@ using System.Collections;
 
 public abstract class PassiveSkill : Skill {
 
+
+
     protected override void Awake() {
         base.Awake();
     }

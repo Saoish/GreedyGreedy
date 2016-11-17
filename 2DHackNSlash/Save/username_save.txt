@@ -1,6 +1,6 @@
-0,OPOPOP,Warrior,23,0,20600,0,22,22,20,20,0,0,100,100,0,30,200,0,0
+0,OPOPOP,Warrior,24,0,17100,0,23,23,20,20,0,0,100,100,0,30,200,0,0
 ---CategorySeperator---
-5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0
+5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
 Cleave,Phantom Charge,Fury,null
 ---CategorySeperator---
@@ -10,13 +10,13 @@ Cleave,Phantom Charge,Fury,null
 -EquipSeperator-
 2,Radiant Band,Warrior,Shackle,0,3,3,0,0,0,8,0,0,0,0,0,0,0
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,3,0,7,0,0,2,5,1,1,0,0
+1,Greatsword,Warrior,Weapon,0,0,0,2,0,5,0,0,3,3,2,1,0,0
 -EquipSeperator-
 2,Blood Orb,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
 1,Greatsword,Warrior,Weapon,0,0,0,3,0,2,0,0,4,7,2,2,0,0
 -EquipSeperator-
-null
+2,Radiant Chestguard,Warrior,Chest,0,10,5,0,0,0,0,6,0,0,0,0,0,0
 -EquipSeperator-
 1,Greatsword,Warrior,Weapon,0,0,0,3,0,6,0,0,3,4,1,0,0,0
 -EquipSeperator-
@@ -30,7 +30,7 @@ null
 -EquipSeperator-
 1,Silver Crown,Warrior,Helmet,0,4,7,0,0,0,0,3,0,0,0,0,0,0
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,2,0,5,0,0,3,3,2,1,0,0
+1,Greatsword,Warrior,Weapon,0,0,0,3,0,7,0,0,2,5,1,1,0,0
 -EquipSeperator-
 1,Greatsword,Warrior,Weapon,0,0,0,2,0,6,0,0,7,3,0,2,0,0
 -EquipSeperator-

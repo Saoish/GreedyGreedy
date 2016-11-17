@@ -61,6 +61,7 @@ public abstract class ObjectController : MonoBehaviour {
 
     virtual protected void Start() {
     }
+
     
     //Particle VFX
     public void ActiveVFXParticalWithStayTime(string VFX, float StayTime) {
@@ -111,10 +112,32 @@ public abstract class ObjectController : MonoBehaviour {
 
     abstract public void DeductMana(Value mana_cost);
 
-    abstract public bool HasBuff(System.Type buff);
-    abstract public bool HasDebuff(System.Type debuff);
-    //Combat
+    public bool HasBuff(System.Type buff) {
+        Buff[] buffs = Buffs.GetComponentsInChildren<Buff>();
+        if (buffs.Length == 0)
+            return false;
+        foreach (Buff _buff in buffs)
+            if (_buff.GetType() == buff)
+                return true;
+        return false;
+    }
 
+    public bool HasDebuff(System.Type debuff) {
+        Debuff[] debuffs = Debuffs.GetComponentsInChildren<Debuff>();
+        if (debuffs.Length == 0)
+            return false;
+        foreach (Debuff _debuff in debuffs)
+            if (_debuff.GetType() == debuff)
+                return true;
+        return false;
+    }
+
+    //Animation
+    abstract public float GetMovementAnimSpeed();
+    abstract public float GetAttackAnimSpeed();
+    abstract public float GetPhysicsSpeedFactor();
+
+    //Stats
     abstract public float GetMaxHealth();
     abstract public float GetMaxMana();
     abstract public float GetMaxAD();

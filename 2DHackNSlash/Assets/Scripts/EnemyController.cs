@@ -103,28 +103,7 @@ public class EnemyController : ObjectController {
     }
 
     //----------public
-
     //Combat
-    public override bool HasBuff(System.Type buff) {
-        Buff[] buffs = Buffs.GetComponentsInChildren<Buff>();
-        if (buffs.Length == 0)
-            return false;
-        foreach (Buff _buff in buffs)
-            if (_buff.GetType() == buff)
-                return true;
-        return false;
-    }
-
-    public override bool HasDebuff(System.Type debuff) {
-        Debuff[] debuffs = Debuffs.GetComponentsInChildren<Debuff>();
-        if (debuffs.Length == 0)
-            return false;
-        foreach (Debuff _debuff in debuffs)
-            if (_debuff.GetType() == debuff)
-                return true;
-        return false;
-    }
-
     override public Value AutoAttackDamageDeal(float TargetDefense) {
         Value dmg = Value.CreateValue();
         if (Random.value < (CurrCritChance / 100)) {
@@ -191,15 +170,15 @@ public class EnemyController : ObjectController {
 
 
     //Animation
-    public float GetMovementAnimSpeed() {
+    override public float GetMovementAnimSpeed() {
         return (CurrMoveSpd/100) / (movement_animation_interval);
     }
 
-    public float GetAttackAnimSpeed() {
+    override public float GetAttackAnimSpeed() {
         return (CurrAttkSpd/100) / (attack_animation_interval);
     }
 
-    public float GetPhysicsSpeedFactor() {
+    override public float GetPhysicsSpeedFactor() {
         if (!Attacking) {
             if (CurrMoveSpd < 100)
                 return 1 + CurrMoveSpd / 100;
@@ -254,8 +233,6 @@ public class EnemyController : ObjectController {
             Destroy(transform.parent.gameObject);
         }
     }
-
-
 
 
 

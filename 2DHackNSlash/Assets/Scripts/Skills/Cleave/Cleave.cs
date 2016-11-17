@@ -29,7 +29,7 @@ public class Cleave : ActiveSkill {
 
     protected override void Update() {
         base.Update();
-        
+
     }
 
     public override void InitSkill(int lvl) {
@@ -60,18 +60,17 @@ public class Cleave : ActiveSkill {
         RangeScale = CL.RangeScale;
         transform.localScale = new Vector2(RangeScale, RangeScale);
         OC = transform.parent.parent.GetComponent<ObjectController>();
+        Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), OC.transform.GetComponent<Collider2D>());
     }
 
     public override bool Ready() {
         if (OC.Stunned) {
             Debug.Log(SD.Name + " " + SD.lvl + ": You are Stunned");
             return false;
-        }
-        else if (RealTime_CD > 0) {
+        } else if (RealTime_CD > 0) {
             Debug.Log(SD.Name + " " + SD.lvl + ": Is on cooldown");
             return false;
-        }
-        else if (OC.GetCurrMana() - ManaCost < 0) {
+        } else if (OC.GetCurrMana() - ManaCost < 0) {
             Debug.Log(SD.Name + " " + SD.lvl + ": Not enough mana");
             return false;
         }
@@ -92,7 +91,7 @@ public class Cleave : ActiveSkill {
     void DealSkillDmg(ObjectController target) {
         Value dmg = Value.CreateValue();
         if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
-            dmg.Amount += OC.GetCurrAD() * (ADScale/100) * (OC.GetCurrCritDmgBounus() / 100);
+            dmg.Amount += OC.GetCurrAD() * (ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
             dmg.IsCrit = true;
         } else {
             dmg.Amount += OC.GetCurrAD() * (ADScale / 100);
@@ -119,20 +118,34 @@ public class Cleave : ActiveSkill {
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
-        if (collider.tag == "Enemy") {
-            if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+        if (collider.gameObject.layer != LayerMask.NameToLayer("KillingGround"))
+            return;
+        if (OC.GetType() == typeof(PlayerController)) {
+            if (collider.transform.tag == "Player") {
+                if (collider.transform.parent.name == "FriendlyPlayer")
+                    return;
+            } 
+            else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
                 return;
-            }
-            EnemyController Enemy = collider.GetComponent<EnemyController>();
-            Vector2 BouceOffDirection = (Vector2)Vector3.Normalize(Enemy.transform.position - OC.transform.position);
-            Enemy.rb.mass = 1;
-            Enemy.rb.AddForce(BouceOffDirection * SD.lvl * 2, ForceMode2D.Impulse);
+            ObjectController target = collider.GetComponent<ObjectController>();
+            Vector2 BouceOffDirection = (Vector2)Vector3.Normalize(target.transform.position - OC.transform.position);
+            target.rb.mass = 1;
+            target.rb.AddForce(BouceOffDirection * SD.lvl * 2, ForceMode2D.Impulse);
             OC.ON_DMG_DEAL += DealSkillDmg;
-            OC.ON_DMG_DEAL(Enemy);
+            OC.ON_DMG_DEAL(target);
             OC.ON_DMG_DEAL -= DealSkillDmg;
             HittedStack.Push(collider);
-        } else if (collider.transform.tag == "Player") {
-
+        } else {
+            if (collider.tag == "Enemy") {
+                return;
+            } else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                return;
+            }
+            ObjectController target = collider.GetComponent<ObjectController>();
+            OC.ON_DMG_DEAL += DealSkillDmg;
+            OC.ON_DMG_DEAL(target);
+            OC.ON_DMG_DEAL -= DealSkillDmg;
+            HittedStack.Push(collider);
         }
     }
 }
