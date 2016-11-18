@@ -8,6 +8,8 @@ public abstract class Buff : MonoBehaviour {
     [HideInInspector]
     public float Duration = 0;
 
+    protected float ModAmount;
+
     protected ObjectController target;
 
     protected virtual void Update() {

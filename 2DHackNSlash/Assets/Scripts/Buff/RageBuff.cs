@@ -3,10 +3,6 @@ using System.Collections;
 using System;
 
 public class RageBuff : Buff {
-
-    [HideInInspector]
-    public float ModAmount;
-
     void Awake() {
 
     }

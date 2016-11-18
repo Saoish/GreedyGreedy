@@ -3,10 +3,6 @@ using System.Collections;
 using System;
 
 public class RuinDebuff : Debuff {
-    [HideInInspector]
-    public float ModAmount;
-
-
     void Awake() {
 
     }

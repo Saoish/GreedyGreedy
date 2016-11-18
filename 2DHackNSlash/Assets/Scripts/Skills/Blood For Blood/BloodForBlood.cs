@@ -65,6 +65,7 @@ public class BloodForBlood : PassiveSkill {
                     BFB_BuffMod.Duration = Duration;
                     BFB_BuffMod.ModAD = LPH_INC_Perentage;
                     GameObject BFB_Buff = Instantiate(Resources.Load("BuffPrefabs/" + BFB_BuffMod.Name)) as GameObject;
+                    BFB_Buff.name = "BloodForBloodBuff";
                     BFB_Buff.GetComponent<Buff>().ApplyBuff(BFB_BuffMod, OC);
                     RealTime_TriggerCD = TriggerCD;
                 }

@@ -68,7 +68,7 @@ public class MeleeAttackCollider : AttackCollider {
             return;
         if (OC.GetType() == typeof(PlayerController)) {//Player Attack
             if (collider.tag == "Player") {
-                if(collider.transform.parent.name == "FriendlyPlayer")
+                if (collider.transform.parent.name == "FriendlyPlayer" || collider.transform.parent.name == "MainPlayer")
                     return;
             } 
             else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks

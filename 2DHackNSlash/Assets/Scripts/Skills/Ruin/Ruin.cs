@@ -7,8 +7,9 @@ public class Ruin : PassiveSkill {
     [HideInInspector]
     public float MOVESPD_DEC_Percentage;
 
-    public AudioClip TriggerSFX;
     public float Duration = 5;
+
+    public AudioClip TriggerSFX;
 
     ModData RuinDebuffMod;
 
@@ -73,6 +74,7 @@ public class Ruin : PassiveSkill {
         RuinDebuffMod.Duration = Duration;
         RuinDebuffMod.ModMoveSpd = MOVESPD_DEC_Percentage;
         GameObject RuinDebuffObject =  Instantiate(Resources.Load("DebuffPrefabs/" + RuinDebuffMod.Name)) as GameObject;
+        RuinDebuffObject.name = SD.Name + "Debuff";
         RuinDebuffObject.GetComponent<Debuff>().ApplyDebuff(RuinDebuffMod, target);
     }
 

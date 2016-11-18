@@ -498,7 +498,7 @@ public class PlayerController : ObjectController {
 
     void InstaniateEquipmentModel() {
         if (PlayerData.Class == "Warrior") {
-            BaseModel = Instantiate(Resources.Load("Red Ghost/Ghost/Red Ghost"), transform) as GameObject;
+            BaseModel = Instantiate(Resources.Load("BaseModelPrefabs/Red Ghost"), transform) as GameObject;
             BaseModel.name = "Red Ghost";
             BaseModel.transform.position = transform.position + BaseModel.transform.position;
         }

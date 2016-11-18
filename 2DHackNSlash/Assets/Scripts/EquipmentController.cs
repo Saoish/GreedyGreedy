@@ -86,8 +86,6 @@ public class EquipmentController : MonoBehaviour {
         Loot.layer = LayerMask.NameToLayer("Loot");
         Loot.transform.Find("LootBox").gameObject.layer = LayerMask.NameToLayer("LootBox");
         Loot.name = E.Name;
-        GameObject[] PlayerList = GameObject.FindGameObjectsWithTag("Player");
-        GameObject[] EnemyList = GameObject.FindGameObjectsWithTag("Enemy");
         Destroy(Loot.transform.Find("Icon").gameObject);
         Loot.transform.Find("LootBox").gameObject.SetActive(true);
         Loot.GetComponent<EquipmentController>().LootRandomlize();

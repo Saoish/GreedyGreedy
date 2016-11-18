@@ -2,9 +2,6 @@
 using System.Collections;
 
 public class FuryBuff : Buff {
-    [HideInInspector]
-    public float ModAmount;
-
     void Awake() {
 
     }

@@ -122,7 +122,7 @@ public class Cleave : ActiveSkill {
             return;
         if (OC.GetType() == typeof(PlayerController)) {
             if (collider.transform.tag == "Player") {
-                if (collider.transform.parent.name == "FriendlyPlayer")
+                if (collider.transform.parent.name == "FriendlyPlayer" || collider.transform.parent.name == "MainPlayer")
                     return;
             } 
             else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks

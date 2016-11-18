@@ -8,6 +8,8 @@ public abstract class Debuff : MonoBehaviour {
     [HideInInspector]
     public float Duration = 0;
 
+    protected float ModAmount;
+
     protected ObjectController target;
 
 

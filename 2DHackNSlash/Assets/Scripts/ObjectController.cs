@@ -31,7 +31,7 @@ public abstract class ObjectController : MonoBehaviour {
     [HideInInspector]
     public Transform Debuffs;
 
-    public delegate void on_dmg_deal(ObjectController target);
+    public delegate void on_dmg_deal(ObjectController target = null);
     public delegate void on_health_update(Value health_change = null);
     public delegate void on_mana_update(Value mana_change = null);
 
@@ -65,25 +65,28 @@ public abstract class ObjectController : MonoBehaviour {
     
     //Particle VFX
     public void ActiveVFXParticalWithStayTime(string VFX, float StayTime) {
+        float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
-        VFX_OJ.transform.position = VFX_Transform.position;
-        VFX_OJ.transform.localScale = VFX_Transform.localScale;
+        VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position * scale;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
         VFX_OJ.name = VFX;
         Destroy(VFX_OJ, StayTime);
     }
     public void ActiveVFXParticle(string VFX) {
+        float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
-        VFX_OJ.transform.position = VFX_Transform.position;
-        VFX_OJ.transform.localScale = VFX_Transform.localScale;
+        VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position*scale;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
         VFX_OJ.name = VFX;
     }
     public void DeactiveVFXParticle(string VFX) {
         Destroy(VFX_Transform.Find(VFX).gameObject);
     }
     public void ActiveOneShotVFXParticle(string VFX) {
+        float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
-        VFX_OJ.transform.position = VFX_Transform.position;
-        VFX_OJ.transform.localScale = VFX_Transform.localScale;
+        VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position * scale;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
         VFX_OJ.name = VFX;
         float length = VFX_OJ.transform.GetComponent<ParticleSystem>().duration;
         Destroy(VFX_OJ,length);
@@ -91,9 +94,10 @@ public abstract class ObjectController : MonoBehaviour {
 
     //Anim VFX
     public void ActiveOneShotVFXAnim(string VFX) {
+        float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
-        VFX_OJ.transform.position = VFX_Transform.position;
-        VFX_OJ.transform.localScale = VFX_Transform.localScale;
+        VFX_OJ.transform.position += VFX_Transform.position;
+        VFX_OJ.transform.localScale *= scale;
         VFX_OJ.name = VFX;
         float length = VFX_OJ.transform.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
         Destroy(VFX_OJ, length);
@@ -130,6 +134,17 @@ public abstract class ObjectController : MonoBehaviour {
             if (_debuff.GetType() == debuff)
                 return true;
         return false;
+    }
+
+    public int DebuffStack(System.Type debuff) {
+        Debuff[] debuffs = Debuffs.GetComponentsInChildren<Debuff>();
+        if (debuffs.Length == 0)
+            return 0;
+        int stack = 0;
+        foreach (Debuff _debuff in debuffs)
+            if (_debuff.GetType() == debuff)
+                stack++;
+        return stack;
     }
 
     //Animation

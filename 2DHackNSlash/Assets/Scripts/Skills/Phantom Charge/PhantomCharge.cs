@@ -58,7 +58,7 @@ public class PhantomCharge : ActiveSkill {
         ADScale = PCL.ADScale;
         Force = PCL.Force;
         OC = transform.parent.parent.GetComponent<ObjectController>();
-        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());//Ignore self here
     }
 
     public override bool Ready() {

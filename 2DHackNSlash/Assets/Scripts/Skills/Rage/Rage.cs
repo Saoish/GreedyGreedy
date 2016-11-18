@@ -66,6 +66,7 @@ public class Rage : PassiveSkill {
                 RageBuffMod.Duration = Duration;
                 RageBuffMod.ModAD = AD_INC_Percentage;
                 GameObject RageBuff = Instantiate(Resources.Load("BuffPrefabs/" + RageBuffMod.Name)) as GameObject;
+                RageBuff.name = "RageBuff";
                 RageBuff.GetComponent<Buff>().ApplyBuff(RageBuffMod, OC);
                 RealTime_TriggerCD = TriggerCD;
             }
