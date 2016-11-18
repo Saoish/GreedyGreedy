@@ -127,7 +127,6 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
     }
 
     void MeleeAttacExit(Animator animator, AnimatorStateInfo stateInfo, WeaponController WC) {
-        PlayerController PC = animator.transform.parent.GetComponent<PlayerController>();
         Transform T_AttackCollider = animator.transform.Find("MeleeAttackCollider");
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         AttackCollider.enabled = false;

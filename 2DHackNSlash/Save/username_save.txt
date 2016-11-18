@@ -1,6 +1,6 @@
-0,OPOPOP,Warrior,26,0,9200,0,25,25,20,20,0,0,100,100,0,30,200,0,0
+0,OPOPOP,Warrior,26,0,14000,0,25,25,20,20,0,0,100,100,0,30,200,0,0
 ---CategorySeperator---
-5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0
+5,5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,0,0
 ---CategorySeperator---
 Cleave,Phantom Charge,Fury,null
 ---CategorySeperator---

@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 
 public class RuinDebuff : Debuff {
+    public AudioClip TriggerSFX;
     void Awake() {
 
     }
@@ -23,6 +24,7 @@ public class RuinDebuff : Debuff {
         target.SetCurrMoveSpd(target.GetCurrMoveSpd() - ModAmount);
         Duration = MD.Duration;
         target.ActiveVFXParticle("RuinDebuffVFX");
+        AudioSource.PlayClipAtPoint(TriggerSFX, target.transform.position, GameManager.SFX_Volume);
     }
 
     protected override void RemoveDebuff() {

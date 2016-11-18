@@ -9,8 +9,6 @@ public class Ruin : PassiveSkill {
 
     public float Duration = 5;
 
-    public AudioClip TriggerSFX;
-
     ModData RuinDebuffMod;
 
     protected override void Awake() {
@@ -82,7 +80,6 @@ public class Ruin : PassiveSkill {
         if(UnityEngine.Random.value < (TriggerChance / 100)) {
             if (!target.HasDebuff(typeof(RuinDebuff))) {
                 ApllyRuinDebuff(target);
-                AudioSource.PlayClipAtPoint(TriggerSFX, target.transform.position, GameManager.SFX_Volume);
             }
         }
     }
