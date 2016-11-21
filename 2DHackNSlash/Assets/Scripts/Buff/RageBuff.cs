@@ -26,8 +26,6 @@ public class RageBuff : Buff {
     }
 
     protected override void RemoveBuff() {
-        if (target == null)
-            return;
         target.SetCurrAD(target.GetCurrAD() - ModAmount);
         target.DeactiveVFXParticle("RageBuffVFX");
         Destroy(gameObject);

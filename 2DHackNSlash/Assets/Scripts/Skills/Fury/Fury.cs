@@ -47,21 +47,6 @@ public class Fury : ActiveSkill {
         ManaCost = FL.ManaCost;
         Duration = FL.Duration;
         AttkSpd_INC_Percentage = FL.AttkSpd_INC_Percentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
-    }
-
-    public override bool Ready() {
-        if (OC.Stunned) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": You are Stunned");
-            return false;
-        } else if (RealTime_CD > 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Is on cooldown");
-            return false;
-        } else if (OC.GetCurrMana() - ManaCost < 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Not enough mana");
-            return false;
-        }
-        return true;
     }
 
     public override void Active() {
@@ -78,8 +63,9 @@ public class Fury : ActiveSkill {
         FuryBuffMod.Name = "FuryBuff";
         FuryBuffMod.Duration = Duration;
         FuryBuffMod.ModAttSpd = AttkSpd_INC_Percentage;
-        GameObject FuryBuff = Instantiate(Resources.Load("BuffPrefabs/" + FuryBuffMod.Name)) as GameObject;
-        FuryBuff.GetComponent<Buff>().ApplyBuff(FuryBuffMod, OC);
+        GameObject FuryBuffObject = Instantiate(Resources.Load("BuffPrefabs/" + FuryBuffMod.Name)) as GameObject;
+        FuryBuffObject.name = "FuryBuff";
+        FuryBuffObject.GetComponent<Buff>().ApplyBuff(FuryBuffMod, OC);
         RealTime_CD = CD;
     }
 }

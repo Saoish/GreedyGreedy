@@ -29,7 +29,6 @@ public class Vigor : PassiveSkill {
                 break;
         }
         AD_INC_Percentage = VL.AD_INC_Perentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
     public override void ApplyPassive() {

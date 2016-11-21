@@ -47,7 +47,8 @@ public class BattleFury : PassiveSkill {
         TriggerChance = BFL.TriggerChance;
         Sping_ADScale = BFL.Sping_ADScale;
         Dot_ADSCale_Percentage = BFL.Dot_ADScale_Percentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
+        
+        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());//Ignore self here
     }
 
     protected override void Start() {
@@ -68,7 +69,7 @@ public class BattleFury : PassiveSkill {
 
         else if (OC.GetType() == typeof(PlayerController)) {
             if (collider.tag == "Player") {
-                if (collider.transform.parent.name == "FriendlyPlayer" || collider.transform.parent.name == "MainPlayer")
+                if (collider.transform.parent.name == "FriendlyPlayer")
                     return;
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
                 return;
@@ -92,7 +93,7 @@ public class BattleFury : PassiveSkill {
     }
 
     void DealBFSpingDMG(ObjectController target) {
-        Value dmg = Value.CreateValue();
+        Value dmg = Value.CreateValue(0, 0, false, OC);
         if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
             dmg.Amount += OC.GetCurrAD() * (Sping_ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
             dmg.IsCrit = true;

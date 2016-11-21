@@ -44,7 +44,7 @@ public class IndicationController : MonoBehaviour {
             }
         }
         float ExitTime = PopUpText.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
-        PopText.text = value.Amount.ToString("F0");
+        PopText.text = value.Amount.ToString("F1");
         Destroy(PopUpText, ExitTime);
     }
 

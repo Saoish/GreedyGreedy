@@ -27,7 +27,6 @@ public class Grit : PassiveSkill {
                 break;
         }
         HP_INC_Percentage = GL.HP_INC_Percentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
     public override void ApplyPassive() {

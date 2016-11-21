@@ -12,15 +12,16 @@ public class ContactDetector : MonoBehaviour {
         Physics2D.IgnoreCollision(transform.Find("PlayerController").GetComponent<Collider2D>(), GetComponent<Collider2D>());
     }
 
-    void OnTriggerStay2D(Collider2D collider) {
+    void OnTriggerEnter2D(Collider2D collider) {
         if (collider.tag == "Enemy" || collider.tag == "Player") {
-            collider.transform.GetComponent<ObjectController>().rb.mass = 1000;
+            collider.transform.GetComponent<ObjectController>().MountainlizeMass();
+            collider.transform.GetComponent<ObjectController>().ZerolizeForce();
         }
     }
 
     void OnTriggerExit2D(Collider2D collider) {
         if (collider.tag == "Enemy" || collider.tag == "Player") {
-            collider.transform.GetComponent<ObjectController>().rb.mass = 1;
+            collider.transform.GetComponent<ObjectController>().NormalizeMass();
         }
     }
 }

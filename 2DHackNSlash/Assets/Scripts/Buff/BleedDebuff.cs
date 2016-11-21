@@ -20,14 +20,12 @@ public class BleedDebuff : Debuff {
     public override void ApplyDebuff(ModData MD, ObjectController target) {
         base.ApplyDebuff(MD, target);
         ModAmount = MD.ModHealth;
-        bleed_dmg = Value.CreateValue(ModAmount);
+        bleed_dmg = Value.CreateValue(ModAmount);//No trace back source
         Duration = MD.Duration;
         target.ActiveVFXParticle("BleedDebuffVFX");
     }
 
     protected override void RemoveDebuff() {
-        if (target == null)
-            return;
         target.DeactiveVFXParticle("BleedDebuffVFX");
         DestroyObject(gameObject);
     }

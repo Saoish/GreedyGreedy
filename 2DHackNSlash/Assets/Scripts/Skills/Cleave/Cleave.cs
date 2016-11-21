@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
 
 public class Cleave : ActiveSkill {
     [HideInInspector]
     public float ADScale;
     [HideInInspector]
     public float RangeScale;
-    [HideInInspector]
-    public Animator Anim;
+
+
+    private Animator Anim;
 
     public AudioClip SFX;
 
@@ -18,8 +18,6 @@ public class Cleave : ActiveSkill {
     protected override void Awake() {
         base.Awake();
         Anim = GetComponent<Animator>();
-        if (transform.parent == null)
-            return;
     }
 
     protected override void Start() {
@@ -59,22 +57,7 @@ public class Cleave : ActiveSkill {
         ADScale = CL.ADScale;
         RangeScale = CL.RangeScale;
         transform.localScale = new Vector2(RangeScale, RangeScale);
-        OC = transform.parent.parent.GetComponent<ObjectController>();
         Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), OC.transform.GetComponent<Collider2D>());
-    }
-
-    public override bool Ready() {
-        if (OC.Stunned) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": You are Stunned");
-            return false;
-        } else if (RealTime_CD > 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Is on cooldown");
-            return false;
-        } else if (OC.GetCurrMana() - ManaCost < 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Not enough mana");
-            return false;
-        }
-        return true;
     }
 
     public override void Active() {
@@ -86,10 +69,39 @@ public class Cleave : ActiveSkill {
         RealTime_CD = CD;
     }
 
-    //Unique Methods
+    void OnTriggerEnter2D(Collider2D collider) {
+        if (collider.gameObject.layer != LayerMask.NameToLayer("KillingGround"))
+            return;
+        if (OC.GetType() == typeof(PlayerController)) {
+            if (collider.transform.tag == "Player") {
+                if (collider.transform.parent.name == "FriendlyPlayer")
+                    return;
+            } 
+            else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
+                return;
+            ObjectController target = collider.GetComponent<ObjectController>();
+            Push(target);
+            OC.ON_DMG_DEAL += DealCleaveDmg;
+            OC.ON_DMG_DEAL(target);
+            OC.ON_DMG_DEAL -= DealCleaveDmg;
+            HittedStack.Push(collider);
+        } else {
+            if (collider.tag == "Enemy") {
+                return;
+            } else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                return;
+            }
+            ObjectController target = collider.GetComponent<ObjectController>();
+            Push(target);
+            OC.ON_DMG_DEAL += DealCleaveDmg;
+            OC.ON_DMG_DEAL(target);
+            OC.ON_DMG_DEAL -= DealCleaveDmg;
+            HittedStack.Push(collider);
+        }
+    }
 
-    void DealSkillDmg(ObjectController target) {
-        Value dmg = Value.CreateValue();
+    void DealCleaveDmg(ObjectController target) {
+        Value dmg = Value.CreateValue(0, 0, false, OC);
         if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
             dmg.Amount += OC.GetCurrAD() * (ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
             dmg.IsCrit = true;
@@ -117,35 +129,9 @@ public class Cleave : ActiveSkill {
         target.ON_HEALTH_UPDATE -= target.DeductHealth;
     }
 
-    void OnTriggerEnter2D(Collider2D collider) {
-        if (collider.gameObject.layer != LayerMask.NameToLayer("KillingGround"))
-            return;
-        if (OC.GetType() == typeof(PlayerController)) {
-            if (collider.transform.tag == "Player") {
-                if (collider.transform.parent.name == "FriendlyPlayer" || collider.transform.parent.name == "MainPlayer")
-                    return;
-            } 
-            else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
-                return;
-            ObjectController target = collider.GetComponent<ObjectController>();
-            Vector2 BouceOffDirection = (Vector2)Vector3.Normalize(target.transform.position - OC.transform.position);
-            target.rb.mass = 1;
-            target.rb.AddForce(BouceOffDirection * SD.lvl * 2, ForceMode2D.Impulse);
-            OC.ON_DMG_DEAL += DealSkillDmg;
-            OC.ON_DMG_DEAL(target);
-            OC.ON_DMG_DEAL -= DealSkillDmg;
-            HittedStack.Push(collider);
-        } else {
-            if (collider.tag == "Enemy") {
-                return;
-            } else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
-                return;
-            }
-            ObjectController target = collider.GetComponent<ObjectController>();
-            OC.ON_DMG_DEAL += DealSkillDmg;
-            OC.ON_DMG_DEAL(target);
-            OC.ON_DMG_DEAL -= DealSkillDmg;
-            HittedStack.Push(collider);
-        }
+    void Push(ObjectController target) {
+        Vector2 BouceOffDirection = (Vector2)Vector3.Normalize(target.transform.position - OC.transform.position);
+        target.NormalizeMass();
+        target.AddForce(BouceOffDirection,SD.lvl * 2, ForceMode2D.Impulse);
     }
 }

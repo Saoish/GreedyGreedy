@@ -41,7 +41,6 @@ public class BloodForBlood : PassiveSkill {
                 break;
         }
         LPH_INC_Perentage = BFBL.LPH_INC_Perentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
     protected override void Update() {
@@ -56,7 +55,7 @@ public class BloodForBlood : PassiveSkill {
         OC.ON_HEALTH_UPDATE += BFBPassive;
     }
 
-    private void BFBPassive(Value health_mod) {
+    private void BFBPassive(Value health_mod, ObjectController healer = null) {
         if (health_mod.Type == 0) {//Damage type
             if ((OC.GetCurrHealth() - health_mod.Amount) / OC.GetMaxHealth() <= HealthTriggerThreshold / 100) {
                 if (RealTime_TriggerCD == 0 && !OC.HasBuff(typeof(BloodForBloodBuff))) {

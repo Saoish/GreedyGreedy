@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public abstract class ObjectController : MonoBehaviour {
-    [HideInInspector]
-    public Rigidbody2D rb;
+    protected Rigidbody2D rb;
     [HideInInspector]
     public Collider2D collider;
 
@@ -32,8 +31,8 @@ public abstract class ObjectController : MonoBehaviour {
     public Transform Debuffs;
 
     public delegate void on_dmg_deal(ObjectController target = null);
-    public delegate void on_health_update(Value health_change = null);
-    public delegate void on_mana_update(Value mana_change = null);
+    public delegate void on_health_update(Value health_change);
+    public delegate void on_mana_update(Value mana_change);
 
     public on_dmg_deal ON_DMG_DEAL;
     public on_health_update ON_HEALTH_UPDATE;
@@ -62,7 +61,35 @@ public abstract class ObjectController : MonoBehaviour {
     virtual protected void Start() {
     }
 
-    
+    //Physics
+    public bool HasForce() {
+        return rb.velocity != Vector2.zero;
+    }
+
+    public void MountainlizeMass() {
+        rb.mass = 1000;
+    }
+
+    public void NormalizeMass() {
+        rb.mass = 1;
+    }
+
+    public void ZerolizeForce() {
+        rb.velocity = Vector2.zero;
+    }
+
+    public void ZerolizeDrag() {
+        rb.drag = 0;
+    }
+
+    public void NormalizeDrag() {
+        rb.drag = 10;
+    }
+
+    public void AddForce(Vector2 Direction, float Magnitude, ForceMode2D ForceMode) {
+        rb.AddForce(Direction * Magnitude, ForceMode);
+    }
+
     //Particle VFX
     public void ActiveVFXParticalWithStayTime(string VFX, float StayTime) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
@@ -124,6 +151,22 @@ public abstract class ObjectController : MonoBehaviour {
             if (_buff.GetType() == buff)
                 return true;
         return false;
+    }
+
+    public Buff GetBuff(System.Type buff) {
+        Buff[] buffs = Buffs.GetComponentsInChildren<Buff>();
+        foreach (Buff _buff in buffs)
+            if (_buff.GetType() == buff)
+                return _buff;
+        return null;
+    }
+
+    public Debuff GetDebuff(System.Type debuff) {
+        Debuff[] debuffs = Debuffs.GetComponentsInChildren<Debuff>();
+        foreach (Debuff _debuff in debuffs)
+            if (_debuff.GetType() == debuff)
+                return _debuff;
+        return null;
     }
 
     public bool HasDebuff(System.Type debuff) {

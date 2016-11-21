@@ -42,7 +42,6 @@ public class Rage : PassiveSkill {
                 break;
         }
         AD_INC_Percentage = RL.AD_INC_Percentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
 
@@ -58,7 +57,7 @@ public class Rage : PassiveSkill {
         OC.ON_HEALTH_UPDATE += RagePassive;
     }
 
-    private void RagePassive(Value health_mod) {
+    private void RagePassive(Value health_mod, ObjectController healer = null) {
         if ((OC.GetCurrHealth() - health_mod.Amount) / OC.GetMaxHealth() <= HealthTriggerThreshold / 100) {
             if (RealTime_TriggerCD == 0 && !OC.HasBuff(typeof(RageBuff))) {
                 ModData RageBuffMod = ScriptableObject.CreateInstance<ModData>();

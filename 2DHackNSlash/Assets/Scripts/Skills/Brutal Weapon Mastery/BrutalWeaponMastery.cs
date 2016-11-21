@@ -4,8 +4,6 @@ using System.Collections;
 public class BrutalWeaponMastery : PassiveSkill{
     float AD_INC_Percentage;
 
-    float AD_Amount_INC;
-
     protected override void Awake(){
         base.Awake();
     }
@@ -13,8 +11,7 @@ public class BrutalWeaponMastery : PassiveSkill{
     public override void InitSkill(int lvl){
         base.InitSkill(lvl);
         BrutalWeaponMasterylvl BL = null;
-        switch (this.SD.lvl)
-        {
+        switch (this.SD.lvl){
             case 0:
                 return;
             case 1:
@@ -34,7 +31,6 @@ public class BrutalWeaponMastery : PassiveSkill{
                 break;
         }
         AD_INC_Percentage = BL.AD_INC_Percentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
     protected override void Start(){

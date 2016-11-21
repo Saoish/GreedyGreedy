@@ -88,16 +88,24 @@ public class EnemyController : ObjectController {
 
     void MoveUpdate() {
         if (MoveVector != Vector2.zero)
-            //rb.MovePosition(rb.position + AI.MoveVector * (CurrMoveSpd/100) * Time.deltaTime);
-            rb.AddForce(MoveVector * (CurrMoveSpd / 100) * rb.drag);
+            rb.MovePosition(rb.position + AI.MoveVector * (CurrMoveSpd / 100) * Time.deltaTime);
+        //rb.AddForce(MoveVector * (CurrMoveSpd / 100) * rb.drag);
+        //rb.velocity = MoveVector * (CurrMoveSpd / 100);
     }
 
     void ControlUpdate() {
-        if (Stunned)
+        if (Stunned) {
+            AttackVector = Vector2.zero;
+            MoveVector = Vector2.zero;
             return;
+        }
         if (AI) {
             AttackVector = AI.AttackVector;
-            MoveVector = AI.MoveVector;
+            if (!HasForce()) {
+                MoveVector = AI.MoveVector;
+            } else {
+                MoveVector = Vector2.zero;
+            }
             Direction = AI.Direction;
         }
     }
@@ -105,7 +113,7 @@ public class EnemyController : ObjectController {
     //----------public
     //Combat
     override public Value AutoAttackDamageDeal(float TargetDefense) {
-        Value dmg = Value.CreateValue();
+        Value dmg = Value.CreateValue(0, 0, false, GetComponent<ObjectController>());
         if (Random.value < (CurrCritChance / 100)) {
             dmg.Amount += CurrAD * (CurrCritDmgBounus / 100);
             dmg.Amount += CurrMD * (CurrCritDmgBounus / 100);

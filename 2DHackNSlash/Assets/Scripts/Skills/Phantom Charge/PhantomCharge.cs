@@ -57,22 +57,7 @@ public class PhantomCharge : ActiveSkill {
         ManaCost = PCL.ManaCost;
         ADScale = PCL.ADScale;
         Force = PCL.Force;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
         Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());//Ignore self here
-    }
-
-    public override bool Ready() {
-        if (OC.Stunned) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": You are Stunned");
-            return false;
-        } else if (RealTime_CD > 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Is on cooldown");
-            return false;
-        } else if (OC.GetCurrMana() - ManaCost < 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Not enough mana");
-            return false;
-        }
-        return true;
     }
 
     public override void Active() {
@@ -98,8 +83,8 @@ public class PhantomCharge : ActiveSkill {
 
         SmokePS.enableEmission = true;
         transform.GetComponent<Collider2D>().enabled = true;
-        OC.rb.drag = 0;
-        OC.rb.AddForce(charge_direction * Force, ForceMode2D.Impulse);
+        OC.ZerolizeDrag();
+        OC.AddForce(charge_direction ,Force, ForceMode2D.Impulse);
         //Debug.Log(OC.rb.velocity);
         AudioSource.PlayClipAtPoint(SFX, transform.position, GameManager.SFX_Volume);
 
@@ -111,7 +96,7 @@ public class PhantomCharge : ActiveSkill {
     }
 
     void DealSkillDmg(ObjectController target) {
-        Value dmg = Value.CreateValue();
+        Value dmg = Value.CreateValue(0, 0, false, OC);
         if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
             dmg.Amount += OC.GetCurrAD() * (ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
             dmg.IsCrit = true;
@@ -146,31 +131,25 @@ public class PhantomCharge : ActiveSkill {
                     return;
                 }
                 ObjectController target = collider.GetComponent<ObjectController>();
-                target.rb.mass = 1000;
+                //target.MountainlizeMass();
                 OC.ON_DMG_DEAL += DealSkillDmg;
                 OC.ON_DMG_DEAL(target);
                 OC.ON_DMG_DEAL -= DealSkillDmg;
                 HittedStack.Push(collider);
                 AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
             } else if (collider.tag == "Player") {
-                if (collider.transform.parent.name == "FriendlyPlayer") {
-                    OC.rb.drag = 10;
-                    transform.GetComponent<Collider2D>().enabled = false;
-                    HittedStack.Clear();
-                    OC.ActiveVFXParticalWithStayTime("Phantom Charge End", EndStayTime);
-                    StartCoroutine(DisableSmokePS(SmokeStayTime));
-                    return;
+                if (collider.transform.parent.name != "FriendlyPlayer") {
+                    if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                        return;
+                    }
+                    ObjectController target = collider.GetComponent<ObjectController>();
+                    target.MountainlizeMass();
+                    OC.ON_DMG_DEAL += DealSkillDmg;
+                    OC.ON_DMG_DEAL(target);
+                    OC.ON_DMG_DEAL -= DealSkillDmg;
+                    HittedStack.Push(collider);
+                    AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
                 }
-                else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
-                    return;
-                }
-                ObjectController target = collider.GetComponent<ObjectController>();
-                target.rb.mass = 1000;
-                OC.ON_DMG_DEAL += DealSkillDmg;
-                OC.ON_DMG_DEAL(target);
-                OC.ON_DMG_DEAL -= DealSkillDmg;
-                HittedStack.Push(collider);
-                AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
             }
         }
 
@@ -181,7 +160,7 @@ public class PhantomCharge : ActiveSkill {
                     return;
                 }
                 ObjectController target = collider.GetComponent<ObjectController>();
-                target.rb.mass = 1000;
+                //target.MountainlizeMass();
                 OC.ON_DMG_DEAL += DealSkillDmg;
                 OC.ON_DMG_DEAL(target);
                 OC.ON_DMG_DEAL -= DealSkillDmg;
@@ -190,8 +169,8 @@ public class PhantomCharge : ActiveSkill {
             } 
         }
 
-
-        OC.rb.drag = 10;
+        OC.NormalizeDrag();
+        OC.ZerolizeForce();
         transform.GetComponent<Collider2D>().enabled = false;
         HittedStack.Clear();
         OC.ActiveVFXParticalWithStayTime("Phantom Charge End", EndStayTime);

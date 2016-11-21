@@ -29,5 +29,12 @@ public abstract class Debuff : MonoBehaviour {
         this.MD = MD;
         gameObject.transform.SetParent(target.transform.Find("Debuffs"));
     }
+
+    virtual public void ApplyDebuff(ModData MD, ObjectController target,Value debuff_dmg) {
+        this.target = target;
+        this.MD = MD;
+        gameObject.transform.SetParent(target.transform.Find("Debuffs"));
+    }
+
     abstract protected void RemoveDebuff();
 }

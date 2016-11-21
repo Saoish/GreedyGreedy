@@ -9,8 +9,6 @@ public class Ruin : PassiveSkill {
 
     public float Duration = 5;
 
-    ModData RuinDebuffMod;
-
     protected override void Awake() {
         base.Awake();
     }
@@ -39,7 +37,6 @@ public class Ruin : PassiveSkill {
         }
         TriggerChance = RL.TriggerChance;
         MOVESPD_DEC_Percentage = RL.MOVESPD_DEC_Percentage;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
     protected override void Start() {
@@ -51,7 +48,7 @@ public class Ruin : PassiveSkill {
     }
 
     public override void ApplyPassive() {
-        OC.ON_DMG_DEAL += ApplyRuinPassive;
+        OC.ON_DMG_DEAL += RuinPassive;
     }
 
 
@@ -66,7 +63,15 @@ public class Ruin : PassiveSkill {
 
 
     //Private
-    void ApllyRuinDebuff(ObjectController target) {
+    void RuinPassive(ObjectController target) {
+        if (UnityEngine.Random.value < (TriggerChance / 100)) {
+            if (!target.HasDebuff(typeof(RuinDebuff))) {
+                ApplyRuinDebuff(target);
+            }
+        }
+    }
+
+    void ApplyRuinDebuff(ObjectController target) {
         ModData RuinDebuffMod =  ScriptableObject.CreateInstance<ModData>();
         RuinDebuffMod.Name = SD.Name+"Debuff";
         RuinDebuffMod.Duration = Duration;
@@ -74,13 +79,5 @@ public class Ruin : PassiveSkill {
         GameObject RuinDebuffObject =  Instantiate(Resources.Load("DebuffPrefabs/" + RuinDebuffMod.Name)) as GameObject;
         RuinDebuffObject.name = SD.Name + "Debuff";
         RuinDebuffObject.GetComponent<Debuff>().ApplyDebuff(RuinDebuffMod, target);
-    }
-
-    void ApplyRuinPassive(ObjectController target) {
-        if(UnityEngine.Random.value < (TriggerChance / 100)) {
-            if (!target.HasDebuff(typeof(RuinDebuff))) {
-                ApllyRuinDebuff(target);
-            }
-        }
     }
 }

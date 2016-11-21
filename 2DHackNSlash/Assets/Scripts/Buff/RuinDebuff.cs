@@ -8,10 +8,6 @@ public class RuinDebuff : Debuff {
 
     }
 
-	// Use this for initialization
-	void Start () {
-	
-	}
 
     // Update is called once per frame
     protected override void Update() {
@@ -28,8 +24,6 @@ public class RuinDebuff : Debuff {
     }
 
     protected override void RemoveDebuff() {
-        if (target == null)//Probably dead already
-            return;
         target.SetCurrMoveSpd(target.GetCurrMoveSpd() + ModAmount);
         target.DeactiveVFXParticle("RuinDebuffVFX");
         DestroyObject(gameObject);

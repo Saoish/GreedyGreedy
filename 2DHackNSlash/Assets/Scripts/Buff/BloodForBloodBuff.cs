@@ -28,8 +28,6 @@ public class BloodForBloodBuff : Buff {
     }
 
     protected override void RemoveBuff() {
-        if (target == null)
-            return;
         target.SetCurrLPH(target.GetCurrLPH() - ModAmount);
         target.DeactiveVFXParticle("BloodForBloodBuffVFX");
         DestroyObject(gameObject);

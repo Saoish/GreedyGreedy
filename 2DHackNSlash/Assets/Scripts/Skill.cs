@@ -23,6 +23,7 @@ public abstract class Skill : MonoBehaviour {
 
     public virtual void InitSkill(int lvl) {
         SD.lvl = lvl;
+        OC = transform.parent.parent.GetComponent<ObjectController>();
     }
 
     // Use this for initialization
@@ -37,5 +38,9 @@ public abstract class Skill : MonoBehaviour {
 
     public Sprite GetSkillIcon() {
         return GetComponent<Image>().sprite;
+    }
+
+    public ObjectController GetOC() {
+        return OC;
     }
 }

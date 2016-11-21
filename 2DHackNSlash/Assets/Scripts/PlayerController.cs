@@ -110,19 +110,28 @@ public class PlayerController : ObjectController {
     }
 
     void ControlUpdate() {
-        if (Stunned)
+        if (Stunned) {
+            AttackVector = Vector2.zero;
+            MoveVector = Vector2.zero;
             return;
-        if (CM != null) {
-            AttackVector = CM.AttackVector;
-            MoveVector = CM.MoveVector;
-            Direction = CM.Direction;
+        } else {
+            if (CM != null) {
+                AttackVector = CM.AttackVector;
+                if (!HasForce()) {
+                    MoveVector = CM.MoveVector;
+                } else {
+                    MoveVector = Vector2.zero;
+                }
+                Direction = CM.Direction;
+            }
         }
     }
 
     void MoveUpdate() {
         if (MoveVector != Vector2.zero) {
-            //rb.MovePosition(rb.position + MoveVector * (CurrMoveSpd / 100) * Time.deltaTime);
-            rb.AddForce(MoveVector * (CurrMoveSpd / 100) * rb.drag);
+            rb.MovePosition(rb.position + MoveVector * (CurrMoveSpd / 100) * Time.deltaTime);
+            //rb.AddForce(MoveVector * (CurrMoveSpd / 100) * rb.drag);
+            //rb.velocity = MoveVector * (CurrMoveSpd / 100);
         }
     }
 
@@ -163,7 +172,7 @@ public class PlayerController : ObjectController {
 
     //Combat
     override public Value AutoAttackDamageDeal(float TargetDefense) {
-        Value dmg = Value.CreateValue();
+        Value dmg = Value.CreateValue(0,0,false,GetComponent<ObjectController>());
         if (UnityEngine.Random.value < (CurrCritChance / 100)) {
             dmg.Amount += CurrAD * (CurrCritDmgBounus / 100);
             dmg.Amount += CurrMD * (CurrCritDmgBounus / 100);
@@ -539,6 +548,8 @@ public class PlayerController : ObjectController {
         if(PlayerData.exp >= NextLevelExp) {
             PlayerData.lvl++;
             PlayerData.exp = 0;
+            CurrHealth = MaxHealth;
+            CurrMana = MaxMana;
             NextLevelExp = LvlExpModule.GetRequiredExp(PlayerData.lvl + 1);
             AudioSource.PlayClipAtPoint(lvlup, transform.position, GameManager.SFX_Volume);
             PlayerData.StatPoints++;
