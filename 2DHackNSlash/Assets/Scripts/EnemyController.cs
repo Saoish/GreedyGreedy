@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class EnemyController : ObjectController {
+public abstract class EnemyController : ObjectController {
     public AudioClip attack;
     public AudioClip hurt;
     public AudioClip die;
@@ -21,8 +21,8 @@ public class EnemyController : ObjectController {
     public float MaxMoveSpd; //Percantage
     public float MaxDefense; //Percantage
 
-    public float MaxCritChance = 0.3f; //Percantage
-    public float MaxCritDmgBounus = 1f; //Percantage
+    public float MaxCritChance = 30f; //Percantage
+    public float MaxCritDmgBounus = 200f; //Percantage
     public float MaxLPH;
     public float MaxMPH;
 
@@ -227,22 +227,22 @@ public class EnemyController : ObjectController {
         }
     }   
 
-    void SpawnEXP() {
+    protected void SpawnEXP() {
         PlayerController MPC = GameObject.Find("MainPlayer/PlayerController").GetComponent<PlayerController>();
         if(MPC.Alive)
             MPC.AddEXP(exp);        
     }
 
-    void DieUpdate() {
-        if (CurrHealth <= 0) {//Insert dead animation here
-            Alive = false;
-            SpawnEXP();
-            GetComponent<DropList>().SpawnLoots();
-            Destroy(transform.parent.gameObject);
-        }
-    }
+    //void DieUpdate() {
+    //    if (CurrHealth <= 0) {//Insert dead animation here
+    //        Alive = false;
+    //        SpawnEXP();
+    //        GetComponent<DropList>().SpawnLoots();
+    //        Destroy(transform.parent.gameObject);
+    //    }
+    //}
 
-
+    protected abstract void DieUpdate();
 
 
 
