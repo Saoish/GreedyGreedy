@@ -19,6 +19,8 @@ public class ControllerManager : MonoBehaviour {
 
     public KeyCode Interact = KeyCode.F;
 
+    public KeyCode Tab = KeyCode.Tab;
+
     //Active Skills
     public KeyCode Skill0 = KeyCode.Alpha1;
     public KeyCode Skill1 = KeyCode.Alpha2;

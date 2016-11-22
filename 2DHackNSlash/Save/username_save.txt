@@ -1,8 +1,8 @@
-0,OPOPOP,Warrior,14,0,7200,0,14,14,20,20,0,0,100,100,0,30,200,0,0
+0,OPOPOP,Warrior,15,0,2000,0,15,15,20,20,0,0,100,100,0,30,200,0,0
 ---CategorySeperator---
 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5
 ---CategorySeperator---
-Cleave,Phantom Charge,Standing Still,War Stomp
+Cleave,Phantom Charge,Bloody Hand,War Stomp
 ---CategorySeperator---
 3,Horned Skullcap,Warrior,Helmet,0,14,13,0,0,0,0,13,0,0,0,0,0,0
 -EquipSeperator-
