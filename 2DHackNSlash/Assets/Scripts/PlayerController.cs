@@ -735,4 +735,8 @@ public class PlayerController : ObjectController {
     public CharacterDataStruct GetPlayerData() {
         return PlayerData;
     }
+
+    public ControllerManager GetCM() {//For mainplayer only
+        return CM;
+    }
 }

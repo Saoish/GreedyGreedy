@@ -58,6 +58,7 @@ public class PhantomCharge : ActiveSkill {
         ADScale = PCL.ADScale;
         Force = PCL.Force;
         Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());//Ignore self here
+        SmokePS.startSize *= OC.GetVFXScale();
     }
 
     public override void Active() {
@@ -173,7 +174,7 @@ public class PhantomCharge : ActiveSkill {
         OC.ZerolizeForce();
         transform.GetComponent<Collider2D>().enabled = false;
         HittedStack.Clear();
-        OC.ActiveVFXParticalWithStayTime("Phantom Charge End", EndStayTime);
+        OC.ActiveVFXParticalWithStayTime("PhantomChargeEndVFX", EndStayTime);
         StartCoroutine(DisableSmokePS(SmokeStayTime));
     }
 

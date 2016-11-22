@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 public class PlayerUIController : MonoBehaviour {
 
-    ControllerManager CM;
+    public PlayerController PC;
 
-    PlayerController PC;
+    ControllerManager CM;
     Transform HealthMask;
     Transform ManaMask;
     Transform ExpMask;
@@ -17,12 +17,13 @@ public class PlayerUIController : MonoBehaviour {
     GameObject ES;
 
 	void Awake () {
-        if (ControllerManager.Instance)
-            CM = ControllerManager.Instance;
-        else
-            CM = FindObjectOfType<ControllerManager>();
+        //if (ControllerManager.Instance)
+        //    CM = ControllerManager.Instance;
+        //else
+        //    CM = FindObjectOfType<ControllerManager>();
 
         PC = transform.parent.Find("PlayerController").GetComponent<PlayerController>();
+        CM = PC.GetCM();
         HealthMask = transform.Find("Action Bar/Health Orb");
         ManaMask = transform.Find("Action Bar/Mana Orb");
         ExpMask = transform.Find("Action Bar/XP mask");
@@ -32,6 +33,7 @@ public class PlayerUIController : MonoBehaviour {
     }
 
     void Start() {
+
     }
 	
 	// Update is called once per frame

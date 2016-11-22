@@ -4,10 +4,9 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class ActiveSkillButtonController : MonoBehaviour {
+    ControllerManager CM;
     PlayerController PC;
     private int Slot = -999;
-
-    ControllerManager CM;
 
     private ActiveSkill Skill;
 
@@ -19,20 +18,8 @@ public class ActiveSkillButtonController : MonoBehaviour {
     private GameObject Red_Mask_OJ;
     private Transform BG;
 
-    void Awake() {
-    }
-	// Use this for initialization
-	void Start () {
-        if (ControllerManager.Instance) {
-            CM = ControllerManager.Instance;
-        } else
-            CM = FindObjectOfType<ControllerManager>();
-        Slot = int.Parse(gameObject.name);
-        IconImage = GetComponent<Image>();
-        CD_Mask = transform.Find("CD_Mask").GetComponent<Image>();
-        Red_Mask_OJ = transform.Find("Red_Mask").gameObject;
-        BG = transform.parent;
-        GetComponent<Button>().onClick.AddListener(ActiveSkill);
+
+    void MapKey() {
         switch (Slot) {
             case 0:
                 K_Key = CM.Skill0;
@@ -51,13 +38,32 @@ public class ActiveSkillButtonController : MonoBehaviour {
                 J_Key = CM.J_LTRT;
                 break;
         }
+    }
+
+    void Awake() {
+    }
+	// Use this for initialization
+	void Start () {
+        Slot = int.Parse(gameObject.name);
+        IconImage = GetComponent<Image>();
+        CD_Mask = transform.Find("CD_Mask").GetComponent<Image>();
+        Red_Mask_OJ = transform.Find("Red_Mask").gameObject;
+        BG = transform.parent;
+        GetComponent<Button>().onClick.AddListener(ActiveSkill);
         PC = GameObject.Find("MainPlayer/PlayerController").transform.GetComponent<PlayerController>();
+        CM = PC.GetCM();
+        MapKey();
         Skill = PC.GetActiveSlotSkillTransform(Slot);
         LoadSkillIcon();
     }
 	
 	// Update is called once per frame
 	void Update () {
+        if (!CM.AllowControlUpdate) {
+            GetComponent<Button>().interactable = false;
+            return;
+        }
+        GetComponent<Button>().interactable = true;
         var pointer = new PointerEventData(EventSystem.current);
         if (J_Key == CM.J_LTRT && K_Key == CM.Skill2) {//2
             if (Input.GetKeyDown(K_Key) || Input.GetAxisRaw(J_Key) > 0)

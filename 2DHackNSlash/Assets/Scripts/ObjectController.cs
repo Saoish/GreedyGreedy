@@ -89,6 +89,10 @@ public abstract class ObjectController : MonoBehaviour {
     public void AddForce(Vector2 Direction, float Magnitude, ForceMode2D ForceMode) {
         rb.AddForce(Direction * Magnitude, ForceMode);
     }
+    
+    public float GetVFXScale() {
+        return VFX_Transform.GetComponent<VFXScaler>().scale;
+    }
 
     //Particle VFX
     public void ActiveVFXParticalWithStayTime(string VFX, float StayTime) {
@@ -106,9 +110,11 @@ public abstract class ObjectController : MonoBehaviour {
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
         VFX_OJ.name = VFX;
     }
+
     public void DeactiveVFXParticle(string VFX) {
         Destroy(VFX_Transform.Find(VFX).gameObject);
     }
+
     public void ActiveOneShotVFXParticle(string VFX) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;

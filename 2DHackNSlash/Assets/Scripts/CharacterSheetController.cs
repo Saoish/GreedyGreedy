@@ -2,66 +2,32 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class CharacterSheetController : MonoBehaviour
-{
-    public string Percision = "F1";
+public class CharacterSheetController : MonoBehaviour{
+    Tab_0 Tab_0;
+    Tab_1 Tab_1;
 
-    private PlayerController PC = null;
+    public PlayerController PC;
 
-	public KeyCode ToggleOnOff = KeyCode.C;
-	public KeyCode ToggleOff = KeyCode.Escape;
+    ControllerManager CM;
 
-	public Light MouseLight = null;
+    int CachedTabIndex = 0;
 
-	public GameObject ResourceLabel;
-	public GameObject ResourcePerHitLabel;
-
-	public GameObject HealthValue;
-	public GameObject ResourceValue;
-	public GameObject ADValue;
-	public GameObject MDValue;
-	public GameObject AttckSpdValue;
-	public GameObject MoveSpdValue;
-	public GameObject DefenseValue;
-	public GameObject CritChanceValue;
-	public GameObject CritBonusValue;
-	public GameObject LifePerHitValue;
-	public GameObject ResourcePerHitValue;
-
-    GameObject ES;
+    int CurrentTabIndex = 0;
 
     void Awake() {
-        ES = GameObject.Find("EventSystem");
-        PC = GameObject.Find("MainPlayer/PlayerController").transform.GetComponent<PlayerController>();
+        PC = transform.parent.GetComponent<PlayerUIController>().PC;
+        CM = PC.GetCM();
+        Tab_0 = transform.Find("Tab_0").GetComponent<Tab_0>();
+        Tab_1 = transform.Find("Tab_1").GetComponent<Tab_1>();
     }
 
-	void Start ()
-	{
-		UpdateCharacterSheetUI ();
+	void Start (){
+        TurnOff();
+    }
 
-		if (PC.GetClass() == "Warrior") {
-			ResourceLabel.GetComponent<UnityEngine.UI.Text> ().text = "Rage";
-			ResourcePerHitLabel.GetComponent<UnityEngine.UI.Text> ().text = "Rage Per Hit";
-		}
-		else
-		{
-			ResourceLabel.GetComponent<UnityEngine.UI.Text> ().text = "Unknown";
-			ResourcePerHitLabel.GetComponent<UnityEngine.UI.Text> ().text = "Unknown Per Hit";
-		}
-			
-	}
-	
-
-	void Update ()
-	{
-        if (IsOn()) {
-            UpdateCharacterSheetUI();
-            Vector3 Mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Mouse = new Vector3(Mouse.x, Mouse.y, MouseLight.transform.position.z);
-            MouseLight.transform.position = Mouse;
-        }
-	}
-
+    void Update() {
+        TabUpdate();
+    }
     public void Toggle() {
         if (IsOn()) {
             TurnOff();
@@ -73,12 +39,28 @@ public class CharacterSheetController : MonoBehaviour
 
     public void TurnOn() {
         gameObject.SetActive(true);
-        ES.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(null);
-        GameObject FBO = GameObject.Find("MainPlayer/PlayerUI/CharacterSheet/InventoryButtons/0").gameObject;
-        ES.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(FBO);
+        CurrentTabIndex = CachedTabIndex;
+        switch (CachedTabIndex) {
+            case 0:
+                Tab_0.TurnOn();
+                break;
+            case 1:
+                Tab_1.TurnOn();
+                break;
+        }
     }
 
     public void TurnOff() {
+        CachedTabIndex = CurrentTabIndex;
+        switch (CurrentTabIndex) {
+            case 0:
+                Tab_0.TurnOff();
+                break;
+            case 1:
+                Tab_1.TurnOff();
+                break;
+        }
+        
         gameObject.SetActive(false);
     }
 
@@ -86,35 +68,47 @@ public class CharacterSheetController : MonoBehaviour
         return gameObject.active;
     }
 
-    void UpdateCharacterSheetUI()
-	{
-        transform.Find("StatsPanel/Stats").GetComponent<Text>().text = "Lvl "+PC.Getlvl() + " : "+PC.GetExp() + "/" + PC.GetNextLvlExp();//Just for now
-
-		//Stats update
-		HealthValue.GetComponent<UnityEngine.UI.Text> ().text = 		PC.CurrHealth.ToString(Percision);
-        ResourceValue.GetComponent<UnityEngine.UI.Text> ().text = 		PC.CurrMana.ToString(Percision);
-        ADValue.GetComponent<UnityEngine.UI.Text> ().text = 			PC.CurrAD.ToString(Percision);
-        MDValue.GetComponent<UnityEngine.UI.Text> ().text = 			PC.CurrMD.ToString(Percision);
-        AttckSpdValue.GetComponent<UnityEngine.UI.Text> ().text = 		PC.CurrAttkSpd.ToString(Percision);
-        MoveSpdValue.GetComponent<UnityEngine.UI.Text> ().text = 		PC.CurrMoveSpd.ToString(Percision);
-        DefenseValue.GetComponent<UnityEngine.UI.Text> ().text = 		PC.CurrDefense.ToString(Percision);
-        CritChanceValue.GetComponent<UnityEngine.UI.Text> ().text =		PC.CurrCritChance.ToString(Percision);
-        CritBonusValue.GetComponent<UnityEngine.UI.Text> ().text = 		PC.CurrCritDmgBounus.ToString(Percision);
-        LifePerHitValue.GetComponent<UnityEngine.UI.Text> ().text = 	PC.CurrLPH.ToString(Percision);
-        ResourcePerHitValue.GetComponent<UnityEngine.UI.Text> ().text = PC.CurrMPH.ToString(Percision);
-
-        //Gear Update
-
-
-
-        //Invetory Update
-
-
-
-        //Talents Update
-
-
-
-
+    private void TabUpdate() {
+        if (Input.GetKeyDown(CM.Tab)) {
+            switch (CurrentTabIndex) {
+                case 0:
+                    Tab_0.TurnOff();
+                    Tab_1.TurnOn();
+                    CurrentTabIndex = 1;
+                    break;
+                case 1:
+                    Tab_1.TurnOff();
+                    Tab_0.TurnOn();
+                    CurrentTabIndex = 0;
+                    break;
+            }
+        }
+        else if (Input.GetKeyDown(CM.J_LB)) {
+            switch (CurrentTabIndex) {
+                case 0:
+                    Tab_0.TurnOff();
+                    Tab_1.TurnOn();
+                    CurrentTabIndex = 1;
+                    break;
+                case 1:
+                    Tab_1.TurnOff();
+                    Tab_0.TurnOn();
+                    CurrentTabIndex = 0;
+                    break;
+            }
+        } else if (Input.GetKeyDown(CM.J_RB)) {
+            switch (CurrentTabIndex) {
+                case 0:
+                    Tab_0.TurnOff();
+                    Tab_1.TurnOn();
+                    CurrentTabIndex = 1;
+                    break;
+                case 1:
+                    Tab_1.TurnOff();
+                    Tab_0.TurnOn();
+                    CurrentTabIndex = 0;
+                    break;
+            }
+        }
     }
 }

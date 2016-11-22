@@ -76,7 +76,6 @@ public class WarStomp : ActiveSkill {
                     return;
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider))
                 return;
-            Debug.Log(collider);
             ObjectController target = collider.GetComponent<ObjectController>();
             OC.ON_DMG_DEAL += StunAndDealStompDmg;
             OC.ON_DMG_DEAL(target);
