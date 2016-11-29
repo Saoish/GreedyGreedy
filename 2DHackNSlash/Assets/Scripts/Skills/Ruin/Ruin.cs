@@ -13,8 +13,8 @@ public class Ruin : PassiveSkill {
         base.Awake();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         Ruinlvl RL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -37,6 +37,7 @@ public class Ruin : PassiveSkill {
         }
         TriggerChance = RL.TriggerChance;
         MOVESPD_DEC_Percentage = RL.MOVESPD_DEC_Percentage;
+        Description = "Upon dealing damage, you have " + TriggerChance + "% chance to slow down enemy movement speed by " + MOVESPD_DEC_Percentage + "% for 5 secs.";
     }
 
     protected override void Start() {

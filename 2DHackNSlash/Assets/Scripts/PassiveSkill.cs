@@ -9,8 +9,11 @@ public abstract class PassiveSkill : Skill {
         base.Awake();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC,lvl);
+        gameObject.name = SD.Name;
+        transform.position = OC.T_Passives.position;
+        transform.SetParent(OC.T_Passives);
     }
 
     protected override void Start() {

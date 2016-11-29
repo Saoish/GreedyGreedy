@@ -24,7 +24,7 @@ public class BloodForBloodBuff : Buff {
         ModAmount = target.GetMaxLPH() * (MD.ModAD / 100);
         target.SetCurrLPH(target.GetCurrLPH () + ModAmount);
         Duration = MD.Duration;
-        target.ActiveVFXParticle("BloodForBloodBuffVFX");
+        target.ActiveVFXParticle("BloodForBloodBuffVFX",Layer.Skill);
     }
 
     protected override void RemoveBuff() {

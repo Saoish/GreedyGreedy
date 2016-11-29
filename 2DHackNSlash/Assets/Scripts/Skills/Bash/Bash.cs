@@ -11,8 +11,8 @@ public class Bash : PassiveSkill {
         base.Awake();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         Bashlvl BL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -34,6 +34,8 @@ public class Bash : PassiveSkill {
                 break;
         }
         TriggerChance = BL.TriggerChance;
+
+        Description = "Upon dealing damage, you have "+TriggerChance+"% chance to stun your targets for "+StunDuration+" secs.";
     }
 
     protected override void Start() {

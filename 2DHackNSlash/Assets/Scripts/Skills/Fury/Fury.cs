@@ -21,8 +21,8 @@ public class Fury : ActiveSkill {
         base.Update();
 	}
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         Furylvl FL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -47,6 +47,9 @@ public class Fury : ActiveSkill {
         ManaCost = FL.ManaCost;
         Duration = FL.Duration;
         AttkSpd_INC_Percentage = FL.AttkSpd_INC_Percentage;
+
+
+        Description = "Boost your attack speed by "+AttkSpd_INC_Percentage+"% for "+Duration+" secs.\n\nCost: "+ManaCost+" Mana\nCD: "+CD+" secs";
     }
 
     public override void Active() {

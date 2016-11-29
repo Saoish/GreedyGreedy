@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class MeleeEnemyAttackState : StateMachineBehaviour {
-
+    public AudioClip melee_attack_sfx;
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         MeleeAttackEnter(animator, stateInfo, layerIndex);
@@ -11,14 +11,14 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (stateInfo.normalizedTime >= 0.5) {
+        if (stateInfo.normalizedTime >= 0.3) {
             MeleeAttacExit(animator, stateInfo, layerIndex);
         }
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        EnemyController EC = animator.gameObject.GetComponent<EnemyController>();
+        EnemyController EC = animator.transform.parent.GetComponent<EnemyController>();
         EC.Attacking = false;
     }
 
@@ -33,8 +33,8 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
     //}
 
     void MeleeAttackEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        EnemyController EC = animator.transform.GetComponent<EnemyController>();
-        Transform T_AttackCollider = animator.transform.Find("MeleeAttackCollider");
+        EnemyController EC = animator.transform.parent.GetComponent<EnemyController>();
+        Transform T_AttackCollider = EC.GetMeleeAttackColliderTransform();
         EC.Attacking = true;
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         float AttackRange = T_AttackCollider.GetComponent<MeleeAttackCollider>().AttackRange;
@@ -54,12 +54,12 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
             AttackCollider.offset = new Vector2(0, -AttackRange);
         }
         AttackCollider.enabled = true;
-        AudioSource.PlayClipAtPoint(EC.attack, animator.transform.position, GameManager.SFX_Volume);
+        AudioSource.PlayClipAtPoint(melee_attack_sfx, animator.transform.position, GameManager.SFX_Volume);
     }
 
     void MeleeAttacExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        EnemyController EC = animator.gameObject.GetComponent<EnemyController>();
-        Transform T_AttackCollider = animator.transform.Find("MeleeAttackCollider");
+        EnemyController EC = animator.transform.parent.GetComponent<EnemyController>();
+        Transform T_AttackCollider = EC.GetMeleeAttackColliderTransform();
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         AttackCollider.enabled = false;
         Stack<Collider2D> HittedStack = T_AttackCollider.GetComponent<MeleeAttackCollider>().HittedStack;

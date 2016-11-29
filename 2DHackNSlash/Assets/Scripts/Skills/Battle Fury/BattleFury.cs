@@ -20,10 +20,11 @@ public class BattleFury : PassiveSkill {
 
     protected override void Awake() {
         base.Awake();
+        GetComponent<SpriteRenderer>().sortingOrder = Layer.Skill;
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         BattleFurylvl BFL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -47,8 +48,9 @@ public class BattleFury : PassiveSkill {
         TriggerChance = BFL.TriggerChance;
         Sping_ADScale = BFL.Sping_ADScale;
         Dot_ADSCale_Percentage = BFL.Dot_ADScale_Percentage;
-        
         Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());//Ignore self here
+
+        Description = "Upon dealing damage, you have "+ TriggerChance+"% chance to summon a weapon dealing "+ Sping_ADScale+"% AD dmg to enemies around you and apply bleeding on them for "+BleedDuration+" secs to bleed "+Dot_ADSCale_Percentage+"% AD dmg per sec with max stack of "+MaxStack+".";
     }
 
     protected override void Start() {
@@ -67,9 +69,9 @@ public class BattleFury : PassiveSkill {
         if (collider.gameObject.layer != LayerMask.NameToLayer("KillingGround"))
             return;
 
-        else if (OC.GetType() == typeof(PlayerController)) {
+        if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {//Player Attack
             if (collider.tag == "Player") {
-                if (collider.transform.parent.name == "FriendlyPlayer")
+                if (collider.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
                     return;
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
                 return;
@@ -108,12 +110,8 @@ public class BattleFury : PassiveSkill {
         OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
         OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
-        OC.ON_MANA_UPDATE += OC.HealMana;
-        OC.ON_MANA_UPDATE(Value.CreateValue(OC.GetCurrMPH(), 1));
-        OC.ON_MANA_UPDATE -= OC.HealMana;
-
         if (dmg.IsCrit) {
-            target.ActiveOneShotVFXParticle("WeaponCritSlashVFX");
+            target.ActiveOneShotVFXParticle("WeaponCritSlashVFX", Layer.Skill);
         }
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;

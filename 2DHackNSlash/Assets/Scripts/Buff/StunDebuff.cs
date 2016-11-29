@@ -12,7 +12,7 @@ public class StunDebuff : Debuff {
         base.ApplyDebuff(MD, target);
         target.Stunned = true;
         Duration = MD.Duration;
-        target.ActiveVFXParticle("StunDebuffVFX");
+        target.ActiveVFXParticle("StunDebuffVFX", Layer.Skill);
         AudioSource.PlayClipAtPoint(StunSFX, transform.position, GameManager.SFX_Volume);
     }
 

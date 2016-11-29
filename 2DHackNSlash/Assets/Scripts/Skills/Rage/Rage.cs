@@ -19,8 +19,8 @@ public class Rage : PassiveSkill {
         base.Start();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         Ragelvl RL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -42,6 +42,7 @@ public class Rage : PassiveSkill {
                 break;
         }
         AD_INC_Percentage = RL.AD_INC_Percentage;
+        Description = "Increase your AD by " + AD_INC_Percentage + "% for " + Duration + " secs when your health fall below " + HealthTriggerThreshold + "%. Effect can not be triggered again within "+TriggerCD+" secs.";
     }
 
 
@@ -57,7 +58,7 @@ public class Rage : PassiveSkill {
         OC.ON_HEALTH_UPDATE += RagePassive;
     }
 
-    private void RagePassive(Value health_mod, ObjectController healer = null) {
+    private void RagePassive(Value health_mod) {
         if ((OC.GetCurrHealth() - health_mod.Amount) / OC.GetMaxHealth() <= HealthTriggerThreshold / 100) {
             if (RealTime_TriggerCD == 0 && !OC.HasBuff(typeof(RageBuff))) {
                 ModData RageBuffMod = ScriptableObject.CreateInstance<ModData>();

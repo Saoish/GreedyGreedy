@@ -3,21 +3,24 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class EquippedButtonController : MonoBehaviour {
-    PlayerController PC;
+    MainPlayer MPC;
     GameObject EquipmentIcon;
     private string Slot;
-
-    GameObject ES;
 
     public GameObject Stats;
 
     Equipment E = null;
 
+    public AudioClip selected;
+
+    public void OnSelect() {
+        AudioSource.PlayClipAtPoint(selected, transform.position, GameManager.SFX_Volume);
+    }
+
     // Use this for initialization
     void Awake() {
         Slot = gameObject.name;
-        PC = GameObject.Find("MainPlayer/PlayerController").transform.GetComponent<PlayerController>();
-        ES = GameObject.Find("EventSystem");
+        MPC = transform.parent.parent.GetComponent<Tab_0>().MPC;
         Stats = Instantiate(Stats, transform) as GameObject;
         Stats.transform.localPosition = new Vector3(0, 0, 0);
         Stats.transform.localScale = new Vector3(1.2f, 1.2f, 0);
@@ -33,22 +36,22 @@ public class EquippedButtonController : MonoBehaviour {
     }
 
     public void OnClickUnEquip() {
-        if (PC.GetEquippedItem(Slot) != null) {
-            if (PC.InventoryIsFull()) {//Inventory Full
+        if (MPC.GetEquippedItem(Slot) != null) {
+            if (MPC.InventoryIsFull()) {//Inventory Full
                 Debug.Log("Your inventory is full!");
                 return;
             } else {
-                int SlotIndex = PC.FirstAvailbleInventorySlot();
-                PC.AddToInventory(SlotIndex, E);
-                PC.UnEquip(Slot);
+                int SlotIndex = MPC.FirstAvailbleInventorySlot();
+                MPC.AddToInventory(SlotIndex, E);
+                MPC.UnEquip(Slot);
             }
         }
     }
     public void UpdateSlot() {
-        if (PC.GetEquippedItem(Slot) == E) {
+        if (MPC.GetEquippedItem(Slot) == E) {
             return;
         } else {
-            E = PC.GetEquippedItem(Slot);
+            E = MPC.GetEquippedItem(Slot);
             if (E != null) {
                 if (EquipmentIcon != null)
                     DestroyObject(EquipmentIcon);
@@ -63,7 +66,7 @@ public class EquippedButtonController : MonoBehaviour {
 
 
     void UpdateStats() {
-        if (E != null && ES.GetComponent<UnityEngine.EventSystems.EventSystem>().currentSelectedGameObject == gameObject) {
+        if (E != null && UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject == gameObject) {
             Stats.gameObject.SetActive(true);
 
             Vector2 Interval = new Vector2(0, -50f);
@@ -231,7 +234,7 @@ public class EquippedButtonController : MonoBehaviour {
                 Transform AddLPH = Stats.transform.Find("AddLPH");
                 AddLPH.gameObject.SetActive(false);
             }
-            if (E.AddMPH > 0) {
+            if (E.AddManaRegen > 0) {
                 Transform AddMPH = Stats.transform.Find("AddMPH");
                 Text AddMPHText = AddMPH.GetComponent<Text>();
                 AddMPHText.color = MyColor.White;

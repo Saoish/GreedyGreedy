@@ -2,14 +2,14 @@
 using System.Collections;
 
 public class BrutalWeaponMastery : PassiveSkill{
-    float AD_INC_Percentage;
+    float MANACOST_DEC_Percentage;
 
     protected override void Awake(){
         base.Awake();
     }
 
-    public override void InitSkill(int lvl){
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         BrutalWeaponMasterylvl BL = null;
         switch (this.SD.lvl){
             case 0:
@@ -30,7 +30,8 @@ public class BrutalWeaponMastery : PassiveSkill{
                 BL = GetComponent<BrutalWeaponMastery5>();
                 break;
         }
-        AD_INC_Percentage = BL.AD_INC_Percentage;
+        MANACOST_DEC_Percentage = BL.MANACOST_DEC_Percentage;
+        Description = "Reduce mana cost on your auto attack by "+ MANACOST_DEC_Percentage+"% if you have Two-Handed Warrior weapon equipped.";
     }
 
     protected override void Start(){
@@ -42,12 +43,12 @@ public class BrutalWeaponMastery : PassiveSkill{
     }
 
     public override void ApplyPassive() {//Error will be raised if try to apply on Monsters
-        WeaponController WC = ((PlayerController)OC).GetEquippedWeaponController();
+        WeaponController WC = ((PlayerController)OC).GetWC();
         if (!WC) {
             return;
         }
         if (WC.Type == 0 || WC.Type == 1) {
-            OC.SetMaxAD(OC.GetMaxAD() + OC.GetMaxAD() * (AD_INC_Percentage / 100));
+            WC.ManaCost -= WC.ManaCost*(MANACOST_DEC_Percentage/100);
         } 
     }
 }

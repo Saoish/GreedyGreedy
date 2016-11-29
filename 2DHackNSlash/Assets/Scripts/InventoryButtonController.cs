@@ -3,21 +3,24 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class InventoryButtonController : MonoBehaviour {
-    PlayerController PC;
+    MainPlayer MPC;
     GameObject EquipmentIcon;
     private int Slot = -999;
-
-    GameObject ES;
 
     Text StatsText;
     public GameObject Stats;
 
     Equipment E = null;
 
+    public AudioClip selected;
+
+    public void OnSelect() {
+        AudioSource.PlayClipAtPoint(selected, transform.position, GameManager.SFX_Volume);
+    }
+
     void Awake() {
         Slot = int.Parse(gameObject.name);
-        PC = GameObject.Find("MainPlayer/PlayerController").transform.GetComponent<PlayerController>();
-        ES = GameObject.Find("EventSystem");
+        MPC = transform.parent.parent.GetComponent<Tab_0>().MPC;
         Stats = Instantiate(Stats,transform) as GameObject;
         Stats.transform.localPosition = new Vector3(0, 0, 0);
         Stats.transform.localScale = new Vector3(1.2f, 1.2f,0);
@@ -34,17 +37,17 @@ public class InventoryButtonController : MonoBehaviour {
     }
 
     public void OnClickEquip() {
-        if (PC.GetInventoryItem(Slot)!=null) {
-            if (PC.Compatible(E)) {
-                if (PC.GetEquippedItem(E.Type)!=null) {//Has Equipped Item
-                    Equipment TakeOff = PC.GetEquippedItem(E.Type);
-                    PC.UnEquip(TakeOff.Type);
-                    PC.RemoveFromInventory(Slot, E);
-                    PC.Equip(E);
-                    PC.AddToInventory(Slot, TakeOff);                   
+        if (MPC.GetInventoryItem(Slot)!=null) {
+            if (MPC.Compatible(E)) {
+                if (MPC.GetEquippedItem(E.Type)!=null) {//Has Equipped Item
+                    Equipment TakeOff = MPC.GetEquippedItem(E.Type);
+                    MPC.UnEquip(TakeOff.Type);
+                    MPC.RemoveFromInventory(Slot, E);
+                    MPC.Equip(E);
+                    MPC.AddToInventory(Slot, TakeOff);                   
                 } else {
-                    PC.Equip(E);
-                    PC.RemoveFromInventory(Slot, E);
+                    MPC.Equip(E);
+                    MPC.RemoveFromInventory(Slot, E);
                 }
             } else {
                 Debug.Log("You can't equip this item.");
@@ -54,10 +57,10 @@ public class InventoryButtonController : MonoBehaviour {
 
     public void UpdateSlot() {
         //Debug.Log(E.Name);
-        if (PC.GetInventoryItem(Slot) == E) {
+        if (MPC.GetInventoryItem(Slot) == E) {
             return;
         } else {
-            E = PC.GetInventoryItem(Slot);
+            E = MPC.GetInventoryItem(Slot);
             if (E != null) {
                 if (EquipmentIcon != null)
                     DestroyObject(EquipmentIcon);
@@ -70,7 +73,7 @@ public class InventoryButtonController : MonoBehaviour {
     }
 
     void UpdateStats() {
-        if (E!=null  && ES.GetComponent<UnityEngine.EventSystems.EventSystem>().currentSelectedGameObject == gameObject) {
+        if (E!=null  && UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject == gameObject) {
             Stats.gameObject.SetActive(true);
 
             Vector2 Interval = new Vector2(0,-50f);
@@ -97,7 +100,7 @@ public class InventoryButtonController : MonoBehaviour {
 
             Transform Class = Stats.transform.Find("Class");
             Text ClassText = Class.GetComponent<Text>();
-            if (E.Class == PC.GetClass() || E.Class == "All")
+            if (E.Class == MPC.GetClass() || E.Class == "All")
                 ClassText.color = MyColor.Green;
             else
                 ClassText.color = MyColor.Red;
@@ -115,7 +118,7 @@ public class InventoryButtonController : MonoBehaviour {
 
             Transform LvlReq = Stats.transform.Find("LvlReq");
             Text LvlReqText = LvlReq.GetComponent<Text>();
-            if (E.LvlReq > PC.Getlvl())
+            if (E.LvlReq > MPC.Getlvl())
                 LvlReqText.color = MyColor.Red;
             else
                 LvlReqText.color = MyColor.Green;
@@ -124,7 +127,7 @@ public class InventoryButtonController : MonoBehaviour {
             LastUpdatePosition = LvlReq.localPosition;
             LvlReq.gameObject.SetActive(true);
 
-            Equipment _E = PC.GetEquippedItem(E.Type);
+            Equipment _E = MPC.GetEquippedItem(E.Type);
             if (_E != null) {
                 if (E.AddHealth > 0 || _E.AddHealth>0) {
                     Transform AddHealth = Stats.transform.Find("AddHealth");
@@ -305,16 +308,16 @@ public class InventoryButtonController : MonoBehaviour {
                     Transform AddLPH = Stats.transform.Find("AddLPH");
                     AddLPH.gameObject.SetActive(false);
                 }
-                if (E.AddMPH > 0 || _E.AddMPH>0) {
+                if (E.AddManaRegen > 0 || _E.AddManaRegen>0) {
                     Transform AddMPH = Stats.transform.Find("AddMPH");
                     Text AddMPHText = AddMPH.GetComponent<Text>();
-                    if (E.AddMPH > _E.AddMPH)
+                    if (E.AddManaRegen > _E.AddManaRegen)
                         AddMPHText.color = MyColor.Green;
-                    else if (E.AddMPH < _E.AddMPH)
+                    else if (E.AddManaRegen < _E.AddManaRegen)
                         AddMPHText.color = MyColor.Red;
                     else
                         AddMPHText.color = MyColor.White;
-                    AddMPHText.text = "Mana/Hit: +" + E.AddMPH + " <" + (E.AddMPH - _E.AddMPH) + ">";
+                    AddMPHText.text = "Mana/Hit: +" + E.AddManaRegen + " <" + (E.AddManaRegen - _E.AddManaRegen) + ">";
                     AddMPH.localPosition = LastUpdatePosition + Interval;
                     LastUpdatePosition = AddMPH.localPosition;
                     AddMPH.gameObject.SetActive(true);
@@ -443,7 +446,7 @@ public class InventoryButtonController : MonoBehaviour {
                     Transform AddLPH = Stats.transform.Find("AddLPH");
                     AddLPH.gameObject.SetActive(false);
                 }
-                if (E.AddMPH > 0) {
+                if (E.AddManaRegen > 0) {
                     Transform AddMPH = Stats.transform.Find("AddMPH");
                     Text AddMPHText = AddMPH.GetComponent<Text>();
                     AddMPHText.color = MyColor.Green;

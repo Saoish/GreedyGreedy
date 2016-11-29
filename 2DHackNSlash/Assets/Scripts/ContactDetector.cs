@@ -4,7 +4,6 @@ using System.Collections;
 public class ContactDetector : MonoBehaviour {
     void Awake() {
         gameObject.layer = LayerMask.NameToLayer("ContactDetector");
-        //Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("ContactDetector"), LayerMask.NameToLayer("LootBox"));
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("ContactDetector"), LayerMask.NameToLayer("Loot"));
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("ContactDetector"), LayerMask.NameToLayer("Skill"));
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("ContactDetector"), LayerMask.NameToLayer("Melee"));

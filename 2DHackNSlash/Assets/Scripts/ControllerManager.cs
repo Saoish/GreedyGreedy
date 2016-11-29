@@ -4,63 +4,63 @@ using UnityEngine.UI;
 
 public class ControllerManager : MonoBehaviour {
     //Keyboard
-    public KeyCode Menu = KeyCode.Escape;
-    public KeyCode CharacterSheet = KeyCode.C;
+    public static KeyCode ESC = KeyCode.Escape;
+    public static KeyCode CharacterSheet = KeyCode.C;
 
-    public KeyCode MoveUp = KeyCode.W;
-    public KeyCode MoveLeft = KeyCode.A;
-    public KeyCode MoveDown = KeyCode.S;
-    public KeyCode MoveRight = KeyCode.D;
+    public static KeyCode MoveUp = KeyCode.W;
+    public static KeyCode MoveLeft = KeyCode.A;
+    public static KeyCode MoveDown = KeyCode.S;
+    public static KeyCode MoveRight = KeyCode.D;
 
-    public KeyCode AttackUp = KeyCode.UpArrow;
-    public KeyCode AttackLeft = KeyCode.LeftArrow;
-    public KeyCode AttackDown = KeyCode.DownArrow;
-    public KeyCode AttackRight = KeyCode.RightArrow;
+    public static KeyCode AttackUp = KeyCode.UpArrow;
+    public static KeyCode AttackLeft = KeyCode.LeftArrow;
+    public static KeyCode AttackDown = KeyCode.DownArrow;
+    public static KeyCode AttackRight = KeyCode.RightArrow;
 
-    public KeyCode Interact = KeyCode.F;
-
-    public KeyCode Tab = KeyCode.Tab;
+    public static KeyCode Interact = KeyCode.F;
+    public static KeyCode Flip = KeyCode.Tab;
+    public static KeyCode ToggleShow = KeyCode.LeftShift;
 
     //Active Skills
-    public KeyCode Skill0 = KeyCode.Alpha1;
-    public KeyCode Skill1 = KeyCode.Alpha2;
-    public KeyCode Skill2 = KeyCode.Alpha3;
-    public KeyCode Skill3 = KeyCode.Alpha4;
+    public static KeyCode Skill0 = KeyCode.Alpha1;
+    public static KeyCode Skill1 = KeyCode.Alpha2;
+    public static KeyCode Skill2 = KeyCode.Alpha3;
+    public static KeyCode Skill3 = KeyCode.Alpha4;
 
     //Xbox one Controller 
-    public string J_Start = "joystick button 7";
-    public string J_Back = "joystick button 6";
+    public static string J_Start = "joystick button 7";
+    public static string J_Back = "joystick button 6";
 
-    public string J_LeftAnalogHor = "J_HorizontalMove";//Axis
-    public string J_LeftAnalogVer = "J_VerticalMove";//Axis
-    public string J_RightAnalogHor = "J_HorizontalAttack";//Axis
-    public string J_RightAnalogVer = "J_VerticalAttack";//Axis
-    public string J_LeftTrigger = "joystick button 8";
-    public string J_RightTrigger = "joystick button 9";
+    public static string J_LeftAnalogHor = "J_HorizontalMove";//Axis
+    public static string J_LeftAnalogVer = "J_VerticalMove";//Axis
+    public static string J_RightAnalogHor = "J_HorizontalAttack";//Axis
+    public static string J_RightAnalogVer = "J_VerticalAttack";//Axis
+    public static string J_LeftTrigger = "joystick button 8";
+    public static string J_RightTrigger = "joystick button 9";
 
-    public string J_LB = "joystick button 4";
-    public string J_RB = "joystick button 5";
-    public string J_LTRT = "J_LTRT"; //This one is actually an axis for fk sake
+    public static string J_LB = "joystick button 4";
+    public static string J_RB = "joystick button 5";
+    public static string J_LTRT = "J_LTRT"; //This one is actually an axis for fk sake
 
-    public string J_X = "joystick button 2";
-    public string J_Y = "joystick button 3";
-    public string J_B = "joystick button 1";
-    public string J_A = "joystick button 0";
+    public static string J_X = "joystick button 2";
+    public static string J_Y = "joystick button 3";
+    public static string J_B = "joystick button 1";
+    public static string J_A = "joystick button 0";
 
-    public string J_DH = "J_DpadHor";//Axis
-    public string J_DV = "J_DpadVer";//Axis
+    public static string J_DH = "J_DpadHor";//Axis
+    public static string J_DV = "J_DpadVer";//Axis
 
 
-    //public string J_LB 
+    //public static string J_LB 
     [HideInInspector]
-    public Vector2 MoveVector;
+    public static Vector2 MoveVector;
     [HideInInspector]
-    public Vector2 AttackVector;
+    public static Vector2 AttackVector;
     [HideInInspector]
-    public int Direction; //0,1,2,3 -> Down,Left,Right,Up
+    public static int Direction; //0,1,2,3 -> Down,Left,Right,Up
 
     [HideInInspector]
-    public bool AllowControlUpdate = true;
+    public static bool AllowControlUpdate = true;
 
 
     public static ControllerManager instance;

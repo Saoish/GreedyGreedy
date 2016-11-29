@@ -21,7 +21,7 @@ public class Equipment :ScriptableObject{
     public float AddCritDmgBounus; //Percantage
 
     public float AddLPH;
-    public float AddMPH;
+    public float AddManaRegen;
 
     public int Reroll; //NumofTime been rerolled
     public int Reforged; //NumofTime been reforged

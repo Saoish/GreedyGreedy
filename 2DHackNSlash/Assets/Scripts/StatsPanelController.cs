@@ -17,27 +17,27 @@ public class StatsPanelController : MonoBehaviour {
     Text CritChanceValue;
     Text CritBonusValue;
     Text LifePerHitValue;
-    Text ManaPerHitValue;
+    Text ManaRegenValue;
 
-    PlayerController PC;
+    MainPlayer MPC;
 
     // Use this for initialization
     void Start () {
-        PC = GameObject.Find("MainPlayer/PlayerController").transform.GetComponent<PlayerController>();
+        MPC = transform.parent.GetComponent<Tab_0>().MPC;
 
         Stats = transform.Find("Stats").GetComponent<Text>();
 
-        HealthValue = transform.Find("Health Value").GetComponent<Text>();
-        ManaValue = transform.Find("Mana Value").GetComponent<Text>();
-        ADValue = transform.Find("Attack Dmg Value").GetComponent<Text>();
-        MDValue = transform.Find("Magic Dmg Value").GetComponent<Text>();
-        AttkSpdValue = transform.Find("Attack Speed Value").GetComponent<Text>();
-        MoveSpdValue = transform.Find("Move Speed Value").GetComponent<Text>();
-        DefenseValue = transform.Find("Defense Value").GetComponent<Text>();
-        CritBonusValue = transform.Find("Crit Chance Value").GetComponent<Text>();
-        CritChanceValue = transform.Find("Crit Bonus Value").GetComponent<Text>();
-        LifePerHitValue = transform.Find("Life Per Hit Value").GetComponent<Text>();
-        ManaPerHitValue = transform.Find("Mana Per Hit Value").GetComponent<Text>();
+        HealthValue = transform.Find("Values/Health Value").GetComponent<Text>();
+        ManaValue = transform.Find("Values/Mana Value").GetComponent<Text>();
+        ADValue = transform.Find("Values/Attack Dmg Value").GetComponent<Text>();
+        MDValue = transform.Find("Values/Magic Dmg Value").GetComponent<Text>();
+        AttkSpdValue = transform.Find("Values/Attack Speed Value").GetComponent<Text>();
+        MoveSpdValue = transform.Find("Values/Move Speed Value").GetComponent<Text>();
+        DefenseValue = transform.Find("Values/Defense Value").GetComponent<Text>();
+        CritChanceValue = transform.Find("Values/Crit Chance Value").GetComponent<Text>();
+        CritBonusValue = transform.Find("Values/Crit Bonus Value").GetComponent<Text>();
+        LifePerHitValue = transform.Find("Values/Life Per Hit Value").GetComponent<Text>();
+        ManaRegenValue = transform.Find("Values/Mana Regen Value").GetComponent<Text>();
 
     }
 	
@@ -47,20 +47,20 @@ public class StatsPanelController : MonoBehaviour {
 	}
 
     void UpdateStatsUI() {
-        Stats.text = "Lvl " + PC.Getlvl() + " : " + PC.GetExp() + "/" + PC.GetNextLvlExp();//Just for now
+        Stats.text = "Lvl " + MPC.Getlvl() + " : " + MPC.GetExp() + "/" + MPC.GetNextLvlExp();//Just for now
 
         //Stats update
-        HealthValue.text = PC.GetCurrHealth().ToString(Percision);
-        ManaValue.text = PC.GetCurrMana().ToString(Percision);
-        ADValue.text = PC.GetCurrAD().ToString(Percision);
-        MDValue.text = PC.GetCurrMD().ToString(Percision);
-        AttkSpdValue.text = PC.GetCurrAttkSpd().ToString(Percision);
-        MoveSpdValue.text = PC.GetCurrMoveSpd().ToString(Percision);
-        DefenseValue.text = PC.GetCurrDefense().ToString(Percision);
-        CritChanceValue.text = PC.GetCurrCritChance().ToString(Percision);
-        CritBonusValue.text = PC.GetCurrCritDmgBounus().ToString(Percision);
-        LifePerHitValue.text = PC.GetCurrLPH().ToString(Percision);
-        ManaPerHitValue.text = PC.GetCurrMPH().ToString(Percision);
+        HealthValue.text = MPC.GetCurrHealth().ToString(Percision);
+        ManaValue.text = MPC.GetCurrMana().ToString(Percision);
+        ADValue.text = MPC.GetCurrAD().ToString(Percision);
+        MDValue.text = MPC.GetCurrMD().ToString(Percision);
+        AttkSpdValue.text = MPC.GetCurrAttkSpd().ToString(Percision) + "%";
+        MoveSpdValue.text = MPC.GetCurrMoveSpd().ToString(Percision) + "%";
+        DefenseValue.text = MPC.GetCurrDefense().ToString(Percision) + "%";
+        CritChanceValue.text = MPC.GetCurrCritChance().ToString(Percision) + "%";
+        CritBonusValue.text = MPC.GetCurrCritDmgBounus().ToString(Percision) + "%";
+        LifePerHitValue.text = MPC.GetCurrLPH().ToString(Percision);
+        ManaRegenValue.text = MPC.GetCurrManaRegen().ToString(Percision)+"/s";
 
         //Gear Update
 

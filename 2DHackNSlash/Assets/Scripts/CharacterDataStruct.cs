@@ -26,7 +26,7 @@ public struct CharacterDataStruct{
     public float BaseCritChance;
     public float BaseCritDmgBounus;
     public float BaseLPH;
-    public float BaseMPH;
+    public float BaseManaRegen;
 
     public int[] SkillTreelvls;
 

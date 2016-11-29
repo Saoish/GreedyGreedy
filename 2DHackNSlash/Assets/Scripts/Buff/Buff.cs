@@ -28,6 +28,7 @@ public abstract class Buff : MonoBehaviour {
         this.target = target;
         this.MD = MD;
         gameObject.transform.SetParent(target.transform.Find("Buffs"));
+        gameObject.transform.localPosition = Vector3.zero;
     }
     abstract protected void RemoveBuff();
 

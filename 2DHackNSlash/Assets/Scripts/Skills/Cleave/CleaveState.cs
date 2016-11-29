@@ -30,7 +30,7 @@ public class CleaveState : StateMachineBehaviour {
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (stateInfo.normalizedTime >= 0.5) {
+        if (stateInfo.normalizedTime >= 0.3) {
             animator.transform.GetComponent<Collider2D>().enabled = false;
             Stack<Collider2D> HittedStack = animator.transform.GetComponent<Cleave>().HittedStack;
             if (HittedStack.Count != 0) {

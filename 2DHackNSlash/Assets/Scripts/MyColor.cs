@@ -2,7 +2,6 @@
 using System.Collections;
 
 public static class MyColor{
-
     static public Color White = Color.white;
     static public Color Cyan = Color.cyan;
     static public Color Yellow = Color.yellow;
@@ -10,4 +9,6 @@ public static class MyColor{
     static public Color Green = Color.green;
     static public Color Red = Color.red;
     static public Color Blue = Color.blue;
+    static public Color Grey = Color.grey;
+    static public Color Purple = new Color(1f, 0, 1f, 1f);
 }

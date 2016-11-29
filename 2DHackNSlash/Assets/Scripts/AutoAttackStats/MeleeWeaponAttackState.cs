@@ -6,23 +6,19 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
 
     //OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        WeaponController WC = animator.transform.GetComponent<WeaponController>();
-        if (WC.Type == 0 || WC.Type == 1) {//GreatSwaord or Axes, has 3 combo
-            MeleeAttackEnter(animator, stateInfo, WC);
-        }
+        MeleeAttackEnter(animator, stateInfo);
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        WeaponController WC = animator.transform.GetComponent<WeaponController>();
-        if ((WC.Type == 0 || WC.Type == 1) && stateInfo.normalizedTime >= 0.5) {
-            MeleeAttacExit(animator, stateInfo, WC);
+        if (stateInfo.normalizedTime >= 0.3) {
+            MeleeAttacExit(animator, stateInfo);
         }
     }
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        PlayerController PC = animator.transform.parent.GetComponent<PlayerController>();
+        PlayerController PC = animator.transform.parent.parent.GetComponent<PlayerController>();
         PC.Attacking = false;
     }
 
@@ -36,9 +32,13 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
 
     //}
 
-    void MeleeAttackEnter(Animator animator, AnimatorStateInfo stateInfo, WeaponController WC) {
-        PlayerController PC = animator.transform.parent.GetComponent<PlayerController>();
-        Transform T_AttackCollider = animator.transform.Find("MeleeAttackCollider");
+    void MeleeAttackEnter(Animator animator, AnimatorStateInfo stateInfo) {
+        PlayerController PC = animator.transform.parent.parent.GetComponent<PlayerController>();
+        WeaponController WC = PC.GetWC();
+        PC.ON_MANA_UPDATE += PC.DeductMana;
+        PC.ON_MANA_UPDATE(Value.CreateValue(WC.ManaCost));
+        PC.ON_MANA_UPDATE -= PC.DeductMana;
+        Transform T_AttackCollider = PC.GetMeleeAttackColliderTransform();
         PC.Attacking = true;
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         float AttackRange = T_AttackCollider.GetComponent<MeleeAttackCollider>().AttackRange;
@@ -126,8 +126,9 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
         AttackCollider.enabled = true;
     }
 
-    void MeleeAttacExit(Animator animator, AnimatorStateInfo stateInfo, WeaponController WC) {
-        Transform T_AttackCollider = animator.transform.Find("MeleeAttackCollider");
+    void MeleeAttacExit(Animator animator, AnimatorStateInfo stateInfo) {
+        PlayerController PC = animator.transform.parent.parent.GetComponent<PlayerController>();
+        Transform T_AttackCollider = PC.GetMeleeAttackColliderTransform();
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         AttackCollider.enabled = false;
         Stack<Collider2D> HittedStack = T_AttackCollider.GetComponent<MeleeAttackCollider>().HittedStack;

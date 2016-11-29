@@ -3,9 +3,9 @@ using System.Collections;
 
 public class Grit : PassiveSkill {
     float HP_INC_Percentage;
-    
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         Gritlvl GL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -27,6 +27,8 @@ public class Grit : PassiveSkill {
                 break;
         }
         HP_INC_Percentage = GL.HP_INC_Percentage;
+
+        Description = "Increase your max health by "+HP_INC_Percentage+"%.";
     }
 
     public override void ApplyPassive() {

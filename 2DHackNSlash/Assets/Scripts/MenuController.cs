@@ -8,12 +8,8 @@ public class MenuController : MonoBehaviour
 
 	public Light MouseLight = null;
 
-    GameObject ES;
-
 	void Awake ()
 	{
-        ES = GameObject.Find("EventSystem");
-        //gameObject.SetActive(false);
     }
 
 
@@ -38,9 +34,9 @@ public class MenuController : MonoBehaviour
 
     public void TurnOn() {
         gameObject.SetActive(true);
-        ES.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(null);
-        GameObject FBO = GameObject.Find("MainPlayer/PlayerUI/Menu/SaveButton").gameObject;
-        ES.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(FBO);
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+        GameObject FBO = transform.Find("SaveButton").gameObject;
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(FBO);
     }
 
     public void TurnOff() {

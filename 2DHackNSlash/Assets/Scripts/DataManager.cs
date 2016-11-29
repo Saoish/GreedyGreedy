@@ -41,7 +41,6 @@ public static class DataManager {
     public static void Load() {
         if (!File.Exists(FilePath)) {//First Time Login
             InitSave();
-            return;
         }
         StreamReader LoadStream = new StreamReader(FilePath);
         string SlotData = "";
@@ -103,7 +102,7 @@ public static class DataManager {
             CharacterData[SlotIndex].BaseCritChance + DataSeperator +
             CharacterData[SlotIndex].BaseCritDmgBounus + DataSeperator +
             CharacterData[SlotIndex].BaseLPH + DataSeperator +
-            CharacterData[SlotIndex].BaseMPH +
+            CharacterData[SlotIndex].BaseManaRegen +
             Environment.NewLine + CategorySeperator + Environment.NewLine);
     }
 
@@ -156,7 +155,7 @@ public static class DataManager {
                     CharacterData[SlotIndex].Equipments[e.Key].AddCritDmgBounus + DataSeperator +
 
                     CharacterData[SlotIndex].Equipments[e.Key].AddLPH + DataSeperator +
-                    CharacterData[SlotIndex].Equipments[e.Key].AddMPH + DataSeperator +
+                    CharacterData[SlotIndex].Equipments[e.Key].AddManaRegen + DataSeperator +
 
                     CharacterData[SlotIndex].Equipments[e.Key].Reroll + DataSeperator +
                     CharacterData[SlotIndex].Equipments[e.Key].Reforged);
@@ -191,7 +190,7 @@ public static class DataManager {
                     CharacterData[SlotIndex].Inventory[i].AddCritDmgBounus + DataSeperator +
 
                     CharacterData[SlotIndex].Inventory[i].AddLPH + DataSeperator +
-                    CharacterData[SlotIndex].Inventory[i].AddMPH + DataSeperator +
+                    CharacterData[SlotIndex].Inventory[i].AddManaRegen + DataSeperator +
 
                     CharacterData[SlotIndex].Inventory[i].Reroll + DataSeperator +
                     CharacterData[SlotIndex].Inventory[i].Reforged);
@@ -233,7 +232,7 @@ public static class DataManager {
         CharacterData[slotIndex].BaseCritChance = float.Parse(S_BaseData[i++]);
         CharacterData[slotIndex].BaseCritDmgBounus = float.Parse(S_BaseData[i++]);
         CharacterData[slotIndex].BaseLPH = float.Parse(S_BaseData[i++]);
-        CharacterData[slotIndex].BaseMPH = float.Parse(S_BaseData[i++]);
+        CharacterData[slotIndex].BaseManaRegen = float.Parse(S_BaseData[i++]);
     }
 
     private static void ReadSkillTreelvls(int SlotIndex, string SkillTreelvlsData) {
@@ -314,7 +313,7 @@ public static class DataManager {
         E.AddCritDmgBounus = float.Parse(S_PieceEquipData[i++]);
 
         E.AddLPH = float.Parse(S_PieceEquipData[i++]);
-        E.AddMPH = float.Parse(S_PieceEquipData[i++]);
+        E.AddManaRegen = float.Parse(S_PieceEquipData[i++]);
 
         E.Reroll = int.Parse(S_PieceEquipData[i++]);
         E.Reforged = int.Parse(S_PieceEquipData[i++]);
@@ -350,7 +349,7 @@ public static class DataManager {
             CharacterData[slotIndex].BaseCritChance + DataSeperator +
             CharacterData[slotIndex].BaseCritDmgBounus + DataSeperator +
             CharacterData[slotIndex].BaseLPH + DataSeperator +
-            CharacterData[slotIndex].BaseMPH);
+            CharacterData[slotIndex].BaseManaRegen);
 
             SaveStream.Write(Environment.NewLine + CategorySeperator + Environment.NewLine);
 

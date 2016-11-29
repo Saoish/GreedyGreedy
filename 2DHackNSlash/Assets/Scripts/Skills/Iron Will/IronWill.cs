@@ -5,8 +5,8 @@ using System;
 public class IronWill : PassiveSkill {
     float DEF_INC_Percentage;
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         IronWilllvl IWL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -28,6 +28,8 @@ public class IronWill : PassiveSkill {
                 break;
         }
         DEF_INC_Percentage = IWL.DEF_INC_Percentage;
+
+        Description = "Increase your max defense by " + DEF_INC_Percentage + "%.";
     }
 
     public override void ApplyPassive() {

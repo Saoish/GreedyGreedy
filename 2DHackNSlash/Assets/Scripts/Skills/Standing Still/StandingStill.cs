@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 
 public class StandingStill : ActiveSkill {
-    float Duration = 10;
+    public float Duration = 10;
     float Heal_MaxHP_Percentage;
     float DotHeal_MaxHP_Percentage;
 
@@ -17,8 +17,8 @@ public class StandingStill : ActiveSkill {
         base.Update();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         StandingStilllvl SSL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -43,6 +43,8 @@ public class StandingStill : ActiveSkill {
         ManaCost = SSL.ManaCost;
         Heal_MaxHP_Percentage = SSL.Heal_MaxHP_Percentage;
         DotHeal_MaxHP_Percentage = SSL.DotHeal_MaxHP_Percentage;
+
+        Description = "Instantly gain "+Heal_MaxHP_Percentage+"% of your MAX HP back and a healing buff to heal "+DotHeal_MaxHP_Percentage+"% of your MAX HP you every second for "+Duration+" secs.\n\nCost: "+ManaCost+" Mana\nCD: "+CD+" secs";
     }
 
     public override void Active() {

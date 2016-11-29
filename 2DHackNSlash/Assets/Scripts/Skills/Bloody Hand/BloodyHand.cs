@@ -18,6 +18,7 @@ public class BloodyHand : ActiveSkill {
     protected override void Awake() {
         base.Awake();
         Anim = GetComponent<Animator>();
+        GetComponent<SpriteRenderer>().sortingOrder = Layer.Skill;
     }
 
     protected override void Start() {
@@ -30,8 +31,8 @@ public class BloodyHand : ActiveSkill {
 
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         BloodyHandlvl BHL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -58,6 +59,8 @@ public class BloodyHand : ActiveSkill {
         RangeScale = BHL.RangeScale;
         transform.localScale = new Vector2(RangeScale, RangeScale);
         Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), OC.transform.GetComponent<Collider2D>());
+
+        Description = "Summon a size " +RangeScale+" bloody hand to deal " +ADScale+"% AD damage and grab enemies for you.\n\nCost: "+ManaCost+" Mana\nCD: "+CD+" secs";
     }
 
     public override void Active() {
@@ -72,9 +75,9 @@ public class BloodyHand : ActiveSkill {
     void OnTriggerEnter2D(Collider2D collider) {
         if (collider.gameObject.layer != LayerMask.NameToLayer("KillingGround"))
             return;
-        if (OC.GetType() == typeof(PlayerController)) {
-            if (collider.transform.tag == "Player") {
-                if (collider.transform.parent.name == "FriendlyPlayer")
+        if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {//Player Attack
+            if (collider.tag == "Player") {
+                if (collider.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
                     return;
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
                 return;
@@ -114,10 +117,6 @@ public class BloodyHand : ActiveSkill {
         OC.ON_HEALTH_UPDATE += OC.HealHP;
         OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
         OC.ON_HEALTH_UPDATE -= OC.HealHP;
-
-        OC.ON_MANA_UPDATE += OC.HealMana;
-        OC.ON_MANA_UPDATE(Value.CreateValue(OC.GetCurrMPH(), 1));
-        OC.ON_MANA_UPDATE -= OC.HealMana;
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;
         target.ON_HEALTH_UPDATE(dmg);

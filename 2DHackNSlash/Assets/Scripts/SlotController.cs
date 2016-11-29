@@ -30,7 +30,7 @@ public class SlotController : MonoBehaviour {
             SLM = SaveLoadManager.Instance;
         else
             SLM = FindObjectOfType<SaveLoadManager>();
-        PlayerData = SLM.LoadPlayerInfo(SlotIndex);
+        PlayerData = SaveLoadManager.LoadPlayerInfo(SlotIndex);
     }
             
     // Use this for initialization
@@ -45,7 +45,7 @@ public class SlotController : MonoBehaviour {
     }
 
     public void PlayButtonOnClick() {
-        SLM.SlotIndexToLoad = SlotIndex;
+        SaveLoadManager.SlotIndexToLoad = SlotIndex;
         Application.LoadLevel("Developing");
     }
 
@@ -94,7 +94,7 @@ public class SlotController : MonoBehaviour {
 
     void InstaniateEquipment() {
         if (PlayerData.Class == "Warrior") {
-            BaseModel = Instantiate(Resources.Load("Red Ghost/Ghost/Red Ghost"), transform) as GameObject;
+            BaseModel = Instantiate(Resources.Load("BaseModelPrefabs/Red Ghost"), transform) as GameObject;
             BaseModel.name = "Red Ghost";
             BaseModel.transform.position = transform.position + BaseModel.transform.position;
         } else if (PlayerData.Class == "Mage") {
@@ -104,7 +104,7 @@ public class SlotController : MonoBehaviour {
         }
         foreach (var e in PlayerData.Equipments) {
             if (e.Value != null) {
-                GameObject equipPrefab = EquipmentController.ObtainPrefab(e.Value, transform);
+                GameObject equipPrefab = EquipmentController.ObtainPrefabForCharacterSelection(e.Value, transform);
             }
         }
     }

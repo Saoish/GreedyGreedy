@@ -12,7 +12,7 @@ public class RetaliationDebuff : Debuff {
         target.ON_HEALTH_UPDATE += target.DeductHealth;
         target.ON_HEALTH_UPDATE(debuff_dmg);
         target.ON_HEALTH_UPDATE -= target.DeductHealth;
-        target.ActiveOneShotVFXParticle("RetaliationDebuffVFX");
+        target.ActiveOneShotVFXParticle("RetaliationDebuffVFX", Layer.Skill);
     }
 
     protected override void RemoveDebuff() {

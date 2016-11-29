@@ -14,8 +14,11 @@ public abstract class ActiveSkill : Skill {
         base.Awake();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
+        gameObject.name = SD.Name;
+        transform.position = OC.T_Actives.position;
+        transform.SetParent(OC.T_Actives);
     }
 
     protected override void Start () {
@@ -40,13 +43,13 @@ public abstract class ActiveSkill : Skill {
 
     public bool Ready() {
         if (OC.Stunned) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": You are Stunned");
+            RedNotification.Push(RedNotification.Type.STUNNED);
             return false;
         } else if (RealTime_CD > 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Is on cooldown");
+            RedNotification.Push(RedNotification.Type.ON_CD);
             return false;
         } else if (OC.GetCurrMana() - ManaCost < 0) {
-            Debug.Log(SD.Name + " " + SD.lvl + ": Not enough mana");
+            RedNotification.Push(RedNotification.Type.NO_MANA);
             return false;
         }
         return true;

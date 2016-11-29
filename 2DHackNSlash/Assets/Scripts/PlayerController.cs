@@ -3,34 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class PlayerController : ObjectController {
-    private int NextLevelExp = -999;
+public abstract class PlayerController : ObjectController {
+    protected int NextLevelExp = -999;
 
     public AudioClip hurt;
     public AudioClip crit_hurt;
-    public AudioClip die;
     public AudioClip lvlup;
 
-    [HideInInspector]
-    private CharacterDataStruct PlayerData;
+    protected CharacterDataStruct PlayerData;
 
-    [HideInInspector]
-    public string Name;
+    protected string Name;
 
-    [HideInInspector]
-    public float MaxHealth;
-    [HideInInspector]
-    public float MaxMana;
-    [HideInInspector]
-    public float MaxAD;
-    [HideInInspector]
-    public float MaxMD;
-    [HideInInspector]
-    public float MaxAttkSpd;
-    [HideInInspector]
-    public float MaxMoveSpd;
-    [HideInInspector]
-    public float MaxDefense;
+    protected float MaxHealth;
+    protected float MaxMana;
+    protected float MaxAD;
+    protected float MaxMD;
+    protected float MaxAttkSpd;
+    protected float MaxMoveSpd;
+    protected float MaxDefense;
 
     [HideInInspector]
     public float MaxCritChance; //Percantage
@@ -39,7 +29,7 @@ public class PlayerController : ObjectController {
     [HideInInspector]
     public float MaxLPH;
     [HideInInspector]
-    public float MaxMPH;
+    public float MaxManaRegen;
 
 
     public float CurrHealth;
@@ -52,44 +42,20 @@ public class PlayerController : ObjectController {
     public float CurrCritChance;    
     public float CurrCritDmgBounus;    
     public float CurrLPH;    
-    public float CurrMPH;
+    public float CurrManaRegen;
 
-    Dictionary<string, GameObject> EquipPrefabs;
-    
+    protected Dictionary<string, GameObject> EquipPrefabs;
 
-    private ControllerManager CM;
-    private SaveLoadManager SLM;
-    private PlayerUIController PUIC;
+    protected GameObject BaseModel;
 
-    private GameObject BaseModel;
-
-    private GameObject PickedTarget = null;
-
-    public GameObject FirstWeapon;
+    protected WeaponController WC;
 
     [HideInInspector]
     public GameObject SkillTree;
 
     protected override void Awake() {
         base.Awake();
-        //QualitySettings.vSyncCount = 0;
-        //Application.targetFrameRate = 30;
-        if (FirstWeapon != null)
-            FirstWeapon.GetComponent<EquipmentController>().InstantiateLoot(transform);
         EquipPrefabs = new Dictionary<string, GameObject>();
-        if (transform.parent.name == "MainPlayer") {
-            if (ControllerManager.Instance) {
-                CM = ControllerManager.Instance;
-            } else
-                CM = FindObjectOfType<ControllerManager>();
-            if (SaveLoadManager.Instance)
-                SLM = SaveLoadManager.Instance;
-            else
-                SLM = FindObjectOfType<SaveLoadManager>();
-            PUIC = transform.parent.Find("PlayerUI").GetComponent<PlayerUIController>();
-            PlayerData = SLM.LoadPlayerInfo(SLM.SlotIndexToLoad);
-        }
-        //InitPlayer();
     }
 
     protected override void Start() {
@@ -98,65 +64,21 @@ public class PlayerController : ObjectController {
     }
 
     // Update is called once per frame
-    void Update() {
-        ControlUpdate();
-        PickUpInUpdate();
+    protected override void Update() {
+        base.Update();
+        ControlUpdate();        
         EquiPrefabsUpdate();
         BaseModelUpdate();
+        ManaRegen();
     }
 
-    void FixedUpdate() {
-        MoveUpdate();
-    }
+    protected abstract void ControlUpdate();
 
-    void ControlUpdate() {
-        if (Stunned) {
-            AttackVector = Vector2.zero;
-            MoveVector = Vector2.zero;
-            return;
-        } else {
-            if (CM != null) {
-                AttackVector = CM.AttackVector;
-                if (!HasForce()) {
-                    MoveVector = CM.MoveVector;
-                } else {
-                    MoveVector = Vector2.zero;
-                }
-                Direction = CM.Direction;
-            }
-        }
-    }
 
-    void MoveUpdate() {
-        if (MoveVector != Vector2.zero) {
-            rb.MovePosition(rb.position + MoveVector * (CurrMoveSpd / 100) * Time.deltaTime);
-            //rb.AddForce(MoveVector * (CurrMoveSpd / 100) * rb.drag);
-            //rb.velocity = MoveVector * (CurrMoveSpd / 100);
-        }
-    }
-
-    void OnTriggerStay2D(Collider2D collider) {
-        if (collider.gameObject.layer == LayerMask.NameToLayer("LootBox")) {
-            PickedTarget = collider.transform.parent.gameObject;
-            return;
-        }
-    }
-
-    void OnTriggerExit2D(Collider2D collider) {
-        if (collider.gameObject.layer == LayerMask.NameToLayer("LootBox") && PickedTarget!=null) {
-            PickedTarget = null;
-        }
-    }
     //----------public
-    //Skills Handling
-    public ActiveSkill GetActiveSlotSkillTransform(int Slot) {
-        if (PlayerData.ActiveSlotData[Slot] == null ||Actives.childCount == 0)
-            return null;
-        for (int i = 0; i < Actives.childCount; i++) {
-            if (Actives.GetChild(i).GetComponent<ActiveSkill>().SD.Name == PlayerData.ActiveSlotData[Slot].Name)
-                return Actives.GetChild(i).GetComponent<ActiveSkill>();
-        }
-        return null;
+
+    public WeaponController GetWC() {
+        return WC;
     }
 
     //EXP handling
@@ -164,205 +86,101 @@ public class PlayerController : ObjectController {
         if (PlayerData.lvl < LvlExpModule.LvlCap) {
             PlayerData.exp += exp;
             CheckLevelUp();
-            //if(PUIC)
-            //    PUIC.UpdateExpBar();
         }
-        SLM.SaveCurrentPlayerInfo();
+        SaveLoadManager.SaveCurrentPlayerInfo();
     }
 
     //Combat
-    override public Value AutoAttackDamageDeal(float TargetDefense) {
-        Value dmg = Value.CreateValue(0,0,false,GetComponent<ObjectController>());
-        if (UnityEngine.Random.value < (CurrCritChance / 100)) {
-            dmg.Amount += CurrAD * (CurrCritDmgBounus / 100);
-            dmg.Amount += CurrMD * (CurrCritDmgBounus / 100);
-            dmg.IsCrit = true;
-        } else {
-            dmg.Amount = CurrAD + CurrMD;
-            dmg.IsCrit = false;
-        }
-        float reduced_dmg = dmg.Amount * (TargetDefense / 100);
-        dmg.Amount = dmg.Amount - reduced_dmg;
-        return dmg;
-    }
-
     override public void DeductHealth(Value dmg) {
-        if (CurrHealth - dmg.Amount <= 0) {
+        if (CurrHealth - dmg.Amount <= 0 && Alive) {
             CurrHealth -= dmg.Amount;
-            IC.UpdateHealthBar();
             IC.PopUpText(dmg);
-            DieUpdate();
+            ON_DEATH_UPDATE += Die;
+            ON_DEATH_UPDATE();
+            ON_DEATH_UPDATE -= Die;
             return;
         }
-        if (dmg.IsCrit) {
-            Animator Anim = GetComponent<Animator>();
+        if (dmg.Type == -1) {//Dot type. no sound update
+        } else if (dmg.IsCrit) {
+            Animator Anim = VisualHolder.GetComponent<Animator>();
             Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
             Anim.Play("crit");
             AudioSource.PlayClipAtPoint(crit_hurt, transform.position, GameManager.SFX_Volume);
-        }else {
+        } else {
             AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
         }
-        CurrHealth -= dmg.Amount;
-        if (transform.parent.tag == "MainPlayer") {
-            PUIC.UpdateHealthManaBar();
+        if (CurrHealth - dmg.Amount <= 0 && Alive) {
+            IC.PopUpText(dmg);
+            ON_DEATH_UPDATE += Die;
+            ON_DEATH_UPDATE();
+            ON_DEATH_UPDATE -= Die;
         } else {
-            IC.UpdateHealthBar();
-        }
-        IC.PopUpText(dmg);
-    }
-
-    public override void DeductMana(Value mana_cost) {
-        if (CurrMana - mana_cost.Amount >= 0)//Double check
-            CurrMana -= mana_cost.Amount;
-        if (transform.parent.tag == "MainPlayer") {
-            PUIC.UpdateHealthManaBar();
+            CurrHealth -= dmg.Amount;
+            IC.PopUpText(dmg);
         }
     }
 
-    public override void HealHP(Value heal_hp) {
-        if (CurrHealth < MaxHealth && CurrHealth + heal_hp.Amount <= MaxHealth) {
-            CurrHealth += heal_hp.Amount;
-            IC.PopUpText(heal_hp);
-        } else if (CurrHealth < MaxHealth && CurrHealth + heal_hp.Amount > MaxHealth) {
-            heal_hp.Amount = MaxHealth - CurrHealth;
-            CurrHealth += heal_hp.Amount;
-            IC.PopUpText(heal_hp);
-        }
-        if (PUIC != null)
-            PUIC.UpdateHealthManaBar();
-        else
-            IC.UpdateHealthBar();
-    }
-
-    public override void HealMana(Value heal_mana) {
-        if (CurrMana < MaxMana && CurrMana + heal_mana.Amount <= MaxMana) {
-            CurrMana += heal_mana.Amount;
-            //IC.PopUpHeal(heal_mana);
-        } else if (CurrMana < MaxMana && CurrMana + heal_mana.Amount > MaxMana) {
-            heal_mana.Amount = MaxMana - CurrMana;
-            CurrHealth += heal_mana.Amount;
-            //IC.PopUpHeal(heal_mana);
-        }
-        if (PUIC != null)
-            PUIC.UpdateHealthManaBar();
-        else
-            IC.UpdateHealthBar();
-    }
-
-
-    //Animation Handling
-    override public float GetMovementAnimSpeed() {
-        return (CurrMoveSpd/100) / (movement_animation_interval);
-    }
-
-    override public float GetAttackAnimSpeed() {
-        return (CurrAttkSpd/100) / (attack_animation_interval);
-    }
-
-    override public float GetPhysicsSpeedFactor() {
-        if (!Attacking) {
-            if (CurrMoveSpd < 100)
-                return 1 + CurrMoveSpd / 100;
-            else if (CurrMoveSpd > 100)
-                return 1 - CurrMoveSpd / 100;
-            else
-                return 1;
-        } else {
-            if (CurrAttkSpd < 100)
-                return 1 + CurrAttkSpd / 100;
-            else if (CurrMoveSpd > 100)
-                return 1 - CurrAttkSpd / 100;
-            else
-                return 1;
-        }
-    }
-
-    //Equipment/Inventory Handling
-    public bool InventoryIsFull() {
-        return FirstAvailbleInventorySlot() == PlayerData.Inventory.Length;
-    }
-
-
-    public WeaponController GetEquippedWeaponController() {
-        //Debug.Log("Player version");
-        if (GetEquippedItem("Weapon") == null)
-            return null;
-        return transform.Find(GetEquippedItem("Weapon").Name).GetComponent<WeaponController>();
-    }
-
-    public Equipment GetEquippedItem(string Slot) {
-        return PlayerData.Equipments[Slot];
-    }
-    public Equipment GetInventoryItem(int Slot) {
-        return PlayerData.Inventory[Slot];
-    }
-
-    public bool Compatible(Equipment E) {
-        if (E == null)
-            return false;
-        if (E.Class == "All")//Trinket
-            return PlayerData.lvl >= E.LvlReq;
-        return (PlayerData.lvl >= E.LvlReq && PlayerData.Class == E.Class);
-    }
-
-    public int FirstAvailbleInventorySlot() {
-        for(int i = 0; i < PlayerData.Inventory.Length; i++) {
-            if (PlayerData.Inventory[i] == null)
-                return i;
-        }
-        return PlayerData.Inventory.Length;
-    }
-
-    public void Equip(Equipment E) {
-        PlayerData.Equipments[E.Type] = E;
-        GameObject equipPrefab = EquipmentController.ObtainPrefab(E, transform);
-        EquipPrefabs[E.Type] = equipPrefab;
-        UpdateStats();
-        SLM.SaveCurrentPlayerInfo();
-    }
-
-    public void UnEquip(string Slot) {
-        Destroy(EquipPrefabs[Slot]);
-        PlayerData.Equipments[Slot] = null;
-        UpdateStats();
-        SLM.SaveCurrentPlayerInfo();
-    }
-
-    public void AddToInventory(int Slot, Equipment E) {
-        PlayerData.Inventory[Slot] = E;
-        SLM.SaveCurrentPlayerInfo();
-    }
-
-    public void RemoveFromInventory(int Slot, Equipment E) {
-        PlayerData.Inventory[Slot] = null;
-        SLM.SaveCurrentPlayerInfo();
+    protected override void Die() {
+        base.Die();
     }
 
     //-------private
+    protected void ReloadWeaponModel() {
+        if (PlayerData.Equipments["Weapon"] != null) {
+            Destroy(EquipPrefabs["Weapon"]);
+            EquipPrefabs["Weapon"] = EquipmentController.ObtainPrefab(PlayerData.Equipments["Weapon"], transform);
+            FetchWC();
+        }
+    }
+
+    private void FetchWC() {
+        if (PlayerData.Equipments["Weapon"] == null) {
+            WC = null;
+            return;
+        }
+        WC = EquipPrefabs["Weapon"].GetComponent<WeaponController>();
+    }
+
     void InitPlayer() {
         InstaniateEquipmentModel();
 
         if (PlayerData.lvl < LvlExpModule.LvlCap)
             NextLevelExp = LvlExpModule.GetRequiredExp(PlayerData.lvl + 1);
 
+        FetchWC();
+
         InitMaxStats();
         InitSkillTree();
         InitOnCallEvent();
         InitPassives();
         InitCurrStats();
-
-
-        //PUIC.UpdateExpBar();
     }
 
-    void InitPassives() {
+    protected void InitPassives() {
         //Debug.Log(Passives.GetComponentsInChildren<PassiveSkill>().Length);
-        foreach (var passive in Passives.GetComponentsInChildren<PassiveSkill>()) {
+        foreach (var passive in T_Passives.GetComponentsInChildren<PassiveSkill>()) {
             passive.ApplyPassive();
         }
     }
 
-    void InitSkillTree() {
+    protected Transform GetActiveSkill_T(System.Type active_skill_type) {
+        foreach(Transform skill_t in T_Actives) {
+            if (skill_t.GetComponent<Skill>().GetType() == active_skill_type)
+                return skill_t;
+        }
+        return null;
+    }
+
+    protected Transform GetPassiveSkill_T(System.Type passive_skill_type) {
+        foreach (Transform skill_t in T_Passives) {
+            //Debug.Log(skill_t.GetComponent<Skill>().GetType());
+            if (skill_t.GetComponent<Skill>().GetType() == passive_skill_type)
+                return skill_t;
+        }
+        return null;
+    }
+
+    protected void InitSkillTree() {
         if (PlayerData.Class == "Warrior") {
             SkillTree = Instantiate(Resources.Load("SkillPrefabs/WarriorSkillTree"), transform) as GameObject;
             SkillTree.name = "SkillTree";
@@ -375,22 +193,13 @@ public class PlayerController : ObjectController {
         SkillTreeController STC = SkillTree.GetComponent<SkillTreeController>();
         for (int i = 0; i < PlayerData.SkillTreelvls.Length; i++) {
             if (STC.SkillTree[i] != null && PlayerData.SkillTreelvls[i] != 0) {//Does lvl+skill check here
-                GameObject SkillObject = Instantiate(Resources.Load("SkillPrefabs/" + STC.SkillTree[i].Name)) as GameObject;
-                if (SkillObject.transform.GetComponent<Skill>().GetType().IsSubclassOf(typeof(ActiveSkill)))
-                    SkillObject.transform.SetParent(Actives);
-                else if (SkillObject.transform.GetComponent<Skill>().GetType().IsSubclassOf(typeof(PassiveSkill))) {
-                    SkillObject.transform.SetParent(Passives);
-                }
-                SkillObject.name = STC.SkillTree[i].Name;
-                SkillObject.GetComponent<Skill>().InitSkill(PlayerData.SkillTreelvls[i]);
+                GameObject Skill_OJ = Instantiate(Resources.Load("SkillPrefabs/" + STC.SkillTree[i].Name)) as GameObject;
+                Skill_OJ.transform.GetComponent<Skill>().InitSkill(GetComponent<ObjectController>(), PlayerData.SkillTreelvls[i]);
             }
-        }
-        if (PUIC) {//MainPlayer UI
-
         }
     }
 
-    void InitMaxStats() {
+    protected void InitMaxStats() {
         Name = PlayerData.Name;
         MaxHealth = PlayerData.BaseHealth;
         MaxMana = PlayerData.BaseMana;
@@ -402,7 +211,7 @@ public class PlayerController : ObjectController {
         MaxCritChance = PlayerData.BaseCritChance;
         MaxCritDmgBounus = PlayerData.BaseCritDmgBounus;
         MaxLPH = PlayerData.BaseLPH;
-        MaxMPH = PlayerData.BaseMPH;
+        MaxManaRegen = PlayerData.BaseManaRegen;
         foreach (var e in PlayerData.Equipments) {
             if (e.Value != null) {
                 MaxHealth += e.Value.AddHealth;
@@ -415,12 +224,12 @@ public class PlayerController : ObjectController {
                 MaxCritChance += e.Value.AddCritChance;
                 MaxCritDmgBounus += e.Value.AddCritDmgBounus;
                 MaxLPH += e.Value.AddLPH;
-                MaxMPH += e.Value.AddMPH;
+                MaxManaRegen += e.Value.AddManaRegen;
             }           
         }
     }
 
-    void InitCurrStats() {
+    protected void InitCurrStats() {
         CurrHealth = MaxHealth;
         CurrMana = MaxMana;
         CurrAD = MaxAD;
@@ -431,28 +240,24 @@ public class PlayerController : ObjectController {
         CurrCritChance = MaxCritChance;
         CurrCritDmgBounus = MaxCritDmgBounus;
         CurrLPH = MaxLPH;
-        CurrMPH = MaxMPH;
+        CurrManaRegen = MaxManaRegen;
     }
 
-    void BaseModelUpdate() {
+    protected void BaseModelUpdate() {
         Animator BaseModelAnim = BaseModel.GetComponent<Animator>();
-        if (CM != null) {
-            BaseModelAnim.SetInteger("Direction", Direction);
-            BaseModelAnim.speed = GetMovementAnimSpeed();
-        }
+        BaseModelAnim.SetInteger("Direction", Direction);
+        BaseModelAnim.speed = GetMovementAnimSpeed();
     }
 
-    void EquiPrefabsUpdate() {
-        if (CM != null) {
-            foreach(var e_prefab in EquipPrefabs.Values) {
-                if(e_prefab!=null)
-                    e_prefab.GetComponent<EquipmentController>().EquipUpdate(Direction, AttackVector);
-            }
-        }      
+    protected void EquiPrefabsUpdate() {
+        foreach(var e_prefab in EquipPrefabs.Values) {
+            if(e_prefab!=null)
+                e_prefab.GetComponent<EquipmentController>().EquipUpdate(GetComponent<PlayerController>());
+        }    
     }
 
     //-------helper
-    void UpdateStats() {
+    protected void UpdateStats() {
         MaxHealth = PlayerData.BaseHealth;
         MaxMana = PlayerData.BaseMana;
         MaxAD = PlayerData.BaseAD;
@@ -463,7 +268,7 @@ public class PlayerController : ObjectController {
         MaxCritChance = PlayerData.BaseCritChance;
         MaxCritDmgBounus = PlayerData.BaseCritDmgBounus;
         MaxLPH = PlayerData.BaseLPH;
-        MaxMPH = PlayerData.BaseMPH;
+        MaxManaRegen = PlayerData.BaseManaRegen;
         foreach (var e in PlayerData.Equipments) {
             if (e.Value != null) {
                 MaxHealth += e.Value.AddHealth;
@@ -476,12 +281,12 @@ public class PlayerController : ObjectController {
                 MaxCritChance += e.Value.AddCritChance;
                 MaxCritDmgBounus += e.Value.AddCritDmgBounus;
                 MaxLPH += e.Value.AddLPH;
-                MaxMPH += e.Value.AddMPH;
+                MaxManaRegen += e.Value.AddManaRegen;
             }
         }
 
+        ReloadWeaponModel();
         InitOnCallEvent();
-
         InitPassives();
 
         if (CurrHealth>MaxHealth)
@@ -496,20 +301,47 @@ public class PlayerController : ObjectController {
         CurrCritChance = MaxCritChance;
         CurrCritDmgBounus = MaxCritDmgBounus;
         CurrLPH = MaxLPH;
-        CurrMPH = MaxMPH;
+        CurrManaRegen = MaxManaRegen;
     }
 
-    void InitOnCallEvent() {
+    protected void UpdateSkillsState() {
+        SkillTreeController STC = SkillTree.GetComponent<SkillTreeController>();
+        for (int i = 0; i < PlayerData.SkillTreelvls.Length; i++) {
+            if (STC.SkillTree[i].GetType().IsSubclassOf(typeof(ActiveSkill))) {
+                if (GetActiveSkill_T(STC.SkillTree[i].GetType()) && PlayerData.SkillTreelvls[i] != 0)
+                    GetActiveSkill_T(STC.SkillTree[i].GetType()).GetComponent<Skill>().InitSkill(GetComponent<ObjectController>(), PlayerData.SkillTreelvls[i]);
+                else if (GetActiveSkill_T(STC.SkillTree[i].GetType()) && PlayerData.SkillTreelvls[i] == 0)
+                    Destroy(GetActiveSkill_T(STC.SkillTree[i].GetType()).gameObject);
+                else if (PlayerData.SkillTreelvls[i] != 0 && !GetActiveSkill_T(STC.SkillTree[i].GetType())) {
+                    GameObject Skill_OJ = Instantiate(Resources.Load("SkillPrefabs/" + STC.SkillTree[i].Name)) as GameObject;
+                    Skill_OJ.transform.GetComponent<Skill>().InitSkill(GetComponent<ObjectController>(), PlayerData.SkillTreelvls[i]);
+                }
+            } else {
+                if (GetPassiveSkill_T(STC.SkillTree[i].GetType()) && PlayerData.SkillTreelvls[i] != 0)
+                    GetPassiveSkill_T(STC.SkillTree[i].GetType()).GetComponent<Skill>().InitSkill(GetComponent<ObjectController>(), PlayerData.SkillTreelvls[i]);
+                else if (GetPassiveSkill_T(STC.SkillTree[i].GetType()) && PlayerData.SkillTreelvls[i] == 0)
+                    Destroy(GetPassiveSkill_T(STC.SkillTree[i].GetType()).gameObject);
+                else if (PlayerData.SkillTreelvls[i] != 0 && !GetActiveSkill_T(STC.SkillTree[i].GetType())) {
+                    GameObject Skill_OJ = Instantiate(Resources.Load("SkillPrefabs/" + STC.SkillTree[i].Name)) as GameObject;
+                    Skill_OJ.transform.GetComponent<Skill>().InitSkill(GetComponent<ObjectController>(), PlayerData.SkillTreelvls[i]);
+                }
+            }
+        }
+    }
+
+    protected void InitOnCallEvent() {
         ON_DMG_DEAL = null;
         ON_HEALTH_UPDATE = null;
         ON_MANA_UPDATE = null;
+        ON_DEATH_UPDATE = null;
     }
 
-    void InstaniateEquipmentModel() {
+    protected void InstaniateEquipmentModel() {
         if (PlayerData.Class == "Warrior") {
-            BaseModel = Instantiate(Resources.Load("BaseModelPrefabs/Red Ghost"), transform) as GameObject;
+            BaseModel = Instantiate(Resources.Load("BaseModelPrefabs/Red Ghost"), VisualHolder) as GameObject;
             BaseModel.name = "Red Ghost";
-            BaseModel.transform.position = transform.position + BaseModel.transform.position;
+            BaseModel.transform.position = VisualHolder.position + BaseModel.transform.position;
+            BaseModel.transform.GetComponent<SpriteRenderer>().sortingOrder = Layer.OJ;
         }
         else if(PlayerData.Class == "Mage") {
 
@@ -525,24 +357,7 @@ public class PlayerController : ObjectController {
         }
     }
 
-    void PickUpInUpdate() {
-        if (PickedTarget != null && CM.AllowControlUpdate) {
-            PUIC.transform.Find("PickUpNotify").gameObject.SetActive(true);
-            if (Input.GetKeyDown(CM.Interact) || Input.GetKeyDown(CM.J_A)) {
-                if (InventoryIsFull()) {
-                    Debug.Log("Your inventory is full!");
-                } else {
-                    int InventoryIndex = FirstAvailbleInventorySlot();
-                    AddToInventory(InventoryIndex, PickedTarget.GetComponent<EquipmentController>().E);
-                    Destroy(PickedTarget);
-                    PickedTarget = null;
-                }
-            }
-        } else
-            PUIC.transform.Find("PickUpNotify").gameObject.SetActive(false);
-    }
-
-    void CheckLevelUp() {
+    protected void CheckLevelUp() {
         if (PlayerData.lvl >= LvlExpModule.LvlCap)
             return;
         if(PlayerData.exp >= NextLevelExp) {
@@ -556,17 +371,6 @@ public class PlayerController : ObjectController {
             PlayerData.SkillPoints++;            
         }     
     }
-
-    void DieUpdate() {
-        if (CurrHealth <= 0) {//Insert dead animation here
-            //GetComponent<DropList>().SpawnLoots(); //Added for PVP later
-            Alive = false;
-            Destroy(gameObject);
-        }
-    }
-
-
-
 
     override public float GetMaxHealth() {
         return MaxHealth;
@@ -595,8 +399,8 @@ public class PlayerController : ObjectController {
     override public float GetMaxLPH() {
         return MaxLPH;
     }
-    override public float GetMaxMPH() {
-        return MaxMPH;
+    override public float GetMaxManaRegen() {
+        return MaxManaRegen;
     }
     override public float GetMaxDefense() {
         return MaxDefense;
@@ -633,8 +437,8 @@ public class PlayerController : ObjectController {
     override public float GetCurrLPH() {
         return CurrLPH;
     }
-    override public float GetCurrMPH() {
-        return CurrMPH;
+    override public float GetCurrManaRegen() {
+        return CurrManaRegen;
     }
     override public float GetCurrDefense() {
         return CurrDefense;
@@ -669,8 +473,8 @@ public class PlayerController : ObjectController {
     override public void SetMaxLPH(float lph) {
         MaxLPH = lph;
     }
-    override public void SetMaxMPH(float mph) {
-        MaxMPH = mph;
+    override public void SetMaxManaRegen(float mph) {
+        MaxManaRegen = mph;
     }
     override public void SetMaxDefense(float defense) {
         MaxDefense = defense;
@@ -704,8 +508,8 @@ public class PlayerController : ObjectController {
     override public void SetCurrLPH(float lph) {
         CurrLPH = lph;
     }
-    override public void SetCurrMPH(float mph) {
-        CurrMPH = mph;
+    override public void SetCurrManaRegen(float mph) {
+        CurrManaRegen = mph;
     }
     override public void SetCurrDefense(float defense) {
         CurrDefense = defense;
@@ -734,9 +538,5 @@ public class PlayerController : ObjectController {
 
     public CharacterDataStruct GetPlayerData() {
         return PlayerData;
-    }
-
-    public ControllerManager GetCM() {//For mainplayer only
-        return CM;
     }
 }

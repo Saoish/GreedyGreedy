@@ -10,8 +10,8 @@ public class Retaliation : PassiveSkill {
         base.Awake();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         Retaliationlvl RL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -34,6 +34,8 @@ public class Retaliation : PassiveSkill {
         }
         TriggerChance = RL.TriggerChance;
         Reflected_DMG_Percentage = RL.Reflected_DMG_Percentage;
+
+        Description = "Upon taking damage, you have " + TriggerChance + "% chance to reflect " + Reflected_DMG_Percentage + "% taken damge to attacker as true damage.";
     }
 
     protected override void Start() {

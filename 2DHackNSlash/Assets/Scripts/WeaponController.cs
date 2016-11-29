@@ -11,6 +11,8 @@ public class WeaponController : MonoBehaviour{
     //6 -> Katana
     public int Type;
 
+    public float ManaCost;
+
     public AudioClip combo_1;
     public AudioClip combo_2;
     public AudioClip combo_3;

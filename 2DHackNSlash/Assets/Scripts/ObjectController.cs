@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public abstract class ObjectController : MonoBehaviour {
     protected Rigidbody2D rb;
-    [HideInInspector]
-    public Collider2D collider;
 
     [HideInInspector]
     public Vector2 MoveVector = Vector2.zero;
@@ -22,9 +20,9 @@ public abstract class ObjectController : MonoBehaviour {
     public bool Alive = true;
 
     [HideInInspector]
-    public Transform Actives;
+    public Transform T_Actives;
     [HideInInspector]
-    public Transform Passives;
+    public Transform T_Passives;
     [HideInInspector]
     public Transform Buffs;
     [HideInInspector]
@@ -33,15 +31,22 @@ public abstract class ObjectController : MonoBehaviour {
     public delegate void on_dmg_deal(ObjectController target = null);
     public delegate void on_health_update(Value health_change);
     public delegate void on_mana_update(Value mana_change);
+    public delegate void on_dealth_update();
 
     public on_dmg_deal ON_DMG_DEAL;
     public on_health_update ON_HEALTH_UPDATE;
     public on_mana_update ON_MANA_UPDATE;
+    public on_dealth_update ON_DEATH_UPDATE;
 
     public float movement_animation_interval = 1f;
     public float attack_animation_interval = 1f;
 
+    protected float RegenTimer = 0f;
+    protected float RegenInterval = 0.1f;
+
     private Transform VFX_Transform;
+    protected Transform VisualHolder;
+    protected Transform MeleeAttackCollider;
 
     protected IndicationController IC;
 
@@ -49,11 +54,12 @@ public abstract class ObjectController : MonoBehaviour {
         gameObject.layer = LayerMask.NameToLayer("KillingGround");
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("KillingGround"), LayerMask.NameToLayer("Loot"));
         rb = transform.parent.GetComponent<Rigidbody2D>();
-        collider = transform.parent.GetComponent<Collider2D>();
         IC = transform.Find("Indication Board").GetComponent<IndicationController>();
+        VisualHolder = transform.Find("VisualHolder");
+        MeleeAttackCollider = transform.Find("MeleeAttackCollider");
         VFX_Transform = transform.Find("VFX");
-        Actives = transform.Find("Actives");
-        Passives = transform.Find("Passives");
+        T_Actives = transform.Find("Actives");
+        T_Passives = transform.Find("Passives");
         Buffs = transform.Find("Buffs");
         Debuffs = transform.Find("Debuffs");
     }
@@ -61,9 +67,38 @@ public abstract class ObjectController : MonoBehaviour {
     virtual protected void Start() {
     }
 
+    virtual protected void Update() {
+    }
+
+    protected void FixedUpdate() {
+        MoveUpdate();
+    }
+
+    void MoveUpdate() {
+        if (MoveVector != Vector2.zero) {
+            rb.MovePosition(rb.position + MoveVector * (GetCurrMoveSpd() / 100) * Time.deltaTime);
+        }
+    }
+
+    //Transform
+    public Transform GetVisualHolderTransform() {
+        return VisualHolder;
+    }
+
+    public Transform GetMeleeAttackColliderTransform() {
+        return MeleeAttackCollider;
+    }
+
+    public void SwapMeleeAttackCollider(Transform MeleeAttackCollider) {
+        Destroy(this.MeleeAttackCollider.gameObject);
+        this.MeleeAttackCollider = null;
+        MeleeAttackCollider.parent = transform;
+        this.MeleeAttackCollider = MeleeAttackCollider;
+    }
+
     //Physics
     public bool HasForce() {
-        return rb.velocity != Vector2.zero;
+        return rb.velocity != Vector2.zero ||rb.angularVelocity!=0;
     }
 
     public void MountainlizeMass() {
@@ -75,7 +110,8 @@ public abstract class ObjectController : MonoBehaviour {
     }
 
     public void ZerolizeForce() {
-        rb.velocity = Vector2.zero;
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = 0;
     }
 
     public void ZerolizeDrag() {
@@ -95,19 +131,30 @@ public abstract class ObjectController : MonoBehaviour {
     }
 
     //Particle VFX
-    public void ActiveVFXParticalWithStayTime(string VFX, float StayTime) {
+    public void ActiveOutsideVFXPartical(string VFX,int layer) {
+        float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
+        GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), rb.position, transform.rotation) as GameObject;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
+        VFX_OJ.name = VFX;
+        Destroy(VFX_OJ,VFX_OJ.transform.GetComponent<ParticleSystem>().duration);
+    }
+
+    public void ActiveVFXParticalWithStayTime(string VFX, float StayTime,int layer) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
         VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position * scale;
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
         Destroy(VFX_OJ, StayTime);
     }
-    public void ActiveVFXParticle(string VFX) {
+    public void ActiveVFXParticle(string VFX,int layer) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
         VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position*scale;
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
     }
 
@@ -115,22 +162,24 @@ public abstract class ObjectController : MonoBehaviour {
         Destroy(VFX_Transform.Find(VFX).gameObject);
     }
 
-    public void ActiveOneShotVFXParticle(string VFX) {
+    public void ActiveOneShotVFXParticle(string VFX,int layer) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
         VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position * scale;
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
+        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
         float length = VFX_OJ.transform.GetComponent<ParticleSystem>().duration;
         Destroy(VFX_OJ,length);
     }
 
     //Anim VFX
-    public void ActiveOneShotVFXAnim(string VFX) {
+    public void ActiveOneShotVFXAnim(string VFX,int layer) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
         VFX_OJ.transform.position += VFX_Transform.position;
         VFX_OJ.transform.localScale *= scale;
+        VFX_OJ.transform.GetComponent<SpriteRenderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
         float length = VFX_OJ.transform.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
         Destroy(VFX_OJ, length);
@@ -140,14 +189,65 @@ public abstract class ObjectController : MonoBehaviour {
 
 
     //Combat
-    abstract public void HealHP(Value heal_hp);
-    abstract public void HealMana(Value heal_mana);
+    public void HealHP(Value heal_hp) {
+        if (GetCurrHealth() < GetMaxHealth() && GetCurrHealth() + heal_hp.Amount <= GetMaxHealth()) {
+            SetCurrHealth(GetCurrHealth()+heal_hp.Amount);
+            IC.PopUpText(heal_hp);
+        } else if (GetCurrHealth() < GetMaxHealth() && GetCurrHealth() + heal_hp.Amount > GetMaxHealth()) {
+            heal_hp.Amount = GetMaxHealth() - GetCurrHealth();
+            SetCurrHealth(GetCurrHealth() + heal_hp.Amount);
+            IC.PopUpText(heal_hp);
+        }
+    }
+    public void HealMana(Value heal_mana) {
+        if (GetCurrMana() < GetMaxMana() && GetCurrMana() + heal_mana.Amount <= GetMaxMana()) {
+            SetCurrMana(GetCurrMana()+heal_mana.Amount);
+        } else if (GetCurrMana() < GetMaxMana() && GetCurrMana() + heal_mana.Amount > GetMaxMana()) {
+            heal_mana.Amount = GetMaxMana() - GetCurrMana();
+            SetCurrMana(GetCurrMana()+heal_mana.Amount);
+        }
+    }
 
-    abstract public Value AutoAttackDamageDeal(float TargetDefense);
+    public Value AutoAttackDamageDeal(float TargetDefense) {
+        Value dmg = Value.CreateValue(0, 0, false, GetComponent<ObjectController>());
+        if (Random.value < (GetCurrCritChance() / 100)) {
+            dmg.Amount += GetCurrAD() * (GetCurrCritDmgBounus() / 100);
+            dmg.Amount += GetCurrMD() * (GetCurrCritDmgBounus() / 100);
+            dmg.IsCrit = true;
+        } else {
+            dmg.Amount = GetCurrAD() + GetCurrMD();
+            dmg.IsCrit = false;
+        }
+        float reduced_dmg = dmg.Amount * (TargetDefense / 100);
+        dmg.Amount = dmg.Amount - reduced_dmg;
+        return dmg;
+    }
 
     abstract public void DeductHealth(Value dmg);
 
-    abstract public void DeductMana(Value mana_cost);
+    protected virtual void Die() {
+        SetCurrHealth(0);
+        Alive = false;
+        GetComponent<Collider2D>().enabled = false;
+        VisualHolder.gameObject.SetActive(false);
+        Destroy(transform.parent.gameObject, 1);
+    }
+
+    public void DeductMana(Value mana_cost) {
+        if (GetCurrMana() - mana_cost.Amount >= 0)//Double check
+            SetCurrMana(GetCurrMana() - mana_cost.Amount);
+    }
+
+    protected void ManaRegen() {
+        if (RegenTimer >= RegenInterval) {
+            ON_MANA_UPDATE += HealMana;
+            ON_MANA_UPDATE(Value.CreateValue(GetCurrManaRegen() / 10, 1));
+            ON_MANA_UPDATE -= HealMana;
+            RegenTimer = 0;
+        } else {
+            RegenTimer += Time.deltaTime;
+        }
+    }
 
     public bool HasBuff(System.Type buff) {
         Buff[] buffs = Buffs.GetComponentsInChildren<Buff>();
@@ -197,9 +297,29 @@ public abstract class ObjectController : MonoBehaviour {
     }
 
     //Animation
-    abstract public float GetMovementAnimSpeed();
-    abstract public float GetAttackAnimSpeed();
-    abstract public float GetPhysicsSpeedFactor();
+    public float GetMovementAnimSpeed() {
+        return (GetCurrMoveSpd() / 100) / (movement_animation_interval);
+    }
+    public float GetAttackAnimSpeed() {
+        return (GetCurrAttkSpd() / 100) / (attack_animation_interval);
+    }
+    public float GetPhysicsSpeedFactor() {
+        if (!Attacking) {
+            if (GetCurrMoveSpd() < 100)
+                return 1 + GetCurrMoveSpd() / 100;
+            else if (GetCurrMoveSpd() > 100)
+                return 1 - GetCurrMoveSpd() / 100;
+            else
+                return 1;
+        } else {
+            if (GetCurrAttkSpd() < 100)
+                return 1 + GetCurrAttkSpd() / 100;
+            else if (GetCurrMoveSpd() > 100)
+                return 1 - GetCurrAttkSpd() / 100;
+            else
+                return 1;
+        }
+    }
 
     //Stats
     abstract public float GetMaxHealth();
@@ -208,11 +328,11 @@ public abstract class ObjectController : MonoBehaviour {
     abstract public float GetMaxMD();
     abstract public float GetMaxAttkSpd();
     abstract public float GetMaxMoveSpd();
+    abstract public float GetMaxDefense();
     abstract public float GetMaxCritChance();
     abstract public float GetMaxCritDmgBounus();
     abstract public float GetMaxLPH();
-    abstract public float GetMaxMPH();
-    abstract public float GetMaxDefense();
+    abstract public float GetMaxManaRegen();
 
     abstract public float GetCurrHealth();
     abstract public float GetCurrMana();
@@ -220,11 +340,11 @@ public abstract class ObjectController : MonoBehaviour {
     abstract public float GetCurrMD();
     abstract public float GetCurrAttkSpd();
     abstract public float GetCurrMoveSpd();
+    abstract public float GetCurrDefense();
     abstract public float GetCurrCritChance();
     abstract public float GetCurrCritDmgBounus();
     abstract public float GetCurrLPH();
-    abstract public float GetCurrMPH();
-    abstract public float GetCurrDefense();
+    abstract public float GetCurrManaRegen();
 
     abstract public void SetMaxHealth(float health);
     abstract public void SetMaxMana(float mana);
@@ -232,11 +352,11 @@ public abstract class ObjectController : MonoBehaviour {
     abstract public void SetMaxMD(float md);
     abstract public void SetMaxAttkSpd(float attkspd);
     abstract public void SetMaxMoveSpd(float movespd);
+    abstract public void SetMaxDefense(float defense);
     abstract public void SetMaxCritChance(float critchance);
     abstract public void SetMaxCritDmgBounus(float critdmg);
     abstract public void SetMaxLPH(float lph);
-    abstract public void SetMaxMPH(float mph);
-    abstract public void SetMaxDefense(float defense);
+    abstract public void SetMaxManaRegen(float mph);
 
     abstract public void SetCurrHealth(float health);
     abstract public void SetCurrMana(float mana);
@@ -244,15 +364,9 @@ public abstract class ObjectController : MonoBehaviour {
     abstract public void SetCurrMD(float md);
     abstract public void SetCurrAttkSpd(float attkspd);
     abstract public void SetCurrMoveSpd(float movespd);
+    abstract public void SetCurrDefense(float defense);
     abstract public void SetCurrCritChance(float critchance);
     abstract public void SetCurrCritDmgBounus(float critdmg);
     abstract public void SetCurrLPH(float lph);
-    abstract public void SetCurrMPH(float mph);
-    abstract public void SetCurrDefense(float defense);
-
-
-    //public virtual WeaponController GetEquippedWeaponController() {
-    //    Debug.Log("Junk Version");
-    //    return null;
-    //}
+    abstract public void SetCurrManaRegen(float mph);
 }

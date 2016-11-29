@@ -6,17 +6,18 @@ public class CharacterSheetController : MonoBehaviour{
     Tab_0 Tab_0;
     Tab_1 Tab_1;
 
-    public PlayerController PC;
-
-    ControllerManager CM;
+    [HideInInspector]
+    public MainPlayer MPC;
 
     int CachedTabIndex = 0;
 
     int CurrentTabIndex = 0;
 
+    //[HideInInspector]
+    public bool AllowControl = true;
+
     void Awake() {
-        PC = transform.parent.GetComponent<PlayerUIController>().PC;
-        CM = PC.GetCM();
+        MPC = transform.parent.GetComponent<MainPlayerUI>().MPC;
         Tab_0 = transform.Find("Tab_0").GetComponent<Tab_0>();
         Tab_1 = transform.Find("Tab_1").GetComponent<Tab_1>();
     }
@@ -69,7 +70,9 @@ public class CharacterSheetController : MonoBehaviour{
     }
 
     private void TabUpdate() {
-        if (Input.GetKeyDown(CM.Tab)) {
+        if (!AllowControl)
+            return;
+        if (Input.GetKeyDown(ControllerManager.Flip)) {
             switch (CurrentTabIndex) {
                 case 0:
                     Tab_0.TurnOff();
@@ -83,7 +86,7 @@ public class CharacterSheetController : MonoBehaviour{
                     break;
             }
         }
-        else if (Input.GetKeyDown(CM.J_LB)) {
+        else if (Input.GetKeyDown(ControllerManager.J_LB)) {
             switch (CurrentTabIndex) {
                 case 0:
                     Tab_0.TurnOff();
@@ -96,7 +99,7 @@ public class CharacterSheetController : MonoBehaviour{
                     CurrentTabIndex = 0;
                     break;
             }
-        } else if (Input.GetKeyDown(CM.J_RB)) {
+        } else if (Input.GetKeyDown(ControllerManager.J_RB)) {
             switch (CurrentTabIndex) {
                 case 0:
                     Tab_0.TurnOff();

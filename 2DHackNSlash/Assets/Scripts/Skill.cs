@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public abstract class Skill : MonoBehaviour {
     [HideInInspector]
-    public SkillData SD; //For runtime data fetching
+    public SkillData SD; //For runtime data fetching, don't use it on UI update
 
     //For designing purpose only
     public string Name;
@@ -19,11 +19,15 @@ public abstract class Skill : MonoBehaviour {
         SD = ScriptableObject.CreateInstance<SkillData>();
         SD.Name = Name;
         SD.Description = Description;
+        //if (transform.GetComponent<SpriteRenderer>())
+        //    transform.GetComponent<SpriteRenderer>().sortingOrder = Layer.Skill;
+        //if (transform.GetComponent<ParticleSystem>())
+        //    transform.GetComponent<ParticleSystemRenderer>().sortingOrder = Layer.Skill;
     }
 
-    public virtual void InitSkill(int lvl) {
+    public virtual void InitSkill(ObjectController OC,int lvl) {
         SD.lvl = lvl;
-        OC = transform.parent.parent.GetComponent<ObjectController>();
+        this.OC = OC;
     }
 
     // Use this for initialization

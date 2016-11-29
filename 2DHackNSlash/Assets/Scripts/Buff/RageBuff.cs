@@ -22,7 +22,7 @@ public class RageBuff : Buff {
         ModAmount = target.GetMaxAD() * (MD.ModAD / 100);
         target.SetCurrAD(target.GetCurrAD() + ModAmount);
         Duration = MD.Duration;
-        target.ActiveVFXParticle("RageBuffVFX");
+        target.ActiveVFXParticle("RageBuffVFX", Layer.Skill);
     }
 
     protected override void RemoveBuff() {

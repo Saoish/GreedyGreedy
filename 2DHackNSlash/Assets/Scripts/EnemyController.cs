@@ -4,9 +4,9 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 public abstract class EnemyController : ObjectController {
-    public AudioClip attack;
+    public bool LootDrop = true;
+
     public AudioClip hurt;
-    public AudioClip die;
 
     public int exp;
 
@@ -14,7 +14,7 @@ public abstract class EnemyController : ObjectController {
     public int lvl;
 
     public float MaxHealth;
-    public float MaxMana;
+    public float MaxMana = 100;
     public float MaxAD;
     public float MaxMD;
     public float MaxAttkSpd; //Percantage
@@ -24,7 +24,7 @@ public abstract class EnemyController : ObjectController {
     public float MaxCritChance = 30f; //Percantage
     public float MaxCritDmgBounus = 200f; //Percantage
     public float MaxLPH;
-    public float MaxMPH;
+    public float MaxManaRegen = 5;
 
     [HideInInspector]
     public float CurrHealth;
@@ -47,7 +47,7 @@ public abstract class EnemyController : ObjectController {
     [HideInInspector]
     public float CurrLPH;
     [HideInInspector]
-    public float CurrMPH;
+    public float CurrManaRegen;
 
     private Animator Anim;
 
@@ -56,7 +56,8 @@ public abstract class EnemyController : ObjectController {
     protected override void Awake() {
         base.Awake();
         AI = GetComponent<AIController>();
-        Anim = GetComponent<Animator>();
+        Anim = VisualHolder.GetComponent<Animator>();
+        VisualHolder.GetComponent<SpriteRenderer>().sortingOrder = Layer.OJ;
     }
     // Use this for initialization
     protected override void Start() {
@@ -73,38 +74,29 @@ public abstract class EnemyController : ObjectController {
         CurrCritDmgBounus = MaxCritDmgBounus;
 
         CurrLPH = MaxLPH;
-        CurrMPH = MaxMPH;
+        CurrManaRegen = MaxManaRegen;
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	protected override void Update () {
+        base.Update();
         ControlUpdate();
         AnimUpdate();
-    }
-
-    void FixedUpdate() {
-        MoveUpdate();
-    }
-
-    void MoveUpdate() {
-        if (MoveVector != Vector2.zero)
-            rb.MovePosition(rb.position + AI.MoveVector * (CurrMoveSpd / 100) * Time.deltaTime);
-        //rb.AddForce(MoveVector * (CurrMoveSpd / 100) * rb.drag);
-        //rb.velocity = MoveVector * (CurrMoveSpd / 100);
+        ManaRegen();
     }
 
     void ControlUpdate() {
-        if (Stunned) {
+        if (Stunned || !Alive) {
             AttackVector = Vector2.zero;
             MoveVector = Vector2.zero;
             return;
         }
-        if (AI) {
+        else {
             AttackVector = AI.AttackVector;
-            if (!HasForce()) {
-                MoveVector = AI.MoveVector;
-            } else {
+            if (HasForce()) {
                 MoveVector = Vector2.zero;
+            } else {
+                MoveVector = AI.MoveVector;
             }
             Direction = AI.Direction;
         }
@@ -112,99 +104,36 @@ public abstract class EnemyController : ObjectController {
 
     //----------public
     //Combat
-    override public Value AutoAttackDamageDeal(float TargetDefense) {
-        Value dmg = Value.CreateValue(0, 0, false, GetComponent<ObjectController>());
-        if (Random.value < (CurrCritChance / 100)) {
-            dmg.Amount += CurrAD * (CurrCritDmgBounus / 100);
-            dmg.Amount += CurrMD * (CurrCritDmgBounus / 100);
-            dmg.IsCrit = true;
-        } else {
-            dmg.Amount = CurrAD + CurrMD;
-            dmg.IsCrit = false;
-        }
-        float reduced_dmg = dmg.Amount * (TargetDefense / 100);
-        dmg.Amount = dmg.Amount - reduced_dmg;
-        return dmg;
-    }
-
     override public void DeductHealth(Value dmg) {
-        if (CurrHealth - dmg.Amount <= 0) {
-            CurrHealth -= dmg.Amount;
-            IC.UpdateHealthBar();
-            IC.PopUpText(dmg);
-            DieUpdate();
-            return;
-        }
         if (dmg.IsCrit) {
-            Animator Anim = GetComponent<Animator>();
             Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
             Anim.Play("crit");
-        }
-        AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
-        CurrHealth -= dmg.Amount;
-        IC.UpdateHealthBar();
-        IC.PopUpText(dmg);
-    }
-
-    public override void DeductMana(Value mana_cost) {
-        if (CurrMana - mana_cost.Amount >= 0)//Double check
-            CurrMana -= mana_cost.Amount;
-        //No visual UI update
-    }
-
-    public override void HealHP(Value heal_hp) {
-        if (CurrHealth < MaxHealth && CurrHealth + heal_hp.Amount <= MaxHealth) {
-            CurrHealth += heal_hp.Amount;
-            IC.PopUpText(heal_hp);
-        } else if (CurrHealth < MaxHealth && CurrHealth + heal_hp.Amount > MaxHealth) {
-            heal_hp.Amount = MaxHealth - CurrHealth;
-            CurrHealth += heal_hp.Amount;
-            IC.PopUpText(heal_hp);
-        }
-        IC.UpdateHealthBar();
-    }
-
-    public override void HealMana(Value heal_mana) {
-        if (CurrMana < MaxMana && CurrMana + heal_mana.Amount <= MaxMana) {
-            CurrMana += heal_mana.Amount;
-            //IC.PopUpHeal(heal_mana);
-        } else if (CurrMana < MaxMana && CurrMana + heal_mana.Amount > MaxMana) {
-            heal_mana.Amount = MaxMana - CurrMana;
-            CurrHealth += heal_mana.Amount;
-            //IC.PopUpHeal(heal_mana);
-        }
-        IC.UpdateHealthBar();
-    }
-
-
-    //Animation
-    override public float GetMovementAnimSpeed() {
-        return (CurrMoveSpd/100) / (movement_animation_interval);
-    }
-
-    override public float GetAttackAnimSpeed() {
-        return (CurrAttkSpd/100) / (attack_animation_interval);
-    }
-
-    override public float GetPhysicsSpeedFactor() {
-        if (!Attacking) {
-            if (CurrMoveSpd < 100)
-                return 1 + CurrMoveSpd / 100;
-            else if (CurrMoveSpd > 100)
-                return 1 - CurrMoveSpd / 100;
-            else
-                return 1;
         } else {
-            if (CurrAttkSpd < 100)
-                return 1 + CurrAttkSpd / 100;
-            else if (CurrMoveSpd > 100)
-                return 1 - CurrAttkSpd / 100;
-            else
-                return 1;
+            if(dmg.Type!=-1)
+                AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
+        }
+        if (CurrHealth - dmg.Amount <= 0 && Alive) {
+            IC.PopUpText(dmg);
+            ON_DEATH_UPDATE += Die;
+            ON_DEATH_UPDATE();
+            ON_DEATH_UPDATE -= Die;
+        } else {
+            CurrHealth -= dmg.Amount;
+            IC.PopUpText(dmg);
         }
     }
 
+    protected override void Die() {
+        base.Die();
+        SpawnEXP();
+        if(LootDrop)
+            GetComponent<DropList>().SpawnLoots();
+    }
+
+    //Enemy Anim
     void AnimUpdate() {
+        if (!Alive)
+            return;
         if (Attacking) {
             Anim.speed = GetAttackAnimSpeed();
         } else {
@@ -228,21 +157,17 @@ public abstract class EnemyController : ObjectController {
     }   
 
     protected void SpawnEXP() {
-        PlayerController MPC = GameObject.Find("MainPlayer/PlayerController").GetComponent<PlayerController>();
+        MainPlayer MPC = GameObject.Find("MainPlayer/PlayerController").GetComponent<MainPlayer>();
         if(MPC.Alive)
             MPC.AddEXP(exp);        
     }
 
-    //void DieUpdate() {
-    //    if (CurrHealth <= 0) {//Insert dead animation here
-    //        Alive = false;
-    //        SpawnEXP();
-    //        GetComponent<DropList>().SpawnLoots();
-    //        Destroy(transform.parent.gameObject);
-    //    }
-    //}
 
-    protected abstract void DieUpdate();
+
+
+
+
+
 
 
 
@@ -273,8 +198,8 @@ public abstract class EnemyController : ObjectController {
     override public float GetMaxLPH() {
         return MaxLPH;
     }
-    override public float GetMaxMPH() {
-        return MaxMPH;
+    override public float GetMaxManaRegen() {
+        return MaxManaRegen;
     }
     override public float GetMaxDefense() {
         return MaxDefense;
@@ -311,8 +236,8 @@ public abstract class EnemyController : ObjectController {
     override public float GetCurrLPH() {
         return CurrLPH;
     }
-    override public float GetCurrMPH() {
-        return CurrMPH;
+    override public float GetCurrManaRegen() {
+        return CurrManaRegen;
     }
     override public float GetCurrDefense() {
         return CurrDefense;
@@ -347,8 +272,8 @@ public abstract class EnemyController : ObjectController {
     override public void SetMaxLPH(float lph) {
         MaxLPH = lph;
     }
-    override public void SetMaxMPH(float mph) {
-        MaxMPH = mph;
+    override public void SetMaxManaRegen(float mph) {
+        MaxManaRegen = mph;
     }
     override public void SetMaxDefense(float defense) {
         MaxDefense = defense;
@@ -382,8 +307,8 @@ public abstract class EnemyController : ObjectController {
     override public void SetCurrLPH(float lph) {
         CurrLPH = lph;
     }
-    override public void SetCurrMPH(float mph) {
-        CurrMPH = mph;
+    override public void SetCurrManaRegen(float mph) {
+        CurrManaRegen = mph;
     }
     override public void SetCurrDefense(float defense) {
         CurrDefense = defense;

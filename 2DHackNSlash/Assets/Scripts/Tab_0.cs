@@ -2,20 +2,16 @@
 using System.Collections;
 
 public class Tab_0 : MonoBehaviour {
-
-    private PlayerController PC;
-
-    GameObject ES;
+    [HideInInspector]
+    public MainPlayer MPC;
 
     GameObject CachedButtonOJ = null;
 
     void Awake() {
-        ES = GameObject.Find("EventSystem");
-        PC = transform.parent.GetComponent<CharacterSheetController>().PC;
+        MPC = transform.parent.GetComponent<CharacterSheetController>().MPC;
     }
 
     void Start() {
-
     }
 
 
@@ -34,23 +30,21 @@ public class Tab_0 : MonoBehaviour {
 
     public void TurnOn() {
         gameObject.SetActive(true);
-        ES.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(null);
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
         if (CachedButtonOJ)
-            ES.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(CachedButtonOJ);
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(CachedButtonOJ);
         else {
             GameObject FBO = transform.Find("InventoryButtons/0").gameObject;
-            ES.GetComponent<UnityEngine.EventSystems.EventSystem>().SetSelectedGameObject(FBO);
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(FBO);
         }
     }
 
     public void TurnOff() {
-        if(CachedButtonOJ)
-            CachedButtonOJ =  ES.GetComponent<UnityEngine.EventSystems.EventSystem>().currentSelectedGameObject;
+        CachedButtonOJ = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
         gameObject.SetActive(false);
     }
 
     public bool IsOn() {
-        //ES.GetComponent<UnityEngine.EventSystems.EventSystem>().i
         return gameObject.active;
     }
 }

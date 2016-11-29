@@ -18,8 +18,8 @@ public class BloodForBlood : PassiveSkill {
         base.Start();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         BloodForBloodlvl BFBL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -41,6 +41,7 @@ public class BloodForBlood : PassiveSkill {
                 break;
         }
         LPH_INC_Perentage = BFBL.LPH_INC_Perentage;
+        Description = "Increase your life steal by " + LPH_INC_Perentage + "% when your health fall below "+ HealthTriggerThreshold+"%. Effect lasts "+ Duration+" secs and can not be triggered again within "+ TriggerCD+" secs.";
     }
 
     protected override void Update() {
@@ -55,7 +56,7 @@ public class BloodForBlood : PassiveSkill {
         OC.ON_HEALTH_UPDATE += BFBPassive;
     }
 
-    private void BFBPassive(Value health_mod, ObjectController healer = null) {
+    private void BFBPassive(Value health_mod) {
         if (health_mod.Type == 0) {//Damage type
             if ((OC.GetCurrHealth() - health_mod.Amount) / OC.GetMaxHealth() <= HealthTriggerThreshold / 100) {
                 if (RealTime_TriggerCD == 0 && !OC.HasBuff(typeof(BloodForBloodBuff))) {

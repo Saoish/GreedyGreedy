@@ -11,8 +11,8 @@ public class IronWeaponMastery : PassiveSkill {
         base.Awake();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         IronWeaponMasterylvl IL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -34,6 +34,8 @@ public class IronWeaponMastery : PassiveSkill {
                 break;
         }
         DEF_DEC_Percentage = IL.DEF_INC_Percentage;
+
+        Description = "Increase your max defensive by "+DEF_DEC_Percentage+"% when you have a shield equipped.";
     }
 
     protected override void Start() {
@@ -45,7 +47,7 @@ public class IronWeaponMastery : PassiveSkill {
     }
 
     public override void ApplyPassive() {
-        WeaponController WC = ((PlayerController)OC).GetEquippedWeaponController();
+        WeaponController WC = ((PlayerController)OC).GetWC();
         if (!WC) {
             return;
         }

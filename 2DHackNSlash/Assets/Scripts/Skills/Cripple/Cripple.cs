@@ -13,8 +13,8 @@ public class Cripple : PassiveSkill {
         base.Awake();
     }
 
-    public override void InitSkill(int lvl) {
-        base.InitSkill(lvl);
+    public override void InitSkill(ObjectController OC, int lvl) {
+        base.InitSkill(OC, lvl);
         Cripplelvl CL = null;
         switch (this.SD.lvl) {
             case 0:
@@ -37,6 +37,8 @@ public class Cripple : PassiveSkill {
         }
         TriggerChance = CL.TriggerChance;
         DMG_DEC_Percentage = CL.DMG_DEC_Percentage;
+
+        Description = "Upon taking dmg, you have "+TriggerChance+"% chance to cripple the attacker which lowers their damage by "+DMG_DEC_Percentage+"% for "+Duration+ " secs, Cripple effect does not stack.";
     }
 
     protected override void Start() {
