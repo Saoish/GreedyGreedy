@@ -3,23 +3,19 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class AncientSlimeRoom : LevelManager {
-    public int NumberOfSlimesToKilled = 10;
+    public int BossSapwnWave = 10;
 
-    [SerializeField]
     private int WaveSlimesKilled;
-
-    [SerializeField]
-    private int CachedSlimesKilled;
 
     DropList LootSpawner;
 
     float SpawnTimer = 0f;
-    float SpawnInterval = 2f;
+    float SpawnInterval = 1f;
 
     float GapTimer = 0f;
     float LastGapTimer = 0f;
-    float GapInterval = 30f;
-
+    float GapInterval = 5f;
+    [SerializeField]
     int Wave = 1;
     int Spawned = 0;
 
@@ -84,14 +80,14 @@ public class AncientSlimeRoom : LevelManager {
 
     void CondictionCheck() {
         WaveSlimesKilled++;
-        CachedSlimesKilled++;
-        if (CachedSlimesKilled == NumberOfSlimesToKilled) {
-            AllowWait = false;
-            AllowSpawn = false;
-            BossFighting = true;
-            BossSpawner.Spawn();
-        }
-        else if(WaveSlimesKilled >= (Wave-1) * Spawners.Length && !BossFighting) {
+        if (WaveSlimesKilled >= (Wave-1) * Spawners.Length && !BossFighting) {
+            if (Wave == BossSapwnWave && !BossFighting) {
+                AllowWait = false;
+                AllowSpawn = false;
+                BossFighting = true;
+                BossSpawner.Spawn();
+                return;
+            }
             AllowWait = true;
             LootSpawner.SpawnLoots();
             WaveSlimesKilled = 0;

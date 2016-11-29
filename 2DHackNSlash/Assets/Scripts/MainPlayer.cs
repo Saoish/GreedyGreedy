@@ -33,6 +33,7 @@ public class MainPlayer : PlayerController {
 
     protected override void ControlUpdate() {
         if (Stunned || !Alive) {
+
             AttackVector = Vector2.zero;
             MoveVector = Vector2.zero;
             return;
@@ -45,6 +46,9 @@ public class MainPlayer : PlayerController {
                 AttackVector = ControllerManager.AttackVector;
             }
             if (HasForce()) {
+                Debug.Log(rb.velocity);
+                //Debug.Log(rb.angularDrag);
+                Debug.Log(rb.angularVelocity);
                 MoveVector = Vector2.zero;
             } else {
                 MoveVector = ControllerManager.MoveVector;

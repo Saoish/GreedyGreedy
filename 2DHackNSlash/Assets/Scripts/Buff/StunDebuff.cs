@@ -11,6 +11,7 @@ public class StunDebuff : Debuff {
     public override void ApplyDebuff(ModData MD, ObjectController target) {
         base.ApplyDebuff(MD, target);
         target.Stunned = true;
+        target.MountainlizeMass();
         Duration = MD.Duration;
         target.ActiveVFXParticle("StunDebuffVFX", Layer.Skill);
         AudioSource.PlayClipAtPoint(StunSFX, transform.position, GameManager.SFX_Volume);
@@ -18,6 +19,7 @@ public class StunDebuff : Debuff {
 
     protected override void RemoveDebuff() {
         target.Stunned = false;
+        target.NormalizeMass();
         target.DeactiveVFXParticle("StunDebuffVFX");
         DestroyObject(gameObject);
     }
