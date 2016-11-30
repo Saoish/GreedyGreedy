@@ -57,7 +57,7 @@ public class Cleave : ActiveSkill {
         ADScale = CL.ADScale;
         RangeScale = CL.RangeScale;
         transform.localScale = new Vector2(RangeScale, RangeScale);
-        Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), OC.transform.GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), OC.GetRootCollider());
 
         Description = "Summon a size "+RangeScale+" dark weapon to deal "+ ADScale+ "% AD damage to enemies infront of you and knock them off. \n\nCost: " + ManaCost + " Mana\nCD: "+CD+" secs\n";
     }
@@ -76,11 +76,11 @@ public class Cleave : ActiveSkill {
             return;
         if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {//Player Attack
             if (collider.tag == "Player") {
-                if (collider.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
+                if (collider.transform.parent.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
                     return;
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
                 return;
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
             Push(target);
             OC.ON_DMG_DEAL += DealCleaveDmg;
             OC.ON_DMG_DEAL(target);
@@ -92,7 +92,7 @@ public class Cleave : ActiveSkill {
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
                 return;
             }
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
             Push(target);
             OC.ON_DMG_DEAL += DealCleaveDmg;
             OC.ON_DMG_DEAL(target);
@@ -128,7 +128,7 @@ public class Cleave : ActiveSkill {
 
     void Push(ObjectController target) {
         Vector2 BouceOffDirection = (Vector2)Vector3.Normalize(target.transform.position - OC.transform.position);
-        target.NormalizeMass();
+        target.NormalizeRigibody();
         target.AddForce(BouceOffDirection,SD.lvl * 2, ForceMode2D.Impulse);
     }
 

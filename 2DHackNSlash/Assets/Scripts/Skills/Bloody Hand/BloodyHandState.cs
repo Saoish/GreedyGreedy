@@ -33,11 +33,11 @@ public class BloodyHandState : StateMachineBehaviour {
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if (stateInfo.normalizedTime >= 0.4 && stateInfo.normalizedTime<0.5) {
             animator.transform.GetComponent<Collider2D>().enabled = true;
-            animator.transform.GetComponent<BloodyHand>().GetOC().MountainlizeMass();
+            animator.transform.GetComponent<BloodyHand>().GetOC().MountainlizeRigibody();
         }
         if (stateInfo.normalizedTime >= 0.5) {
             animator.transform.GetComponent<Collider2D>().enabled = false;
-            animator.transform.GetComponent<BloodyHand>().GetOC().NormalizeMass();
+            animator.transform.GetComponent<BloodyHand>().GetOC().NormalizeRigibody();
             Stack<Collider2D> HittedStack = animator.transform.GetComponent<BloodyHand>().HittedStack;
             if (HittedStack.Count != 0) {
                 HittedStack.Clear();

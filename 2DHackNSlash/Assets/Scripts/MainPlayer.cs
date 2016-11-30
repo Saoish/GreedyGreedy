@@ -14,7 +14,7 @@ public class MainPlayer : PlayerController {
         foreach(GameObject to in TestObjects) {
             to.GetComponent<EquipmentController>().InstantiateLoot(transform);
         }
-        PUIC = transform.parent.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
+        PUIC = transform.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
         PlayerData = SaveLoadManager.LoadPlayerInfo(SaveLoadManager.SlotIndexToLoad);
     }
 
@@ -33,7 +33,6 @@ public class MainPlayer : PlayerController {
 
     protected override void ControlUpdate() {
         if (Stunned || !Alive) {
-
             AttackVector = Vector2.zero;
             MoveVector = Vector2.zero;
             return;
@@ -46,9 +45,7 @@ public class MainPlayer : PlayerController {
                 AttackVector = ControllerManager.AttackVector;
             }
             if (HasForce()) {
-                Debug.Log(rb.velocity);
-                //Debug.Log(rb.angularDrag);
-                Debug.Log(rb.angularVelocity);
+                Debug.Log(rb.velocity.magnitude);
                 MoveVector = Vector2.zero;
             } else {
                 MoveVector = ControllerManager.MoveVector;
@@ -62,7 +59,7 @@ public class MainPlayer : PlayerController {
             PUIC.transform.Find("PickUpNotify").gameObject.SetActive(true);
             if (Input.GetKeyDown(ControllerManager.Interact) || Input.GetKeyDown(ControllerManager.J_A)) {
                 if (InventoryIsFull()) {
-                    Debug.Log("Your inventory is full!");
+                    RedNotification.Push(RedNotification.Type.INVENTORY_FULL);
                 } else {
                     int InventoryIndex = FirstAvailbleInventorySlot();
                     AddToInventory(InventoryIndex, PickedTarget.GetComponent<EquipmentController>().E);
@@ -87,6 +84,19 @@ public class MainPlayer : PlayerController {
         }
     }
 
+    //void OnCollisionStay2D(Collision2D collision) {
+    //    Debug.Log(collision.collider);
+    //    if (collision.collider.tag == "Enemy" || collision.collider.tag == "Player") {
+    //        collision.collider.transform.parent.GetComponent<ObjectController>();.MountainlizeMass();
+    //        collision.collider.transform.parent.GetComponent<ObjectController>();.ZerolizeForce();
+    //    }
+    //}
+
+    //void OnCollisionExit2D(Collision2D collision) {
+    //    if (collision.collider.tag == "Enemy" || collision.collider.tag == "Player") {
+    //        collision.collider.transform.parent.GetComponent<ObjectController>();.NormalizeMass();
+    //    }
+    //}
 
 
 

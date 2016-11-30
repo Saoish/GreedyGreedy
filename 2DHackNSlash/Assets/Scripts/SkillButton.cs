@@ -62,7 +62,7 @@ public class SkillButton : MonoBehaviour {
         SkillIndex = int.Parse(gameObject.name);
         IconImage = GetComponent<Image>();
         MPC = transform.parent.parent.parent.GetComponent<Tab_1>().MPC;
-        MPUI = MPC.transform.parent.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
+        MPUI = MPC.transform.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
         CSC = MPUI.transform.Find("CharacterSheet").GetComponent<CharacterSheetController>();
         FetchSkill();
         LoadSkillIcon();

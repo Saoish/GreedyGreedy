@@ -1,98 +1,98 @@
-0,OPOPOP,Warrior,10,0,2300,0,40,99,100,100,0,0,100,100,0,0,200,0,20
+0,OPOPOP,Warrior,4,0,600,0,4,4,100,100,0,0,100,100,0,0,200,0,10
 ---CategorySeperator---
-0,5,5,5,5,5,0,5,0,0,5,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
-Cleave,Phantom Charge,Fury,War Stomp
+null,null,null,null
 ---CategorySeperator---
-3,Horned Skullcap,Warrior,Helmet,0,8,0,0,0,0,0,13,0,0,0,0,0,0
--EquipSeperator-
-0,Battered Breastplate,Warrior,Chest,0,1,0,0,0,0,0,3,0,0,0,0,0,0
+null
 -EquipSeperator-
 null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,15,0,4,0,0,2,5,1,0,0,0
+null
+-EquipSeperator-
+1,Greatsword,Warrior,Weapon,0,0,0,12,0,7,0,0,4,7,0,0,0,0
 -EquipSeperator-
 0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
-0,Battle Axe,Warrior,Weapon,0,0,0,14,0,3,0,0,2,3,1,0,0,0
+null
 -EquipSeperator-
-0,Battle Axe,Warrior,Weapon,0,0,0,10,0,1,0,0,3,1,0,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,17,0,4,0,0,5,6,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,16,0,3,0,0,5,3,2,0,0,0
+null
 -EquipSeperator-
-3,Bone Bracelet,Warrior,Shackle,0,5,0,0,0,0,8,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Silver Crown,Warrior,Helmet,0,6,0,0,0,0,0,6,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Manacle,Warrior,Shackle,0,3,0,0,0,0,1,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-2,Radiant Band,Warrior,Shackle,0,10,0,0,0,0,4,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Breastplate,Warrior,Chest,0,3,0,0,0,0,0,1,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battle Axe,Warrior,Weapon,0,0,0,14,0,3,0,0,3,1,1,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,13,0,4,0,0,5,2,2,0,0,0
+null
 -EquipSeperator-
-1,Silver Chestguard,Warrior,Chest,0,2,0,0,0,0,0,2,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Silver Crown,Warrior,Helmet,0,2,0,0,0,0,0,7,0,0,0,0,0,0
+null
 -EquipSeperator-
-2,Radiant Crown,Warrior,Helmet,0,3,0,0,0,0,0,6,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Sea Orb,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Manacle,Warrior,Shackle,0,3,0,0,0,0,4,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Plate Hood,Warrior,Helmet,0,5,0,0,0,0,0,2,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Plate Hood,Warrior,Helmet,0,3,0,0,0,0,0,5,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Sea Orb,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Breastplate,Warrior,Chest,0,4,0,0,0,0,0,1,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battle Axe,Warrior,Weapon,0,0,0,10,0,5,0,0,5,2,1,0,0,0
+null
 -EquipSeperator-
-3,Bone Bracelet,Warrior,Shackle,0,6,0,0,0,0,15,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Silver Band,Warrior,Shackle,0,4,0,0,0,0,2,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Silver Chestguard,Warrior,Chest,0,4,0,0,0,0,0,7,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Breastplate,Warrior,Chest,0,5,0,0,0,0,0,4,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Silver Crown,Warrior,Helmet,0,5,0,0,0,0,0,7,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battered Manacle,Warrior,Shackle,0,2,0,0,0,0,4,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,14,0,5,0,0,3,5,1,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,13,0,5,0,0,6,4,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-2,Blood Orb,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,12,0,5,0,0,3,2,1,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,14,0,5,0,0,5,7,0,0,0,0
+null
 ------SlotSeperator------
 1,null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---

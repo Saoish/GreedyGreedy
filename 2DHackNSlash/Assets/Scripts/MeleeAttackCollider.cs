@@ -24,9 +24,11 @@ public class MeleeAttackCollider : AttackCollider {
 
     protected override void Start() {
         base.Start();
-        OC = transform.parent.GetComponent<ObjectController>();
-        if(OC!=null)
-            Physics2D.IgnoreCollision(SelfCollider, OC.transform.GetComponent<Collider2D>());
+        //Debug.Log(transform.parent);
+        OC = GetComponentInParent<ObjectController>();
+        if (OC != null) {
+            Physics2D.IgnoreCollision(SelfCollider, OC.GetRootCollider());
+        }
     }
 
     protected override void Update () {
@@ -58,13 +60,13 @@ public class MeleeAttackCollider : AttackCollider {
             return;
         if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {//Player Attack
             if (collider.tag == "Player") {
-                if (collider.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
+                if (collider.transform.parent.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
                     return;
             } 
             else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
                     return;
             }
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();
             OC.ON_DMG_DEAL += DealMeleeAttackDMG;
             OC.ON_DMG_DEAL(target);
             OC.ON_DMG_DEAL -= DealMeleeAttackDMG;
@@ -77,7 +79,7 @@ public class MeleeAttackCollider : AttackCollider {
             else if(HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
                 return;
             }
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();
             OC.ON_DMG_DEAL += DealMeleeAttackDMG;
             OC.ON_DMG_DEAL(target);
             OC.ON_DMG_DEAL -= DealMeleeAttackDMG;

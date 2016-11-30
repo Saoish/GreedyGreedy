@@ -11,7 +11,7 @@ public class IndicationController : MonoBehaviour {
     // Use this for initialization
     void Start() {
         //GetComponent<Canvas>().sortingOrder = OrderInLayers;
-        OC = transform.parent.GetComponent<ObjectController>();
+        OC = transform.parent.parent.GetComponent<ObjectController>();
         HealthMask = transform.Find("Health Bar/Mask");
         Name = transform.Find("Name").GetComponent<Text>();
         Name.text = OC.GetName();
@@ -32,7 +32,7 @@ public class IndicationController : MonoBehaviour {
 
     //public methods
     public void PopUpText(Value value) {
-        if (value.Amount == 0)
+        if (value.Amount == 0 || !OC.Alive)
             return;
         GameObject PopUpText = Instantiate(Resources.Load("UIPrefabs/PopUpText"),transform) as GameObject;
         PopUpText.transform.localScale = new Vector3(2, 2, 1);

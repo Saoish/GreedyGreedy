@@ -6,6 +6,9 @@ public class WarStomp : ActiveSkill {
     float ADScale;
     float StunDuration;
 
+    delegate void Del(ObjectController target);
+    Del DEL;
+
     public Stack<Collider2D> HittedStack = new Stack<Collider2D>();
 
     Collider2D StompCollider;
@@ -55,7 +58,7 @@ public class WarStomp : ActiveSkill {
         ManaCost = WSL.ManaCost;
         ADScale = WSL.ADScale;
         StunDuration = WSL.StunDuration;
-        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());//Ignore self here
+        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.GetRootCollider());//Ignore self here
 
         Description = "Heavily stomp the ground, dealing "+ADScale+"% AD dmg to nearby foes and stun them for "+StunDuration+" secs.\n\nCost: "+ManaCost+" Mana\nCD: "+CD+" secs";
     }
@@ -74,11 +77,11 @@ public class WarStomp : ActiveSkill {
             return;
         if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {//Player Attack
             if (collider.tag == "Player") {
-                if (collider.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
+                if (collider.transform.parent.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
                     return;
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider))
                 return;
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
             OC.ON_DMG_DEAL += StunAndDealStompDmg;
             OC.ON_DMG_DEAL(target);
             OC.ON_DMG_DEAL -= StunAndDealStompDmg;
@@ -90,7 +93,7 @@ public class WarStomp : ActiveSkill {
             else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {
                 return;
             }
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();
             OC.ON_DMG_DEAL += StunAndDealStompDmg;
             OC.ON_DMG_DEAL(target);
             OC.ON_DMG_DEAL -= StunAndDealStompDmg;

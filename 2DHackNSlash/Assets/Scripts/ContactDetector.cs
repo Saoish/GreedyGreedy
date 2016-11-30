@@ -8,19 +8,20 @@ public class ContactDetector : MonoBehaviour {
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("ContactDetector"), LayerMask.NameToLayer("Skill"));
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("ContactDetector"), LayerMask.NameToLayer("Melee"));
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("ContactDetector"), LayerMask.NameToLayer("Projectile"));
-        Physics2D.IgnoreCollision(transform.Find("PlayerController").GetComponent<Collider2D>(), GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(transform.Find("Root").GetComponent<Collider2D>(), GetComponent<Collider2D>());
     }
 
     void OnTriggerEnter2D(Collider2D collider) {
         if (collider.tag == "Enemy" || collider.tag == "Player") {
-            collider.transform.GetComponent<ObjectController>().MountainlizeMass();
-            collider.transform.GetComponent<ObjectController>().ZerolizeForce();
+            collider.transform.parent.GetComponent<ObjectController>().MountainlizeRigibody();
+            collider.transform.parent.GetComponent<ObjectController>().ZerolizeForce();
+            //collider.transform.parent.GetComponent<ObjectController>().NormalizeDrag();
         }
     }
 
     void OnTriggerExit2D(Collider2D collider) {
         if (collider.tag == "Enemy" || collider.tag == "Player") {
-            collider.transform.GetComponent<ObjectController>().NormalizeMass();
+            collider.transform.parent.GetComponent<ObjectController>().NormalizeRigibody();
         }
     }
 }

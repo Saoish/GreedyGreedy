@@ -108,6 +108,8 @@ public abstract class EnemyController : ObjectController {
         if (dmg.IsCrit) {
             Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
             Anim.Play("crit");
+            if (dmg.Type != -1)
+                AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
         } else {
             if(dmg.Type!=-1)
                 AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
@@ -126,8 +128,10 @@ public abstract class EnemyController : ObjectController {
     protected override void Die() {
         base.Die();
         SpawnEXP();
-        if(LootDrop)
-            GetComponent<DropList>().SpawnLoots();
+        if (LootDrop) {
+            if(GetComponent<DropList>())
+                GetComponent<DropList>().SpawnLoots();
+        }
     }
 
     //Enemy Anim
@@ -157,7 +161,7 @@ public abstract class EnemyController : ObjectController {
     }   
 
     protected void SpawnEXP() {
-        MainPlayer MPC = GameObject.Find("MainPlayer/PlayerController").GetComponent<MainPlayer>();
+        MainPlayer MPC = GameObject.Find("MainPlayer").GetComponent<MainPlayer>();
         if(MPC.Alive)
             MPC.AddEXP(exp);        
     }

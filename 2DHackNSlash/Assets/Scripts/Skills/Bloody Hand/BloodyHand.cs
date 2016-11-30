@@ -58,7 +58,7 @@ public class BloodyHand : ActiveSkill {
         ADScale = BHL.ADScale;
         RangeScale = BHL.RangeScale;
         transform.localScale = new Vector2(RangeScale, RangeScale);
-        Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), OC.transform.GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(GetComponent<BoxCollider2D>(), OC.GetRootCollider());
 
         Description = "Summon a size " +RangeScale+" bloody hand to deal " +ADScale+"% AD damage and grab enemies for you.\n\nCost: "+ManaCost+" Mana\nCD: "+CD+" secs";
     }
@@ -77,11 +77,11 @@ public class BloodyHand : ActiveSkill {
             return;
         if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {//Player Attack
             if (collider.tag == "Player") {
-                if (collider.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
+                if (collider.transform.parent.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer))
                     return;
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider))//Prevent duplicated attacks
                 return;
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
             Pull(target);
             OC.ON_DMG_DEAL += DealBHDmg;
             OC.ON_DMG_DEAL(target);
@@ -93,7 +93,7 @@ public class BloodyHand : ActiveSkill {
             } else if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
                 return;
             }
-            ObjectController target = collider.GetComponent<ObjectController>();
+            ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
             Pull(target);
             OC.ON_DMG_DEAL += DealBHDmg;
             OC.ON_DMG_DEAL(target);
@@ -125,6 +125,7 @@ public class BloodyHand : ActiveSkill {
 
     void Pull(ObjectController target) {
         Vector2 PullDirection = (Vector2)Vector3.Normalize(OC.transform.position - target.transform.position);
+        //target.NormalizeRigibody();
         target.AddForce(PullDirection,PullForce, ForceMode2D.Impulse);
     }
 

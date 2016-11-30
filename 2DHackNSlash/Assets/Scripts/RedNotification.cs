@@ -22,7 +22,8 @@ public class RedNotification : MonoBehaviour {
         MAX_SKILL_LVL,
         STUNNED,
         SKILL_REQUIREMENT_NOT_MET,
-        SKILL_NOT_LEARNED
+        SKILL_NOT_LEARNED,
+        INVENTORY_FULL
     };
     void Awake() {
         Anim = GetComponent<Animator>();
@@ -49,6 +50,8 @@ public class RedNotification : MonoBehaviour {
             message = "You do not meet the requirement.";
         }else if(type == Type.SKILL_NOT_LEARNED) {
             message = "You have not learned this skill yet.";
+        }else if(type == Type.INVENTORY_FULL) {
+            message = "Your inventory is full.";
         }
 
 

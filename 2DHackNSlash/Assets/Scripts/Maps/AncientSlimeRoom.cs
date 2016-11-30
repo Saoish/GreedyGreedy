@@ -14,7 +14,7 @@ public class AncientSlimeRoom : LevelManager {
 
     float GapTimer = 0f;
     float LastGapTimer = 0f;
-    float GapInterval = 5f;
+    float GapInterval = 0f;
     [SerializeField]
     int Wave = 1;
     int Spawned = 0;

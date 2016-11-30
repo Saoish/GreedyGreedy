@@ -19,7 +19,7 @@ public class MainPlayerUI : MonoBehaviour {
     public bool AllowControl = true;
 
 	void Awake () {
-        MPC = transform.parent.Find("PlayerController").GetComponent<MainPlayer>();
+        MPC = transform.parent.GetComponent<MainPlayer>();
         HealthMask = transform.Find("Action Bar/Health Orb");
         ManaMask = transform.Find("Action Bar/Mana Orb");
         ExpMask = transform.Find("Action Bar/XP mask");

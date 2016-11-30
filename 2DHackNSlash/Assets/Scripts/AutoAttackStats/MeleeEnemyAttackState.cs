@@ -18,7 +18,7 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        EnemyController EC = animator.transform.parent.GetComponent<EnemyController>();
+        EnemyController EC = animator.transform.parent.parent.GetComponent<EnemyController>();
         EC.Attacking = false;
     }
 
@@ -33,7 +33,7 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
     //}
 
     void MeleeAttackEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        EnemyController EC = animator.transform.parent.GetComponent<EnemyController>();
+        EnemyController EC = animator.transform.parent.parent.GetComponent<EnemyController>();
         Transform T_AttackCollider = EC.GetMeleeAttackColliderTransform();
         EC.Attacking = true;
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
@@ -58,7 +58,7 @@ public class MeleeEnemyAttackState : StateMachineBehaviour {
     }
 
     void MeleeAttacExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        EnemyController EC = animator.transform.parent.GetComponent<EnemyController>();
+        EnemyController EC = animator.transform.parent.parent.GetComponent<EnemyController>();
         Transform T_AttackCollider = EC.GetMeleeAttackColliderTransform();
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         AttackCollider.enabled = false;

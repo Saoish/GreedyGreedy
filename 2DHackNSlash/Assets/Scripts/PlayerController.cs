@@ -100,14 +100,22 @@ public abstract class PlayerController : ObjectController {
             ON_DEATH_UPDATE -= Die;
             return;
         }
-        if (dmg.Type == -1) {//Dot type. no sound update
+        if (dmg.Type == -1) {//Dot no sound update
         } else if (dmg.IsCrit) {
             Animator Anim = VisualHolder.GetComponent<Animator>();
             Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
             Anim.Play("crit");
             AudioSource.PlayClipAtPoint(crit_hurt, transform.position, GameManager.SFX_Volume);
+        }
+        if (dmg.IsCrit) {
+            Animator Anim = VisualHolder.GetComponent<Animator>();
+            Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
+            Anim.Play("crit");
+            if(dmg.Type!=-1)
+                AudioSource.PlayClipAtPoint(crit_hurt, transform.position, GameManager.SFX_Volume);
         } else {
-            AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
+            if (dmg.Type != -1)
+                AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
         }
         if (CurrHealth - dmg.Amount <= 0 && Alive) {
             IC.PopUpText(dmg);

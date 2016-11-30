@@ -58,7 +58,7 @@ public class PhantomCharge : ActiveSkill {
         ManaCost = PCL.ManaCost;
         ADScale = PCL.ADScale;
         Force = PCL.Force;
-        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.transform.GetComponent<Collider2D>());//Ignore self here
+        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.GetRootCollider());//Ignore self here
         SmokePS.startSize *= OC.GetVFXScale();
 
         Description = "Turn into a black mist and charge forward with speed of "+Force+", dealing "+ADScale+"% AD damage to collided enemies.\n\n Cost: "+ManaCost+" Mana\nCD: "+CD+" secs";
@@ -130,7 +130,7 @@ public class PhantomCharge : ActiveSkill {
                 if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
                     return;
                 }
-                ObjectController target = collider.GetComponent<ObjectController>();
+                ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                 //target.MountainlizeMass();
                 OC.ON_DMG_DEAL += DealSkillDmg;
                 OC.ON_DMG_DEAL(target);
@@ -138,12 +138,12 @@ public class PhantomCharge : ActiveSkill {
                 HittedStack.Push(collider);
                 AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
             } else if (collider.tag == "Player") {
-                if (collider.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer)) {
+                if (collider.transform.parent.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer)) {
                     if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
                         return;
                     }
-                    ObjectController target = collider.GetComponent<ObjectController>();
-                    target.MountainlizeMass();
+                    ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
+                    target.MountainlizeRigibody();
                     OC.ON_DMG_DEAL += DealSkillDmg;
                     OC.ON_DMG_DEAL(target);
                     OC.ON_DMG_DEAL -= DealSkillDmg;
@@ -159,7 +159,7 @@ public class PhantomCharge : ActiveSkill {
                 if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
                     return;
                 }
-                ObjectController target = collider.GetComponent<ObjectController>();
+                ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                 //target.MountainlizeMass();
                 OC.ON_DMG_DEAL += DealSkillDmg;
                 OC.ON_DMG_DEAL(target);

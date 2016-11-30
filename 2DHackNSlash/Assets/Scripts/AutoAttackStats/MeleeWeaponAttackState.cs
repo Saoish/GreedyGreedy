@@ -18,7 +18,7 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        PlayerController PC = animator.transform.parent.parent.GetComponent<PlayerController>();
+        PlayerController PC = animator.transform.parent.parent.parent.GetComponent<PlayerController>();
         PC.Attacking = false;
     }
 
@@ -33,7 +33,7 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
     //}
 
     void MeleeAttackEnter(Animator animator, AnimatorStateInfo stateInfo) {
-        PlayerController PC = animator.transform.parent.parent.GetComponent<PlayerController>();
+        PlayerController PC = animator.transform.parent.parent.parent.GetComponent<PlayerController>();
         WeaponController WC = PC.GetWC();
         PC.ON_MANA_UPDATE += PC.DeductMana;
         PC.ON_MANA_UPDATE(Value.CreateValue(WC.ManaCost));
@@ -127,7 +127,7 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
     }
 
     void MeleeAttacExit(Animator animator, AnimatorStateInfo stateInfo) {
-        PlayerController PC = animator.transform.parent.parent.GetComponent<PlayerController>();
+        PlayerController PC = animator.transform.parent.parent.parent.GetComponent<PlayerController>();
         Transform T_AttackCollider = PC.GetMeleeAttackColliderTransform();
         BoxCollider2D AttackCollider = T_AttackCollider.GetComponent<BoxCollider2D>();
         AttackCollider.enabled = false;

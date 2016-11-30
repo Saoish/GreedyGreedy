@@ -48,20 +48,23 @@ public abstract class ObjectController : MonoBehaviour {
     protected Transform VisualHolder;
     protected Transform MeleeAttackCollider;
 
+    protected Collider2D RootCollider;
+
     protected IndicationController IC;
 
     virtual protected void Awake() {
-        gameObject.layer = LayerMask.NameToLayer("KillingGround");
+        transform.Find("Root").gameObject.layer = LayerMask.NameToLayer("KillingGround");
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("KillingGround"), LayerMask.NameToLayer("Loot"));
-        rb = transform.parent.GetComponent<Rigidbody2D>();
-        IC = transform.Find("Indication Board").GetComponent<IndicationController>();
-        VisualHolder = transform.Find("VisualHolder");
-        MeleeAttackCollider = transform.Find("MeleeAttackCollider");
-        VFX_Transform = transform.Find("VFX");
-        T_Actives = transform.Find("Actives");
-        T_Passives = transform.Find("Passives");
-        Buffs = transform.Find("Buffs");
-        Debuffs = transform.Find("Debuffs");
+        rb = transform.GetComponent<Rigidbody2D>();
+        IC = GetComponentInChildren<IndicationController>();
+        VisualHolder = transform.Find("Root/VisualHolder");
+        MeleeAttackCollider = transform.Find("Root/MeleeAttackCollider");
+        VFX_Transform = transform.Find("Root/VFX");
+        T_Actives = transform.Find("Root/Actives");
+        T_Passives = transform.Find("Root/Passives");
+        Buffs = transform.Find("Root/Buffs");
+        Debuffs = transform.Find("Root/Debuffs");
+        RootCollider = transform.Find("Root").GetComponent<Collider2D>();
     }
 
     virtual protected void Start() {
@@ -81,6 +84,18 @@ public abstract class ObjectController : MonoBehaviour {
     }
 
     //Transform
+    public Collider2D GetRootCollider() {
+        return RootCollider;
+    }
+
+    public Transform Debuffs_T() {
+        return Debuffs;
+    }
+    
+    public Transform Buffs_T() {
+        return Buffs;
+    }
+
     public Transform GetVisualHolderTransform() {
         return VisualHolder;
     }
@@ -92,21 +107,23 @@ public abstract class ObjectController : MonoBehaviour {
     public void SwapMeleeAttackCollider(Transform MeleeAttackCollider) {
         Destroy(this.MeleeAttackCollider.gameObject);
         this.MeleeAttackCollider = null;
-        MeleeAttackCollider.parent = transform;
+        MeleeAttackCollider.parent = transform.Find("Root");
         this.MeleeAttackCollider = MeleeAttackCollider;
     }
 
     //Physics
     public bool HasForce() {
-        return rb.velocity != Vector2.zero ||rb.angularVelocity!=0;
+        return rb.velocity.magnitude>=0.1f;
     }
 
-    public void MountainlizeMass() {
-        rb.mass = 1000;
+    public void MountainlizeRigibody() {
+        //rb.mass = 1000;
+        rb.isKinematic = true;
     }
 
-    public void NormalizeMass() {
-        rb.mass = 1;
+    public void NormalizeRigibody() {
+        //rb.mass = 1;
+        rb.isKinematic = false;
     }
 
     public void ZerolizeForce() {
@@ -228,9 +245,9 @@ public abstract class ObjectController : MonoBehaviour {
     protected virtual void Die() {
         SetCurrHealth(0);
         Alive = false;
-        GetComponent<Collider2D>().enabled = false;
+        RootCollider.enabled = false;
         VisualHolder.gameObject.SetActive(false);
-        Destroy(transform.parent.gameObject, 1);
+        Destroy(transform.gameObject, 1);
     }
 
     public void DeductMana(Value mana_cost) {
