@@ -1,42 +1,42 @@
-0,OPOPOP,Warrior,30,0,2700,0,0,0,100,100,30,0,100,100,0,0,200,0,10
+0,OPOPOP,Warrior,1,0,0,0,1,50,100,100,0,0,100,100,0,0,200,0,10
 ---CategorySeperator---
-0,5,5,5,5,5,0,0,0,0,5,0,0,0,0,0,0,0
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
-Cleave,Phantom Charge,null,War Stomp
+null,null,null,null
 ---CategorySeperator---
-0,Battered Plate Hood,Warrior,Helmet,0,1,0,0,0,0,0,2,0,0,0,0,0,0
--EquipSeperator-
-0,Battered Breastplate,Warrior,Chest,0,2,0,0,0,0,0,4,0,0,0,0,0,0
+null
 -EquipSeperator-
 null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,17,0,6,0,0,4,3,2,0,0,0
+null
 -EquipSeperator-
-1,Sea Orb,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
+-EquipSeperator-
+null
 ---CategorySeperator---
-2,Blood Orb,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battle Axe,Warrior,Weapon,0,0,0,13,0,4,0,0,5,4,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-2,Blood Orb,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-3,Bone Bracelet,Warrior,Shackle,0,14,0,0,0,0,8,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-2,Radiant Band,Warrior,Shackle,0,5,0,0,0,0,4,0,0,0,0,0,0,0
+null
 -EquipSeperator-
-0,Battle Axe,Warrior,Weapon,0,0,0,14,0,5,0,0,4,4,1,0,0,0
+null
 -EquipSeperator-
-0,Battered Breastplate,Warrior,Chest,0,1,0,0,0,0,0,1,0,0,0,0,0,0
+null
 -EquipSeperator-
-1,Greatsword,Warrior,Weapon,0,0,0,17,0,7,0,0,4,2,0,0,0,0
+null
 -EquipSeperator-
 null
 -EquipSeperator-

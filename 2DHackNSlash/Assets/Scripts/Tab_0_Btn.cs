@@ -23,6 +23,9 @@ public class Tab_0_Btn : MonoBehaviour {
             StatPoints_Text.text = "";
             Anim.SetBool("Blinking", false);
             Anim.enabled = false;
+            Color c = GetComponent<Image>().color;
+            c.a = 0;
+            GetComponent<Image>().color = c;
         }
 
     }

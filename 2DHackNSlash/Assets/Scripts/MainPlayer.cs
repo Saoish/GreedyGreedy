@@ -3,9 +3,10 @@ using System.Collections;
 using System;
 
 public class MainPlayer : PlayerController {
-    private GameObject PickedTarget = null;
+
+    public GameObject PickedTarget = null;
     
-    private MainPlayerUI PUIC;
+    private MainPlayerUI MPUI;
 
     public GameObject[] TestObjects;
 
@@ -16,7 +17,7 @@ public class MainPlayer : PlayerController {
         foreach(GameObject to in TestObjects) {
             to.GetComponent<EquipmentController>().InstantiateLoot(transform);
         }
-        PUIC = transform.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
+        MPUI = transform.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
         PlayerData = SaveLoadManager.LoadPlayerInfo(SaveLoadManager.SlotIndexToLoad);
         MainCamera = VisualHolder.GetComponentInChildren<Camera>();
     }
@@ -33,9 +34,9 @@ public class MainPlayer : PlayerController {
     protected override void Die() {
         base.Die();
         MainCamera.transform.parent = null;
-        Destroy(transform.gameObject);
-        GameManager.LoadSceneWithWaitTime("Developing", 3f);
-        //GameManager.LoadScene("Developing");
+        TopNotification.Push("Your soul is fading...",MyColor.Red);
+        Destroy(transform.gameObject,4f);
+        GameManager.LoadSceneWithWaitTime("Developing", 5f);
     }
 
     protected override void ControlUpdate() {
@@ -52,7 +53,7 @@ public class MainPlayer : PlayerController {
                 AttackVector = ControllerManager.AttackVector;
             }
             if (HasForce()) {
-                Debug.Log(rb.velocity.magnitude);
+                //Debug.Log(rb.velocity.magnitude);
                 MoveVector = Vector2.zero;
             } else {
                 MoveVector = ControllerManager.MoveVector;
@@ -63,7 +64,7 @@ public class MainPlayer : PlayerController {
 
     void PickUpInUpdate() {
         if (PickedTarget != null && ControllerManager.AllowControlUpdate) {
-            PUIC.transform.Find("PickUpNotify").gameObject.SetActive(true);
+            MPUI.transform.Find("PickUpNotify").gameObject.SetActive(true);
             if (Input.GetKeyDown(ControllerManager.Interact) || Input.GetKeyDown(ControllerManager.J_A)) {
                 if (InventoryIsFull()) {
                     RedNotification.Push(RedNotification.Type.INVENTORY_FULL);
@@ -74,8 +75,9 @@ public class MainPlayer : PlayerController {
                     PickedTarget = null;
                 }
             }
-        } else
-            PUIC.transform.Find("PickUpNotify").gameObject.SetActive(false);
+        } 
+        else
+            MPUI.transform.Find("PickUpNotify").gameObject.SetActive(false);
     }
 
     void OnTriggerStay2D(Collider2D collider) {
@@ -90,22 +92,6 @@ public class MainPlayer : PlayerController {
             PickedTarget = null;
         }
     }
-
-    //void OnCollisionStay2D(Collision2D collision) {
-    //    Debug.Log(collision.collider);
-    //    if (collision.collider.tag == "Enemy" || collision.collider.tag == "Player") {
-    //        collision.collider.transform.parent.GetComponent<ObjectController>();.MountainlizeMass();
-    //        collision.collider.transform.parent.GetComponent<ObjectController>();.ZerolizeForce();
-    //    }
-    //}
-
-    //void OnCollisionExit2D(Collision2D collision) {
-    //    if (collision.collider.tag == "Enemy" || collision.collider.tag == "Player") {
-    //        collision.collider.transform.parent.GetComponent<ObjectController>();.NormalizeMass();
-    //    }
-    //}
-
-
 
 
 

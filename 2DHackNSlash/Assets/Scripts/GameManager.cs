@@ -17,12 +17,12 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void OnLevelWasLoaded() {
+    //void OnLevelWasLoaded() {
         
-    }
+    //}
 
     void Update() {
-        if (Input.GetKeyDown(ControllerManager.ToggleShow) || Input.GetAxisRaw(ControllerManager.J_DH)<0) {
+        if (ControllerManager.AllowControlUpdate && (Input.GetKeyDown(ControllerManager.ToggleShow) || Input.GetKeyDown(ControllerManager.J_B))) {
             Show_Names *= -1;
         }
     }

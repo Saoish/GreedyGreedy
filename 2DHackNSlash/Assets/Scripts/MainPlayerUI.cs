@@ -70,11 +70,11 @@ public class MainPlayerUI : MonoBehaviour {
 
     public void UpdateHealthManaBar() {
         if(MPC.GetCurrHealth()/MPC.GetMaxHealth()>=0)
-            HealthMask.transform.localScale = new Vector2(1, MPC.CurrHealth / MPC.GetMaxHealth());
+            HealthMask.transform.localScale = new Vector2(1, MPC.GetCurrHealth() / MPC.GetMaxHealth());
         else
             HealthMask.transform.localScale = new Vector2(1, 0);
-        if (MPC.CurrMana / MPC.GetMaxMana() >= 0)
-            ManaMask.transform.localScale = new Vector2( 1, MPC.CurrMana / MPC.GetMaxMana());
+        if (MPC.GetCurrMana() / MPC.GetMaxMana() >= 0)
+            ManaMask.transform.localScale = new Vector2( 1, MPC.GetCurrMana() / MPC.GetMaxMana());
         else
             ManaMask.transform.localScale = new Vector2(1,0);
     }

@@ -22,27 +22,33 @@ public abstract class PlayerController : ObjectController {
     protected float MaxMoveSpd;
     protected float MaxDefense;
 
-    [HideInInspector]
-    public float MaxCritChance; //Percantage
-    [HideInInspector]
-    public float MaxCritDmgBounus; //Percantage
-    [HideInInspector]
-    public float MaxLPH;
-    [HideInInspector]
-    public float MaxManaRegen;
+    protected float MaxCritChance; //Percantage
+    protected float MaxCritDmgBounus; //Percantage
+    protected float MaxLPH;
+    protected float MaxManaRegen;
 
-
-    public float CurrHealth;
-    public float CurrMana;
-    public float CurrAD;
-    public float CurrMD;
-    public float CurrAttkSpd;
-    public float CurrMoveSpd;
-    public float CurrDefense;
-    public float CurrCritChance;    
-    public float CurrCritDmgBounus;    
-    public float CurrLPH;    
-    public float CurrManaRegen;
+    [SerializeField]
+    protected float CurrHealth;
+    [SerializeField]
+    protected float CurrMana;
+    [SerializeField]
+    protected float CurrAD;
+    [SerializeField]
+    protected float CurrMD;
+    [SerializeField]
+    protected float CurrAttkSpd;
+    [SerializeField]
+    protected float CurrMoveSpd;
+    [SerializeField]
+    protected float CurrDefense;
+    [SerializeField]
+    protected float CurrCritChance;
+    [SerializeField]
+    protected float CurrCritDmgBounus;
+    [SerializeField]
+    protected float CurrLPH;
+    [SerializeField]
+    protected float CurrManaRegen;
 
     protected Dictionary<string, GameObject> EquipPrefabs;
 

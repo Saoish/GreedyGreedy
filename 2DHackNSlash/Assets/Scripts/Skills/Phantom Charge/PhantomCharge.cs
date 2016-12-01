@@ -8,6 +8,8 @@ public class PhantomCharge : ActiveSkill {
     public float SmokeStayTime;
     public float EndStayTime;
 
+    public float StunDuration = 1f;
+
     [HideInInspector]
     public float ADScale;
     [HideInInspector]
@@ -61,7 +63,7 @@ public class PhantomCharge : ActiveSkill {
         Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.GetRootCollider());//Ignore self here
         SmokePS.startSize *= OC.GetVFXScale();
 
-        Description = "Turn into a black mist and charge forward with speed of "+Force+", dealing "+ADScale+"% AD damage to collided enemies.\n\n Cost: "+ManaCost+" Mana\nCD: "+CD+" secs";
+        Description = "Turn into a black mist and charge forward with speed of "+Force+", dealing "+ADScale+"% AD damage to collided enemies and stun them for "+StunDuration+" sec(s).\n\n Cost: "+ManaCost+" Mana\nCD: "+CD+" secs";
     }
 
     public override void Active() {
@@ -99,7 +101,16 @@ public class PhantomCharge : ActiveSkill {
         RealTime_CD = CD;
     }
 
-    void DealSkillDmg(ObjectController target) {
+    void StunAndDealChargeDmg(ObjectController target) {
+
+        if (target.HasDebuff(typeof(StunDebuff))) {
+            Debuff ExistedStunDebuff = target.GetDebuff(typeof(StunDebuff));
+            if (StunDuration > ExistedStunDebuff.Duration)
+                ExistedStunDebuff.Duration = StunDuration;
+        } else {
+            ApplyStunDebuff(target);
+        }
+
         Value dmg = Value.CreateValue(0, 0, false, OC);
         if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
             dmg.Amount += OC.GetCurrAD() * (ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
@@ -132,9 +143,9 @@ public class PhantomCharge : ActiveSkill {
                 }
                 ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                 //target.MountainlizeMass();
-                OC.ON_DMG_DEAL += DealSkillDmg;
+                OC.ON_DMG_DEAL += StunAndDealChargeDmg;
                 OC.ON_DMG_DEAL(target);
-                OC.ON_DMG_DEAL -= DealSkillDmg;
+                OC.ON_DMG_DEAL -= StunAndDealChargeDmg;
                 HittedStack.Push(collider);
                 AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
             } else if (collider.tag == "Player") {
@@ -144,9 +155,9 @@ public class PhantomCharge : ActiveSkill {
                     }
                     ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                     target.MountainlizeRigibody();
-                    OC.ON_DMG_DEAL += DealSkillDmg;
+                    OC.ON_DMG_DEAL += StunAndDealChargeDmg;
                     OC.ON_DMG_DEAL(target);
-                    OC.ON_DMG_DEAL -= DealSkillDmg;
+                    OC.ON_DMG_DEAL -= StunAndDealChargeDmg;
                     HittedStack.Push(collider);
                     AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
                 }
@@ -161,9 +172,9 @@ public class PhantomCharge : ActiveSkill {
                 }
                 ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                 //target.MountainlizeMass();
-                OC.ON_DMG_DEAL += DealSkillDmg;
+                OC.ON_DMG_DEAL += StunAndDealChargeDmg;
                 OC.ON_DMG_DEAL(target);
-                OC.ON_DMG_DEAL -= DealSkillDmg;
+                OC.ON_DMG_DEAL -= StunAndDealChargeDmg;
                 HittedStack.Push(collider);
                 AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
             } 
@@ -182,4 +193,14 @@ public class PhantomCharge : ActiveSkill {
         SmokePS.enableEmission = false;
     }
 
+
+    private void ApplyStunDebuff(ObjectController target) {
+        ModData StunDebuffMod = ScriptableObject.CreateInstance<ModData>();
+        StunDebuffMod.Name = "StunDebuff";
+        StunDebuffMod.Duration = StunDuration;
+        GameObject StunDebuffObject = Instantiate(Resources.Load("DebuffPrefabs/" + StunDebuffMod.Name)) as GameObject;
+        StunDebuffObject.name = StunDebuffMod.Name;
+        StunDebuffObject.GetComponent<Debuff>().ApplyDebuff(StunDebuffMod, target);
+
+    }
 }

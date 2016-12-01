@@ -20,6 +20,9 @@ public class Tab_1_Btn : MonoBehaviour {
         } else {
             SkillPoints_Text.text = "";
             Anim.SetBool("Blinking", false);
+            Color c = GetComponent<Image>().color;
+            c.a = 0;
+            GetComponent<Image>().color = c;
         }
 
     }
