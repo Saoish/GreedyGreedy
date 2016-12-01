@@ -10,6 +10,12 @@ public class Fury : ActiveSkill {
 
     public AudioClip SFX;
 
+    ParticleSystem FuryParticle;
+
+    protected override void Awake() {
+        base.Awake();
+        FuryParticle = GetComponent<ParticleSystem>();
+    }
 
     // Use this for initialization
     protected override void Start () {
@@ -48,6 +54,7 @@ public class Fury : ActiveSkill {
         Duration = FL.Duration;
         AttkSpd_INC_Percentage = FL.AttkSpd_INC_Percentage;
 
+        FuryParticle.startSize *= OC.GetVFXScale();
 
         Description = "Boost your attack speed by "+AttkSpd_INC_Percentage+"% for "+Duration+" secs.\n\nCost: "+ManaCost+" Mana\nCD: "+CD+" secs";
     }
@@ -57,6 +64,7 @@ public class Fury : ActiveSkill {
         OC.ON_MANA_UPDATE(Value.CreateValue(ManaCost));
         OC.ON_MANA_UPDATE -= OC.DeductMana;
         ApplyFuryBuff();
+        StartCoroutine(RunFuryParticleVFX(Duration));
         AudioSource.PlayClipAtPoint(SFX, transform.position, GameManager.SFX_Volume);
     }
 
@@ -70,5 +78,11 @@ public class Fury : ActiveSkill {
         FuryBuffObject.name = "FuryBuff";
         FuryBuffObject.GetComponent<Buff>().ApplyBuff(FuryBuffMod, OC);
         RealTime_CD = CD;
+    }
+
+    IEnumerator RunFuryParticleVFX(float time) {
+        FuryParticle.enableEmission = true;
+        yield return new WaitForSeconds(time);
+        FuryParticle.enableEmission = false;
     }
 }

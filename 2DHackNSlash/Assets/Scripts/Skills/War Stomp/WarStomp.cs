@@ -16,10 +16,22 @@ public class WarStomp : ActiveSkill {
     public AudioClip StompSFX;
     public float StompTime = 0.1f;
 
+    GameObject StompVFX;
+    float VFX_StayTime;
+
+    float DefaultColliderRadius = 0.4f;
+
     protected override void Awake() {
         base.Awake();
         StompCollider = GetComponent<Collider2D>();
-    }
+        StompVFX = transform.Find("War Stomp VFX").gameObject;
+        transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = Layer.Skill;
+        transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = Layer.Skill;
+        VFX_StayTime = transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().duration;
+        float ScaleFactor = ((CircleCollider2D)StompCollider).radius / DefaultColliderRadius;
+        transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().startSize *= ScaleFactor;
+        transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().startSize *= ScaleFactor;
+        }
 
     protected override void Start() {
         base.Start();
@@ -69,6 +81,7 @@ public class WarStomp : ActiveSkill {
         OC.ON_MANA_UPDATE -= OC.DeductMana;
         StartCoroutine(ActiveStompCollider(StompTime));
         RealTime_CD = CD;
+        StartCoroutine(RunStompVFX(VFX_StayTime));
         AudioSource.PlayClipAtPoint(StompSFX, transform.position, GameManager.SFX_Volume);
     }
 
@@ -145,6 +158,12 @@ public class WarStomp : ActiveSkill {
         yield return new WaitForSeconds(time);
         StompCollider.enabled = false;
         HittedStack.Clear();
+    }
+
+    IEnumerator RunStompVFX(float time) {
+        StompVFX.SetActive(true);
+        yield return new WaitForSeconds(time);
+        StompVFX.SetActive(false);
     }
 
 }

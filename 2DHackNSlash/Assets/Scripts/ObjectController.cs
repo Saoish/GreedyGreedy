@@ -247,7 +247,6 @@ public abstract class ObjectController : MonoBehaviour {
         Alive = false;
         RootCollider.enabled = false;
         VisualHolder.gameObject.SetActive(false);
-        Destroy(transform.gameObject, 1);
     }
 
     public void DeductMana(Value mana_cost) {

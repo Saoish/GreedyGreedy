@@ -130,6 +130,8 @@ public abstract class PlayerController : ObjectController {
 
     protected override void Die() {
         base.Die();
+        ActiveOutsideVFXPartical("Body Parts Explode", Layer.Ground);
+
     }
 
     //-------private

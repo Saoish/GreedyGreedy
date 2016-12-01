@@ -15,6 +15,7 @@ public class AncientSlimeRoom : LevelManager {
     float GapTimer = 0f;
     float LastGapTimer = 0f;
     float GapInterval = 0f;
+
     [SerializeField]
     int Wave = 1;
     int Spawned = 0;
@@ -22,10 +23,9 @@ public class AncientSlimeRoom : LevelManager {
     MobSpawner[] Spawners;
     BossSpawner BossSpawner;
 
+
+    bool AllowWait = false;
     bool AllowSpawn = false;
-
-    bool AllowWait = true;
-
     bool BossFighting = false;
 
 	// Use this for initialization
@@ -33,6 +33,7 @@ public class AncientSlimeRoom : LevelManager {
         LootSpawner = GetComponentInChildren<DropList>();
         Spawners = GetComponentsInChildren<MobSpawner>();
         BossSpawner = GetComponentInChildren<BossSpawner>();
+        BossSpawner.transform.GetComponent<SpriteRenderer>().sortingOrder = Layer.Ground;
     }
 	
 	// Update is called once per frame
@@ -85,13 +86,15 @@ public class AncientSlimeRoom : LevelManager {
                 AllowWait = false;
                 AllowSpawn = false;
                 BossFighting = true;
-                BossSpawner.Spawn();
+                StartSummoningAncientSlime();
+                HealPlayer();
                 return;
             }
             AllowWait = true;
             LootSpawner.SpawnLoots();
             WaveSlimesKilled = 0;
             HealPlayer();
+            //StartFilling();
         }
     }
 
@@ -104,5 +107,22 @@ public class AncientSlimeRoom : LevelManager {
         GameObject HealingBuffObject = Instantiate(Resources.Load("BuffPrefabs/" + HeallingBuffMod.Name)) as GameObject;
         HealingBuffObject.name = "HealingBuff";
         HealingBuffObject.GetComponent<Buff>().ApplyBuff(HeallingBuffMod, MPC);
+    }
+
+    void StartFilling() {
+        BossSpawner.transform.GetComponent<Animator>().SetTrigger("Fill");
+    }
+
+    public void Fill() {
+
+    }
+
+    void StartSummoningAncientSlime() {
+        Animator AncientBossSpawnerAnim = BossSpawner.transform.GetComponent<Animator>();
+        AncientBossSpawnerAnim.SetTrigger("Spawn");
+    }
+
+    public void SpawnAncientSlime() {
+        BossSpawner.Spawn();
     }
 }

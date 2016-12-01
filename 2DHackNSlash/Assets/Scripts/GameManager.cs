@@ -39,5 +39,16 @@ public class GameManager : MonoBehaviour {
         Application.LoadLevel("Menu");
     }
 
+    public static void LoadScene(string SceneName) {
+        Application.LoadLevel(SceneName);
+    }
+    
+    public static void LoadSceneWithWaitTime(string SceneName, float time) {
+        instance.StartCoroutine(LoadSceneAfter(SceneName,time));
+    }
 
+    static IEnumerator LoadSceneAfter(string SceneName, float time) {
+        yield return new WaitForSeconds(time);
+        LoadScene(SceneName);
+    }
 }

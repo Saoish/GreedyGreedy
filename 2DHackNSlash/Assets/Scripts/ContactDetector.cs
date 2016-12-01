@@ -13,8 +13,8 @@ public class ContactDetector : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D collider) {
         if (collider.tag == "Enemy" || collider.tag == "Player") {
-            collider.transform.parent.GetComponent<ObjectController>().MountainlizeRigibody();
             collider.transform.parent.GetComponent<ObjectController>().ZerolizeForce();
+            collider.transform.parent.GetComponent<ObjectController>().MountainlizeRigibody();
             //collider.transform.parent.GetComponent<ObjectController>().NormalizeDrag();
         }
     }

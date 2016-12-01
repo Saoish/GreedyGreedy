@@ -9,6 +9,8 @@ public class MainPlayer : PlayerController {
 
     public GameObject[] TestObjects;
 
+    Camera MainCamera;
+
     protected override void Awake() {
         base.Awake();
         foreach(GameObject to in TestObjects) {
@@ -16,6 +18,7 @@ public class MainPlayer : PlayerController {
         }
         PUIC = transform.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
         PlayerData = SaveLoadManager.LoadPlayerInfo(SaveLoadManager.SlotIndexToLoad);
+        MainCamera = VisualHolder.GetComponentInChildren<Camera>();
     }
 
     protected override void Start() {
@@ -29,6 +32,10 @@ public class MainPlayer : PlayerController {
 
     protected override void Die() {
         base.Die();
+        MainCamera.transform.parent = null;
+        Destroy(transform.gameObject);
+        GameManager.LoadSceneWithWaitTime("Developing", 3f);
+        //GameManager.LoadScene("Developing");
     }
 
     protected override void ControlUpdate() {

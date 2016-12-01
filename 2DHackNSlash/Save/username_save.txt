@@ -1,8 +1,8 @@
-0,OPOPOP,Warrior,4,0,600,0,4,4,100,100,0,0,100,100,0,0,200,0,10
+0,OPOPOP,Warrior,9,0,1100,0,9,75,100,100,0,0,100,100,0,0,200,0,10
 ---CategorySeperator---
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+0,5,5,5,5,5,0,0,5,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
-null,null,null,null
+Cleave,Phantom Charge,null,null
 ---CategorySeperator---
 null
 -EquipSeperator-
@@ -14,13 +14,13 @@ null
 -EquipSeperator-
 0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
-null
+1,Greatsword,Warrior,Weapon,0,0,0,16,0,2,0,0,6,2,1,0,0,0
 -EquipSeperator-
-null
+0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 -EquipSeperator-
-null
+1,Greatsword,Warrior,Weapon,0,0,0,17,0,7,0,0,6,6,0,0,0,0
 -EquipSeperator-
-null
+0,Torch,All,Trinket,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 -EquipSeperator-
 null
 -EquipSeperator-

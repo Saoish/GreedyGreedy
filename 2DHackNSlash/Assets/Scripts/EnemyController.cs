@@ -161,9 +161,10 @@ public abstract class EnemyController : ObjectController {
     }   
 
     protected void SpawnEXP() {
-        MainPlayer MPC = GameObject.Find("MainPlayer").GetComponent<MainPlayer>();
-        if(MPC.Alive)
-            MPC.AddEXP(exp);        
+        //MainPlayer MPC = GameObject.Find("MainPlayer").GetComponent<MainPlayer>();
+        if (GameObject.Find("MainPlayer") != null) {
+            GameObject.Find("MainPlayer").GetComponent<MainPlayer>().AddEXP(exp);
+        }      
     }
 
 
