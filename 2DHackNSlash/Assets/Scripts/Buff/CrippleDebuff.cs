@@ -20,7 +20,7 @@ public class CrippleDebuff : Debuff {
         target.SetCurrAD(target.GetCurrAD() - ModADAmount);
         target.SetCurrMD(target.GetCurrMD() - ModMDAmount);
         Duration = MD.Duration;
-        target.ActiveVFXParticle("CrippleDebuffVFX", Layer.Skill);
+        target.ActiveVFXParticle("CrippleDebuffVFX");
     }
 
     protected override void RemoveDebuff() {

@@ -12,7 +12,7 @@ public class StunDebuff : Debuff {
         target.Stunned = true;
         //target.MountainlizeRigibody();
         Duration = MD.Duration;
-        target.ActiveVFXParticle("StunDebuffVFX", Layer.Skill);
+        target.ActiveVFXParticle("StunDebuffVFX");
     }
 
     protected override void RemoveDebuff() {

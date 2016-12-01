@@ -148,30 +148,27 @@ public abstract class ObjectController : MonoBehaviour {
     }
 
     //Particle VFX
-    public void ActiveOutsideVFXPartical(string VFX,int layer) {
+    public void ActiveOutsideVFXPartical(string VFX) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), rb.position, transform.rotation) as GameObject;
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
-        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
         Destroy(VFX_OJ,VFX_OJ.transform.GetComponent<ParticleSystem>().duration);
     }
 
-    public void ActiveVFXParticalWithStayTime(string VFX, float StayTime,int layer) {
+    public void ActiveVFXParticalWithStayTime(string VFX, float StayTime) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
         VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position * scale;
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
-        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
         Destroy(VFX_OJ, StayTime);
     }
-    public void ActiveVFXParticle(string VFX,int layer) {
+    public void ActiveVFXParticle(string VFX) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
         VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position*scale;
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
-        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
     }
 
@@ -179,12 +176,11 @@ public abstract class ObjectController : MonoBehaviour {
         Destroy(VFX_Transform.Find(VFX).gameObject);
     }
 
-    public void ActiveOneShotVFXParticle(string VFX,int layer) {
+    public void ActiveOneShotVFXParticle(string VFX) {
         float scale = VFX_Transform.GetComponent<VFXScaler>().scale;
         GameObject VFX_OJ = Instantiate(Resources.Load("VFXPrefabs/" + VFX), VFX_Transform) as GameObject;
         VFX_OJ.transform.position = VFX_Transform.position + VFX_OJ.transform.position * scale;
         VFX_OJ.transform.GetComponent<ParticleSystem>().startSize *= scale;
-        VFX_OJ.transform.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = layer;
         VFX_OJ.name = VFX;
         float length = VFX_OJ.transform.GetComponent<ParticleSystem>().duration;
         Destroy(VFX_OJ,length);

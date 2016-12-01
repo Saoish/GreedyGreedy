@@ -42,7 +42,7 @@ public class AncientSlimeRoom : MapController {
         LootSpawner = GetComponentInChildren<DropList>();
         Spawners = GetComponentsInChildren<MobSpawner>();
         BossSpawner = GetComponentInChildren<BossSpawner>();
-        BossSpawner.transform.GetComponent<SpriteRenderer>().sortingOrder = Layer.Ground;
+        BossSpawner.transform.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Ground;
     }
 
     // Update is called once per frame

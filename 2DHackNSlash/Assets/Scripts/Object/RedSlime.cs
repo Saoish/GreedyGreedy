@@ -5,7 +5,7 @@ using System;
 public class RedSlime : EnemyController {
     protected override void Die() {
         base.Die();
-        ActiveOutsideVFXPartical("Red Slime Explosion", Layer.Ground);
+        ActiveOutsideVFXPartical("Red Slime Explosion");
         Destroy(gameObject);
     }
 }

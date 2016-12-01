@@ -48,7 +48,7 @@ public class MeleeAttackCollider : AttackCollider {
 
         if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {
             if (dmg.IsCrit) {
-                target.ActiveOneShotVFXParticle("WeaponCritSlashVFX", Layer.Skill);
+                target.ActiveOneShotVFXParticle("WeaponCritSlashVFX");
             }
         } else {
 

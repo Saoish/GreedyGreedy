@@ -17,7 +17,7 @@ public class Cleave : ActiveSkill {
     protected override void Awake() {
         base.Awake();
         Anim = GetComponent<Animator>();
-        GetComponent<SpriteRenderer>().sortingOrder = Layer.Skill;
+        GetComponent<SpriteRenderer>().sortingLayerName = Layer.Skill;
     }
 
     protected override void Start() {
@@ -113,12 +113,12 @@ public class Cleave : ActiveSkill {
         float reduced_dmg = dmg.Amount * (target.GetCurrDefense() / 100);
         dmg.Amount = dmg.Amount - reduced_dmg;
 
-        OC.ON_HEALTH_UPDATE += OC.HealHP;
-        OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
-        OC.ON_HEALTH_UPDATE -= OC.HealHP;
+        //OC.ON_HEALTH_UPDATE += OC.HealHP;
+        //OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
+        //OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
         if (dmg.IsCrit) {
-            target.ActiveOneShotVFXParticle("WeaponCritSlashVFX", Layer.Skill);
+            target.ActiveOneShotVFXParticle("WeaponCritSlashVFX");
         }
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;

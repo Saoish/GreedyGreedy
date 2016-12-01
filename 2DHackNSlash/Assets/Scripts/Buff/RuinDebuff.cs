@@ -19,7 +19,7 @@ public class RuinDebuff : Debuff {
         ModAmount = target.GetMaxMoveSpd() * (MD.ModMoveSpd / 100);
         target.SetCurrMoveSpd(target.GetCurrMoveSpd() - ModAmount);
         Duration = MD.Duration;
-        target.ActiveVFXParticle("RuinDebuffVFX", Layer.Skill);
+        target.ActiveVFXParticle("RuinDebuffVFX");
         AudioSource.PlayClipAtPoint(TriggerSFX, target.transform.position, GameManager.SFX_Volume);
     }
 

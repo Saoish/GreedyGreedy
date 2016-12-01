@@ -61,9 +61,9 @@ public class EquipmentController : MonoBehaviour {
                 Anim.SetBool("IsAttacking", false);
             }
             if (PC.Direction == 3)
-                GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip-2;
+                GetComponent<SpriteRenderer>().sortingOrder = -1;
             else
-                GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip+2;
+                GetComponent<SpriteRenderer>().sortingOrder = 1;
         } else {//Helmet,Chest,Shackle
             Anim.speed = PC.GetMovementAnimSpeed();
         }
@@ -78,7 +78,7 @@ public class EquipmentController : MonoBehaviour {
         Destroy(Loot.transform.Find("Icon").gameObject);
         Loot.transform.Find("LootBox").gameObject.SetActive(true);
         Loot.GetComponent<EquipmentController>().LootRandomlize();
-        Loot.GetComponent<SpriteRenderer>().sortingOrder = Layer.Loot; //Subject to change
+        Loot.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Loot; //Subject to change
         Loot.GetComponent<BoxCollider2D>().enabled = true;
         Text E_NameText = Loot.transform.Find("LootBox/UI/Name").GetComponent<Text>();
         switch (E.Rarity) {
@@ -107,7 +107,7 @@ public class EquipmentController : MonoBehaviour {
         Destroy(Loot.transform.Find("Icon").gameObject);
         Loot.transform.Find("LootBox").gameObject.SetActive(true);
         Loot.GetComponent<EquipmentController>().LootRandomlize();
-        Loot.GetComponent<SpriteRenderer>().sortingOrder = Layer.Loot; //Subject to change
+        Loot.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Loot; //Subject to change
         Loot.GetComponent<BoxCollider2D>().enabled = true;
         Text E_NameText = Loot.transform.Find("LootBox/UI/Name").GetComponent<Text>();
         switch (E.Rarity) {
@@ -137,12 +137,10 @@ public class EquipmentController : MonoBehaviour {
         Destroy(equipPrefab.transform.Find("LootBox").gameObject);
         Destroy(equipPrefab.transform.Find("Icon").gameObject);
         equipPrefab.transform.parent = parent;
+        equipPrefab.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Equip;
         if (E.Type == "Weapon") {
-            equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip + 1;
-        } else if (E.Type == "Trinket")
-            equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip + 2;
-        else
-            equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip;
+            equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        } 
         return equipPrefab;
     }
 
@@ -155,16 +153,18 @@ public class EquipmentController : MonoBehaviour {
         equipPrefab.transform.position = parent.transform.position + equipPrefab.transform.position;
         Destroy(equipPrefab.transform.Find("LootBox").gameObject);
         Destroy(equipPrefab.transform.Find("Icon").gameObject);
-        equipPrefab.transform.parent = parent.GetComponent<PlayerController>().GetVisualHolderTransform() ;
+        equipPrefab.transform.parent = parent.GetComponent<PlayerController>().GetVisualHolderTransform();
+        equipPrefab.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Equip;
         if (E.Type == "Weapon") {
-            equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip + 1;
+            //equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = 1;
             if (equipPrefab.transform.Find("MeleeAttackCollider") != null) {
                 parent.GetComponent<PlayerController>().SwapMeleeAttackCollider(equipPrefab.transform.Find("MeleeAttackCollider"));
             }
-        } else if (E.Type == "Trinket")
-            equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip + 2;
-        else
-            equipPrefab.GetComponent<SpriteRenderer>().sortingOrder = Layer.Equip;
+        }
+        //} else if (E.Type == "Trinket")
+        //    equipPrefab.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Equip;
+        //else
+        //    equipPrefab.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Equip;
         return equipPrefab;
     }
 

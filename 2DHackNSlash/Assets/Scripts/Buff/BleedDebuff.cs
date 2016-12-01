@@ -22,7 +22,7 @@ public class BleedDebuff : Debuff {
         ModAmount = MD.ModHealth;
         bleed_dmg = Value.CreateValue(ModAmount,-1);//No trace back source
         Duration = MD.Duration;
-        target.ActiveVFXParticle("BleedDebuffVFX",Layer.Skill);
+        target.ActiveVFXParticle("BleedDebuffVFX");
         DealBleedDmg(bleed_dmg);
     }
 

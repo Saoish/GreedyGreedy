@@ -136,7 +136,7 @@ public abstract class PlayerController : ObjectController {
 
     protected override void Die() {
         base.Die();
-        ActiveOutsideVFXPartical("Body Parts Explode", Layer.Ground);
+        ActiveOutsideVFXPartical("Body Parts Explode");
 
     }
 
@@ -357,7 +357,7 @@ public abstract class PlayerController : ObjectController {
             BaseModel = Instantiate(Resources.Load("BaseModelPrefabs/Red Ghost"), VisualHolder) as GameObject;
             BaseModel.name = "Red Ghost";
             BaseModel.transform.position = VisualHolder.position + BaseModel.transform.position;
-            BaseModel.transform.GetComponent<SpriteRenderer>().sortingOrder = Layer.OJ;
+            BaseModel.transform.GetComponent<SpriteRenderer>().sortingLayerName = "Object";
         }
         else if(PlayerData.Class == "Mage") {
 

@@ -25,8 +25,8 @@ public class WarStomp : ActiveSkill {
         base.Awake();
         StompCollider = GetComponent<Collider2D>();
         StompVFX = transform.Find("War Stomp VFX").gameObject;
-        transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = Layer.Skill;
-        transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder = Layer.Skill;
+        transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingLayerName = Layer.Skill;
+        transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingLayerName = Layer.Skill;
         VFX_StayTime = transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().duration;
         float ScaleFactor = ((CircleCollider2D)StompCollider).radius / DefaultColliderRadius;
         transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().startSize *= ScaleFactor;

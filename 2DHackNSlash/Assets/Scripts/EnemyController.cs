@@ -57,7 +57,7 @@ public abstract class EnemyController : ObjectController {
         base.Awake();
         AI = GetComponent<AIController>();
         Anim = VisualHolder.GetComponent<Animator>();
-        VisualHolder.GetComponent<SpriteRenderer>().sortingOrder = Layer.OJ;
+        VisualHolder.GetComponent<SpriteRenderer>().sortingLayerName = Layer.Object;
     }
     // Use this for initialization
     protected override void Start() {

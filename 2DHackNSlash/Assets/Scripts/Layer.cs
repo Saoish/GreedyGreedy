@@ -2,13 +2,19 @@
 using System.Collections;
 
 public static class Layer {
-    public static int Ground = 1;
+    public static string Map = "Map";
 
-    public static int Loot = Ground + 1;
+    public static string Ground = "Ground";
 
-    public static int OJ = Ground + 2;
+    public static string Loot = "Loot";
 
-    public static int Equip = Ground + 3;
+    public static string Object = "Object";
 
-    public static int Skill = Ground + 6;
+    public static string Equip = "Equip";
+
+    public static string Skill = "Skill";
+
+    public static string Indication = "Indication";
+
+    public static string MPUI = "MPUI";
 }

@@ -21,7 +21,7 @@ public class HealingBuff : Buff {
         ModAmount = MD.ModHealth;
         heal = Value.CreateValue(ModAmount,1);
         Duration = MD.Duration;
-        target.ActiveVFXParticle("HealingBuffVFX", Layer.Skill);
+        target.ActiveVFXParticle("HealingBuffVFX");
         Heal(heal);
     }
 

@@ -22,7 +22,7 @@ public class PhantomCharge : ActiveSkill {
     protected override void Awake() {
         base.Awake();
         SmokePS = transform.GetComponent<ParticleSystem>();
-        SmokePS.GetComponent<Renderer>().sortingOrder = Layer.Skill;
+        SmokePS.GetComponent<Renderer>().sortingLayerName = Layer.Skill;
     }
     // Use this for initialization
     protected override void Start() {
@@ -122,9 +122,9 @@ public class PhantomCharge : ActiveSkill {
         float reduced_dmg = dmg.Amount * (target.GetCurrDefense() / 100);
         dmg.Amount = dmg.Amount - reduced_dmg;
 
-        OC.ON_HEALTH_UPDATE += OC.HealHP;
-        OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
-        OC.ON_HEALTH_UPDATE -= OC.HealHP;
+        //OC.ON_HEALTH_UPDATE += OC.HealHP;
+        //OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
+        //OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;
         target.ON_HEALTH_UPDATE(dmg);
@@ -184,7 +184,7 @@ public class PhantomCharge : ActiveSkill {
         OC.ZerolizeForce();
         transform.GetComponent<Collider2D>().enabled = false;
         HittedStack.Clear();
-        OC.ActiveVFXParticalWithStayTime("PhantomChargeEndVFX", EndStayTime, Layer.Skill);
+        OC.ActiveVFXParticalWithStayTime("PhantomChargeEndVFX", EndStayTime);
         StartCoroutine(DisableSmokePS(SmokeStayTime));
     }
 
