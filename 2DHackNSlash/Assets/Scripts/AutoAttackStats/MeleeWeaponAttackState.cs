@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using GreedyNameSpace;
 
 public class MeleeWeaponAttackState : StateMachineBehaviour {
 
@@ -36,7 +37,7 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
         PlayerController PC = animator.transform.parent.parent.parent.GetComponent<PlayerController>();
         WeaponController WC = PC.GetWC();
         PC.ON_MANA_UPDATE += PC.DeductMana;
-        PC.ON_MANA_UPDATE(Value.CreateValue(WC.ManaCost));
+        PC.ON_MANA_UPDATE(new Value(WC.ManaCost));
         PC.ON_MANA_UPDATE -= PC.DeductMana;
         Transform T_AttackCollider = PC.GetMeleeAttackColliderTransform();
         PC.Attacking = true;
@@ -83,41 +84,41 @@ public class MeleeWeaponAttackState : StateMachineBehaviour {
         }
         //Combo 3
         else if (stateInfo.IsName("combo3_left")) {
-            if (WC.Type == 0) {//GreatSword
+            if (WC.Type == WeaponType.GreatSword) {//GreatSword
                 AttackCollider.offset = Vector2.zero;
                 float AttackRadius = AttackBoxHeight >= AttackBoxWidth ? AttackBoxWidth + AttackRange * 2 : AttackBoxHeight + AttackRange * 2;
                 AttackCollider.size = new Vector2(AttackRadius, AttackRadius);
-            } else if (WC.Type == 1) {//Axe
+            } else if (WC.Type == WeaponType.Axe) {//Axe
                 AttackCollider.size = new Vector2(AttackBoxWidth, AttackBoxHeight);
                 AttackCollider.offset = new Vector2(-AttackRange, 0);
             }
             AudioSource.PlayClipAtPoint(WC.combo_3, animator.transform.position, GameManager.SFX_Volume);
         } else if (stateInfo.IsName("combo3_right")) {
-            if (WC.Type == 0) {//GreatSword
+            if (WC.Type == WeaponType.GreatSword) {//GreatSword
                 AttackCollider.offset = Vector2.zero;
                 float AttackRadius = AttackBoxHeight >= AttackBoxWidth ? AttackBoxWidth + AttackRange * 2 : AttackBoxHeight + AttackRange * 2;
                 AttackCollider.size = new Vector2(AttackRadius, AttackRadius);
-            } else if (WC.Type == 1) {//Axe
+            } else if (WC.Type == WeaponType.Axe) {//Axe
                 AttackCollider.size = new Vector2(AttackBoxWidth, AttackBoxHeight);
                 AttackCollider.offset = new Vector2(AttackRange, 0);
             }
             AudioSource.PlayClipAtPoint(WC.combo_3, animator.transform.position, GameManager.SFX_Volume);
         } else if (stateInfo.IsName("combo3_up")) {
-            if (WC.Type == 0) {
+            if (WC.Type == WeaponType.GreatSword) {
                 AttackCollider.offset = Vector2.zero;
                 float AttackRadius = AttackBoxHeight >= AttackBoxWidth ? AttackBoxWidth + AttackRange * 2 : AttackBoxHeight + AttackRange * 2;
                 AttackCollider.size = new Vector2(AttackRadius, AttackRadius);
-            } else if (WC.Type == 1) {//Axe
+            } else if (WC.Type == WeaponType.Axe) {//Axe
                 AttackCollider.size = new Vector2(AttackBoxHeight, AttackBoxWidth);
                 AttackCollider.offset = new Vector2(0, AttackRange);
             }
             AudioSource.PlayClipAtPoint(WC.combo_3, animator.transform.position, GameManager.SFX_Volume);
         } else if (stateInfo.IsName("combo3_down")) {
-            if (WC.Type == 0) {
+            if (WC.Type == WeaponType.GreatSword) {
                 AttackCollider.offset = Vector2.zero;
                 float AttackRadius = AttackBoxHeight >= AttackBoxWidth ? AttackBoxWidth + AttackRange * 2 : AttackBoxHeight + AttackRange * 2;
                 AttackCollider.size = new Vector2(AttackRadius, AttackRadius);
-            } else if (WC.Type == 1) {//Axe
+            } else if (WC.Type == WeaponType.Axe) {//Axe
                 AttackCollider.size = new Vector2(AttackBoxHeight, AttackBoxWidth);
                 AttackCollider.offset = new Vector2(0, -AttackRange);
             }

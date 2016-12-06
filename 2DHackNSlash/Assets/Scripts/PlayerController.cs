@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using GreedyNameSpace;
 
 public abstract class PlayerController : ObjectController {
     protected int NextLevelExp = -999;
@@ -12,56 +13,20 @@ public abstract class PlayerController : ObjectController {
 
     protected CharacterDataStruct PlayerData;
 
-    protected string Name;
-
-    protected float MaxHealth;
-    protected float MaxMana;
-    protected float MaxAD;
-    protected float MaxMD;
-    protected float MaxAttkSpd;
-    protected float MaxMoveSpd;
-    protected float MaxDefense;
-
-    protected float MaxCritChance; //Percantage
-    protected float MaxCritDmgBounus; //Percantage
-    protected float MaxLPH;
-    protected float MaxManaRegen;
-
-    [SerializeField]
-    protected float CurrHealth;
-    [SerializeField]
-    protected float CurrMana;
-    [SerializeField]
-    protected float CurrAD;
-    [SerializeField]
-    protected float CurrMD;
-    [SerializeField]
-    protected float CurrAttkSpd;
-    [SerializeField]
-    protected float CurrMoveSpd;
-    [SerializeField]
-    protected float CurrDefense;
-    [SerializeField]
-    protected float CurrCritChance;
-    [SerializeField]
-    protected float CurrCritDmgBounus;
-    [SerializeField]
-    protected float CurrLPH;
-    [SerializeField]
-    protected float CurrManaRegen;
-
-    protected Dictionary<string, GameObject> EquipPrefabs;
+    protected Dictionary<EquipType, GameObject> EquipPrefabs;
 
     protected GameObject BaseModel;
 
     protected WeaponController WC;
+
+    protected string Name;
 
     [HideInInspector]
     public GameObject SkillTree;
 
     protected override void Awake() {
         base.Awake();
-        EquipPrefabs = new Dictionary<string, GameObject>();
+        EquipPrefabs = new Dictionary<EquipType, GameObject>();
     }
 
     protected override void Start() {
@@ -75,7 +40,7 @@ public abstract class PlayerController : ObjectController {
         ControlUpdate();        
         EquiPrefabsUpdate();
         BaseModelUpdate();
-        ManaRegen();
+        Regen();
     }
 
     protected abstract void ControlUpdate();
@@ -98,39 +63,24 @@ public abstract class PlayerController : ObjectController {
 
     //Combat
     override public void DeductHealth(Value dmg) {
-        if (CurrHealth - dmg.Amount <= 0 && Alive) {
-            CurrHealth -= dmg.Amount;
+        if (dmg.Pop_Update)
             IC.PopUpText(dmg);
-            ON_DEATH_UPDATE += Die;
-            ON_DEATH_UPDATE();
-            ON_DEATH_UPDATE -= Die;
-            return;
-        }
-        if (dmg.Type == -1) {//Dot no sound update
-        } else if (dmg.IsCrit) {
-            Animator Anim = VisualHolder.GetComponent<Animator>();
-            Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
-            Anim.Play("crit");
-            AudioSource.PlayClipAtPoint(crit_hurt, transform.position, GameManager.SFX_Volume);
-        }
         if (dmg.IsCrit) {
             Animator Anim = VisualHolder.GetComponent<Animator>();
             Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
             Anim.Play("crit");
-            if(dmg.Type!=-1)
+            if (dmg.SFX_Update)
                 AudioSource.PlayClipAtPoint(crit_hurt, transform.position, GameManager.SFX_Volume);
         } else {
-            if (dmg.Type != -1)
+            if (dmg.SFX_Update)
                 AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
         }
-        if (CurrHealth - dmg.Amount <= 0 && Alive) {
-            IC.PopUpText(dmg);
+        if (CurrStats.Get(StatsType.HEALTH) - dmg.Amount <= 0 && Alive) {
             ON_DEATH_UPDATE += Die;
             ON_DEATH_UPDATE();
             ON_DEATH_UPDATE -= Die;
         } else {
-            CurrHealth -= dmg.Amount;
-            IC.PopUpText(dmg);
+            CurrStats.Dec(StatsType.HEALTH, dmg.Amount);
         }
     }
 
@@ -142,19 +92,19 @@ public abstract class PlayerController : ObjectController {
 
     //-------private
     protected void ReloadWeaponModel() {
-        if (PlayerData.Equipments["Weapon"] != null) {
-            Destroy(EquipPrefabs["Weapon"]);
-            EquipPrefabs["Weapon"] = EquipmentController.ObtainPrefab(PlayerData.Equipments["Weapon"], transform);
+        if (PlayerData.Equipments[EquipType.Weapon] != null) {
+            Destroy(EquipPrefabs[EquipType.Weapon]);
+            EquipPrefabs[EquipType.Weapon] = EquipmentController.ObtainPrefab(PlayerData.Equipments[EquipType.Weapon], transform);
             FetchWC();
         }
     }
 
     private void FetchWC() {
-        if (PlayerData.Equipments["Weapon"] == null) {
+        if (PlayerData.Equipments[EquipType.Weapon] == null) {
             WC = null;
             return;
         }
-        WC = EquipPrefabs["Weapon"].GetComponent<WeaponController>();
+        WC = EquipPrefabs[EquipType.Weapon].GetComponent<WeaponController>();
     }
 
     void InitPlayer() {
@@ -197,13 +147,13 @@ public abstract class PlayerController : ObjectController {
     }
 
     protected void InitSkillTree() {
-        if (PlayerData.Class == "Warrior") {
+        if (PlayerData.Class == Class.Warrior) {
             SkillTree = Instantiate(Resources.Load("SkillPrefabs/WarriorSkillTree"), transform) as GameObject;
             SkillTree.name = "SkillTree";
         }
-        else if(PlayerData.Class == "Mage") {
+        else if(PlayerData.Class == Class.Mage) {
 
-        }else if(PlayerData.Class == "Rogue") {
+        }else if(PlayerData.Class == Class.Rogue) {
 
         }
         SkillTreeController STC = SkillTree.GetComponent<SkillTreeController>();
@@ -217,46 +167,22 @@ public abstract class PlayerController : ObjectController {
 
     protected void InitMaxStats() {
         Name = PlayerData.Name;
-        MaxHealth = PlayerData.BaseHealth;
-        MaxMana = PlayerData.BaseMana;
-        MaxAD = PlayerData.BaseAD;
-        MaxMD = PlayerData.BaseMD;
-        MaxAttkSpd = PlayerData.BaseAttkSpd;
-        MaxMoveSpd = PlayerData.BaseMoveSpd;
-        MaxDefense = PlayerData.BaseDefense;
-        MaxCritChance = PlayerData.BaseCritChance;
-        MaxCritDmgBounus = PlayerData.BaseCritDmgBounus;
-        MaxLPH = PlayerData.BaseLPH;
-        MaxManaRegen = PlayerData.BaseManaRegen;
+        for(int i = 0; i < Stats.Size; i++) {
+            MaxStats.Set(i, PlayerData.BaseStats.Get(i));
+        }
         foreach (var e in PlayerData.Equipments) {
             if (e.Value != null) {
-                MaxHealth += e.Value.AddHealth;
-                MaxMana += e.Value.AddMana;
-                MaxAD += e.Value.AddAD;
-                MaxMD += e.Value.AddMD;
-                MaxAttkSpd += e.Value.AddAttkSpd;
-                MaxMoveSpd += e.Value.AddMoveSpd;
-                MaxDefense += e.Value.AddDefense;
-                MaxCritChance += e.Value.AddCritChance;
-                MaxCritDmgBounus += e.Value.AddCritDmgBounus;
-                MaxLPH += e.Value.AddLPH;
-                MaxManaRegen += e.Value.AddManaRegen;
+                for (int i = 0; i < Stats.Size; i++) {
+                    MaxStats.Add(i, e.Value.Stats.Get(i));
+                }
             }           
         }
     }
 
     protected void InitCurrStats() {
-        CurrHealth = MaxHealth;
-        CurrMana = MaxMana;
-        CurrAD = MaxAD;
-        CurrMD = MaxMD;
-        CurrAttkSpd = MaxAttkSpd;
-        CurrMoveSpd = MaxMoveSpd;
-        CurrDefense = MaxDefense;
-        CurrCritChance = MaxCritChance;
-        CurrCritDmgBounus = MaxCritDmgBounus;
-        CurrLPH = MaxLPH;
-        CurrManaRegen = MaxManaRegen;
+        for (int i = 0; i < Stats.Size; i++) {
+            CurrStats.Set(i, MaxStats.Get(i));
+        }
     }
 
     protected void BaseModelUpdate() {
@@ -274,50 +200,23 @@ public abstract class PlayerController : ObjectController {
 
     //-------helper
     protected void UpdateStats() {
-        MaxHealth = PlayerData.BaseHealth;
-        MaxMana = PlayerData.BaseMana;
-        MaxAD = PlayerData.BaseAD;
-        MaxMD = PlayerData.BaseMD;
-        MaxAttkSpd = PlayerData.BaseAttkSpd;
-        MaxMoveSpd = PlayerData.BaseMoveSpd;
-        MaxDefense = PlayerData.BaseDefense;
-        MaxCritChance = PlayerData.BaseCritChance;
-        MaxCritDmgBounus = PlayerData.BaseCritDmgBounus;
-        MaxLPH = PlayerData.BaseLPH;
-        MaxManaRegen = PlayerData.BaseManaRegen;
-        foreach (var e in PlayerData.Equipments) {
-            if (e.Value != null) {
-                MaxHealth += e.Value.AddHealth;
-                MaxMana += e.Value.AddMana;
-                MaxAD += e.Value.AddAD;
-                MaxMD += e.Value.AddMD;
-                MaxAttkSpd += e.Value.AddAttkSpd;
-                MaxMoveSpd += e.Value.AddMoveSpd;
-                MaxDefense += e.Value.AddDefense;
-                MaxCritChance += e.Value.AddCritChance;
-                MaxCritDmgBounus += e.Value.AddCritDmgBounus;
-                MaxLPH += e.Value.AddLPH;
-                MaxManaRegen += e.Value.AddManaRegen;
-            }
-        }
-
+        InitMaxStats();
         ReloadWeaponModel();
         InitOnCallEvent();
         InitPassives();
 
-        if (CurrHealth>MaxHealth)
-            CurrHealth = MaxHealth;
-        if(CurrMana>MaxMana)
-            CurrMana = MaxMana;
-        CurrAD = MaxAD;
-        CurrMD = MaxMD;
-        CurrAttkSpd = MaxAttkSpd;
-        CurrMoveSpd = MaxMoveSpd;
-        CurrDefense = MaxDefense;
-        CurrCritChance = MaxCritChance;
-        CurrCritDmgBounus = MaxCritDmgBounus;
-        CurrLPH = MaxLPH;
-        CurrManaRegen = MaxManaRegen;
+        for (int i = 0; i < Stats.Size; i++) {
+            if ((int)StatsType.HEALTH == i) {
+                if (CurrStats.Get(i) > MaxStats.Get(i))
+                    CurrStats.Set(i,MaxStats.Get(i));
+            }
+            else if ((int)StatsType.MANA == i) {
+                if (CurrStats.Get(i) > MaxStats.Get(i))
+                    CurrStats.Set(i, MaxStats.Get(i));
+            } else {
+                CurrStats.Set(i, MaxStats.Get(i));
+            }
+        }
     }
 
     protected void UpdateSkillsState() {
@@ -353,16 +252,16 @@ public abstract class PlayerController : ObjectController {
     }
 
     protected void InstaniateEquipmentModel() {
-        if (PlayerData.Class == "Warrior") {
+        if (PlayerData.Class == Class.Warrior) {
             BaseModel = Instantiate(Resources.Load("BaseModelPrefabs/Red Ghost"), VisualHolder) as GameObject;
             BaseModel.name = "Red Ghost";
             BaseModel.transform.position = VisualHolder.position + BaseModel.transform.position;
             BaseModel.transform.GetComponent<SpriteRenderer>().sortingLayerName = "Object";
         }
-        else if(PlayerData.Class == "Mage") {
+        else if(PlayerData.Class == Class.Mage) {
 
         }
-        else if(PlayerData.Class == "Rogue") {
+        else if(PlayerData.Class == Class.Rogue) {
 
         }
         foreach(var e in PlayerData.Equipments) {
@@ -379,8 +278,8 @@ public abstract class PlayerController : ObjectController {
         if(PlayerData.exp >= NextLevelExp) {
             PlayerData.lvl++;
             PlayerData.exp = 0;
-            CurrHealth = MaxHealth;
-            CurrMana = MaxMana;
+            CurrStats.Set(StatsType.HEALTH,MaxStats.Get(StatsType.HEALTH));
+            CurrStats.Set(StatsType.MANA, MaxStats.Get(StatsType.MANA));
             NextLevelExp = LvlExpModule.GetRequiredExp(PlayerData.lvl + 1);
             AudioSource.PlayClipAtPoint(lvlup, transform.position, GameManager.SFX_Volume);
             PlayerData.StatPoints++;
@@ -388,157 +287,11 @@ public abstract class PlayerController : ObjectController {
         }     
     }
 
-    override public float GetMaxHealth() {
-        return MaxHealth;
-    }
-    override public float GetMaxMana() {
-        return MaxMana;
-    }
-    override public float GetMaxAD() {
-        return MaxAD;
-    }
-    override public float GetMaxMD() {
-        return MaxMD;
-    }
-    override public float GetMaxAttkSpd() {
-        return MaxAttkSpd;
-    }
-    override public float GetMaxMoveSpd() {
-        return MaxMoveSpd;
-    }
-    override public float GetMaxCritChance() {
-        return MaxCritChance;
-    }
-    override public float GetMaxCritDmgBounus() {
-        return MaxCritDmgBounus;
-    }
-    override public float GetMaxLPH() {
-        return MaxLPH;
-    }
-    override public float GetMaxManaRegen() {
-        return MaxManaRegen;
-    }
-    override public float GetMaxDefense() {
-        return MaxDefense;
-    }
 
 
 
 
-
-    override public float GetCurrHealth() {
-        return CurrHealth;
-    }
-    override public float GetCurrMana() {
-        return CurrMana;
-    }
-    override public float GetCurrAD() {
-        return CurrAD;
-    }
-    override public float GetCurrMD() {
-        return CurrMD;
-    }
-    override public float GetCurrAttkSpd() {
-        return CurrAttkSpd;
-    }
-    override public float GetCurrMoveSpd() {
-        return CurrMoveSpd;
-    }
-    override public float GetCurrCritChance() {
-        return CurrCritChance;
-    }
-    override public float GetCurrCritDmgBounus() {
-        return CurrCritDmgBounus;
-    }
-    override public float GetCurrLPH() {
-        return CurrLPH;
-    }
-    override public float GetCurrManaRegen() {
-        return CurrManaRegen;
-    }
-    override public float GetCurrDefense() {
-        return CurrDefense;
-    }
-
-
-
-    override public void SetMaxHealth(float health) {
-        MaxHealth = health;
-    }
-    override public void SetMaxMana(float mana) {
-        MaxMana = mana;
-    }
-    override public void SetMaxAD(float ad) {
-        MaxAD = ad;
-    }
-    override public void SetMaxMD(float md) {
-        MaxMD = md;
-    }
-    override public void SetMaxAttkSpd(float attkspd) {
-        MaxAttkSpd = attkspd;
-    }
-    override public void SetMaxMoveSpd(float movespd) {
-        MaxMoveSpd = movespd;
-    }
-    override public void SetMaxCritChance(float critchance) {
-        MaxCritChance = critchance;
-    }
-    override public void SetMaxCritDmgBounus(float critdmg) {
-        MaxCritDmgBounus = critdmg;
-    }
-    override public void SetMaxLPH(float lph) {
-        MaxLPH = lph;
-    }
-    override public void SetMaxManaRegen(float mph) {
-        MaxManaRegen = mph;
-    }
-    override public void SetMaxDefense(float defense) {
-        MaxDefense = defense;
-    }
-
-
-    override public void SetCurrHealth(float health) {
-        CurrHealth = health;
-    }
-    override public void SetCurrMana(float mana) {
-        CurrMana = mana;
-    }
-    override public void SetCurrAD(float ad) {
-        CurrAD = ad;
-    }
-    override public void SetCurrMD(float md) {
-        CurrMD = md;
-    }
-    override public void SetCurrAttkSpd(float attkspd) {
-        CurrAttkSpd = attkspd;
-    }
-    override public void SetCurrMoveSpd(float movespd) {
-        CurrMoveSpd = movespd;
-    }
-    override public void SetCurrCritChance(float critchance) {
-        CurrCritChance = critchance;
-    }
-    override public void SetCurrCritDmgBounus(float critdmg) {
-        CurrCritDmgBounus = critdmg;
-    }
-    override public void SetCurrLPH(float lph) {
-        CurrLPH = lph;
-    }
-    override public void SetCurrManaRegen(float mph) {
-        CurrManaRegen = mph;
-    }
-    override public void SetCurrDefense(float defense) {
-        CurrDefense = defense;
-    }
-
-
-
-
-    public override string GetName() {
-        return Name;
-    }
-
-    public string GetClass() {
+    public Class GetClass() {
         return PlayerData.Class;
     }
     public int Getlvl() {
@@ -554,5 +307,9 @@ public abstract class PlayerController : ObjectController {
 
     public CharacterDataStruct GetPlayerData() {
         return PlayerData;
+    }
+
+    public override string GetName() {
+        return Name;
     }
 }

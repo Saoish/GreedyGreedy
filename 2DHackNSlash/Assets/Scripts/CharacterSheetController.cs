@@ -3,8 +3,10 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class CharacterSheetController : MonoBehaviour{
-    Tab_0 Tab_0;
-    Tab_1 Tab_1;
+    [HideInInspector]
+    public Tab_0 Tab_0;
+    [HideInInspector]
+    public Tab_1 Tab_1;
 
     [HideInInspector]
     public MainPlayer MPC;

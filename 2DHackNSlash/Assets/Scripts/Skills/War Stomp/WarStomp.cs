@@ -1,37 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using GreedyNameSpace;
 public class WarStomp : ActiveSkill {
     float ADScale;
     float StunDuration;
+    float StompRadius;
 
     delegate void Del(ObjectController target);
     Del DEL;
 
     public Stack<Collider2D> HittedStack = new Stack<Collider2D>();
 
-    Collider2D StompCollider;
+    CircleCollider2D StompCollider;
 
     public AudioClip StompSFX;
     public float StompTime = 0.1f;
 
     GameObject StompVFX;
     float VFX_StayTime;
+    float StompVFX_DefaultStartSize;
+    float PulseVFX_DefaultStartSize;
+    float SubEmitterBirthVFX_DefaultStartSize;
 
-    float DefaultColliderRadius = 0.4f;
+    float RadiusScaleFactor = 0.4f;
 
     protected override void Awake() {
         base.Awake();
-        StompCollider = GetComponent<Collider2D>();
+        StompCollider = GetComponent<CircleCollider2D>();
         StompVFX = transform.Find("War Stomp VFX").gameObject;
-        transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingLayerName = Layer.Skill;
-        transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingLayerName = Layer.Skill;
+        StompVFX_DefaultStartSize = transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().startSize;
+        PulseVFX_DefaultStartSize = transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().startSize;
+        SubEmitterBirthVFX_DefaultStartSize = transform.Find("War Stomp VFX/pulse/SubEmitterBirth").GetComponent<ParticleSystem>().startSize;
         VFX_StayTime = transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().duration;
-        float ScaleFactor = ((CircleCollider2D)StompCollider).radius / DefaultColliderRadius;
-        transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().startSize *= ScaleFactor;
-        transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().startSize *= ScaleFactor;
-        }
+    }
 
     protected override void Start() {
         base.Start();
@@ -70,14 +72,23 @@ public class WarStomp : ActiveSkill {
         ManaCost = WSL.ManaCost;
         ADScale = WSL.ADScale;
         StunDuration = WSL.StunDuration;
-        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), OC.GetRootCollider());//Ignore self here
+        StompRadius = WSL.StompRadius;
 
-        Description = "Heavily stomp the ground, dealing "+ADScale+"% AD dmg to nearby foes and stun them for "+StunDuration+" secs.\n\nCost: "+ManaCost+" Mana\nCD: "+CD+" secs";
+        Physics2D.IgnoreCollision(StompCollider, OC.GetRootCollider());//Ignore self here
+
+        StompCollider.radius = StompRadius;
+
+        float ScaleFactor = StompCollider.radius / RadiusScaleFactor;
+        transform.Find("War Stomp VFX").GetComponent<ParticleSystem>().startSize  = StompVFX_DefaultStartSize* ScaleFactor;
+        transform.Find("War Stomp VFX/pulse").GetComponent<ParticleSystem>().startSize = PulseVFX_DefaultStartSize* ScaleFactor;
+        transform.Find("War Stomp VFX/pulse/SubEmitterBirth").GetComponent<ParticleSystem>().startSize= SubEmitterBirthVFX_DefaultStartSize * ScaleFactor;
+
+        Description = "Heavily stomp the ground, dealing "+ADScale+"% AD dmg to nearby foes and stun them for "+StunDuration+ " secs. Higher level gives you bigger stomp radius.\n\nCost: " + ManaCost+" Mana\nCD: "+CD+" secs";
     }
 
     public override void Active() {
         OC.ON_MANA_UPDATE += OC.DeductMana;
-        OC.ON_MANA_UPDATE(Value.CreateValue(ManaCost));
+        OC.ON_MANA_UPDATE(new Value(ManaCost));
         OC.ON_MANA_UPDATE -= OC.DeductMana;
         StartCoroutine(ActiveStompCollider(StompTime));
         RealTime_CD = CD;
@@ -115,13 +126,8 @@ public class WarStomp : ActiveSkill {
     }
 
     private void ApplyStunDebuff(ObjectController target) {
-        ModData StunDebuffMod = ScriptableObject.CreateInstance<ModData>();
-        StunDebuffMod.Name = "StunDebuff";
-        StunDebuffMod.Duration = StunDuration;
-        GameObject StunDebuffObject = Instantiate(Resources.Load("DebuffPrefabs/"+ StunDebuffMod.Name)) as GameObject;
-        StunDebuffObject.name = StunDebuffMod.Name;
-        StunDebuffObject.GetComponent<Debuff>().ApplyDebuff(StunDebuffMod, target);
-
+        StunDebuff SD = StunDebuff.Generate(StunDuration);
+        SD.ApplyDebuff(target);
     }
 
     private void StunAndDealStompDmg(ObjectController target) {
@@ -133,20 +139,20 @@ public class WarStomp : ActiveSkill {
             ApplyStunDebuff(target);
         }
 
-        Value dmg = Value.CreateValue(0, 0, false, OC);
-        if(UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
-            dmg.Amount += OC.GetCurrAD() * (ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
+        Value dmg = new Value(0, 0, false, OC);
+        if(UnityEngine.Random.value < (OC.GetCurrStats(StatsType.CRIT_CHANCE) / 100)) {
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (ADScale / 100) * (OC.GetCurrStats(StatsType.CRIT_DMG) / 100);
             dmg.IsCrit = true;
         } else {
-            dmg.Amount += OC.GetCurrAD() * (ADScale / 100);
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (ADScale / 100);
             dmg.IsCrit = false;
         }
-        float reduced_dmg = dmg.Amount * (target.GetCurrDefense() / 100);
+        float reduced_dmg = dmg.Amount * (target.GetCurrStats(StatsType.DEFENSE) / 100);
         dmg.Amount = dmg.Amount - reduced_dmg;
 
-        OC.ON_HEALTH_UPDATE += OC.HealHP;
-        OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(),1));
-        OC.ON_HEALTH_UPDATE -= OC.HealHP;
+        //OC.ON_HEALTH_UPDATE += OC.HealHP;
+        //OC.ON_HEALTH_UPDATE(new Value(OC.GetCurrStats(StatsType.HEALTH), 1));
+        //OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;
         target.ON_HEALTH_UPDATE(dmg);

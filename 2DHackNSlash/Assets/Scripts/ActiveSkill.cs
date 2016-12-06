@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using GreedyNameSpace;
 
 public abstract class ActiveSkill : Skill {
     [HideInInspector]
@@ -48,7 +49,7 @@ public abstract class ActiveSkill : Skill {
         } else if (RealTime_CD > 0) {
             RedNotification.Push(RedNotification.Type.ON_CD);
             return false;
-        } else if (OC.GetCurrMana() - ManaCost < 0) {
+        } else if (OC.GetCurrStats(StatsType.MANA) - ManaCost < 0) {
             RedNotification.Push(RedNotification.Type.NO_MANA);
             return false;
         }

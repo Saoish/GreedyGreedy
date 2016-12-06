@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using GreedyNameSpace;
 
 public class BrutalWeaponMastery : PassiveSkill{
     float MANACOST_DEC_Percentage;
@@ -47,7 +48,7 @@ public class BrutalWeaponMastery : PassiveSkill{
         if (!WC) {
             return;
         }
-        if (WC.Type == 0 || WC.Type == 1) {
+        if (WC.Type == WeaponType.Axe || WC.Type == WeaponType.GreatSword) {
             WC.ManaCost -= WC.ManaCost*(MANACOST_DEC_Percentage/100);
         } 
     }

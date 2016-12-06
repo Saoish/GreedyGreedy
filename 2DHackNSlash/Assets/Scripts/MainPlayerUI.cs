@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using GreedyNameSpace;
 
 public class MainPlayerUI : MonoBehaviour {
     [HideInInspector]
@@ -69,12 +70,12 @@ public class MainPlayerUI : MonoBehaviour {
     }
 
     public void UpdateHealthManaBar() {
-        if(MPC.GetCurrHealth()/MPC.GetMaxHealth()>=0)
-            HealthMask.transform.localScale = new Vector2(1, MPC.GetCurrHealth() / MPC.GetMaxHealth());
+        if(MPC.GetCurrStats(StatsType.HEALTH)/MPC.GetMaxStats(StatsType.HEALTH) >=0)
+            HealthMask.transform.localScale = new Vector2(1, MPC.GetCurrStats(StatsType.HEALTH) / MPC.GetMaxStats(StatsType.HEALTH));
         else
             HealthMask.transform.localScale = new Vector2(1, 0);
-        if (MPC.GetCurrMana() / MPC.GetMaxMana() >= 0)
-            ManaMask.transform.localScale = new Vector2( 1, MPC.GetCurrMana() / MPC.GetMaxMana());
+        if (MPC.GetCurrStats(StatsType.MANA) / MPC.GetMaxStats(StatsType.MANA) >= 0)
+            ManaMask.transform.localScale = new Vector2( 1, MPC.GetCurrStats(StatsType.MANA) / MPC.GetMaxStats(StatsType.MANA));
         else
             ManaMask.transform.localScale = new Vector2(1,0);
     }
@@ -83,4 +84,12 @@ public class MainPlayerUI : MonoBehaviour {
         ExpMask.GetComponent<Image>().fillAmount = ((float)MPC.GetExp() / (float)MPC.GetNextLvlExp());
     }
 
+
+    public void UpdateEquippedSlot(EquipType slot) {
+        CSC.Tab_0.transform.Find("EquippedSlotButtons/" + (int)slot).GetComponent<EquippedButtonController>().UpdateSlot();
+    }
+
+    public void UpdateInventorySlot(int slot) {
+        CSC.Tab_0.transform.Find("InventoryButtons/" + slot).GetComponent<InventoryButtonController>().UpdateSlot();
+    }
 }

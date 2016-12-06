@@ -6,4 +6,5 @@ public class WarStomplvl : MonoBehaviour {
     public float ManaCost;
     public float ADScale;
     public float StunDuration;
+    public float StompRadius;
 }

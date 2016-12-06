@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
-
+using GreedyNameSpace;
 public class BloodyHand : ActiveSkill {
     public float PullForce;
 
@@ -67,7 +67,7 @@ public class BloodyHand : ActiveSkill {
         Anim.SetInteger("Direction", OC.Direction);
         Anim.SetTrigger("Active");
         OC.ON_MANA_UPDATE += OC.DeductMana;
-        OC.ON_MANA_UPDATE(Value.CreateValue(ManaCost));
+        OC.ON_MANA_UPDATE(new Value(ManaCost));
         OC.ON_MANA_UPDATE -= OC.DeductMana;
         RealTime_CD = CD;
     }
@@ -103,19 +103,19 @@ public class BloodyHand : ActiveSkill {
     }
 
     void DealBHDmg(ObjectController target) {
-        Value dmg = Value.CreateValue(0, 0, false, OC);
-        if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
-            dmg.Amount += OC.GetCurrAD() * (ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
+        Value dmg = new Value(0, 0, false, OC);
+        if (UnityEngine.Random.value < (OC.GetCurrStats(StatsType.CRIT_CHANCE) / 100)) {
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (ADScale / 100) * (OC.GetCurrStats(StatsType.CRIT_DMG) / 100);
             dmg.IsCrit = true;
         } else {
-            dmg.Amount += OC.GetCurrAD() * (ADScale / 100);
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (ADScale / 100);
             dmg.IsCrit = false;
         }
-        float reduced_dmg = dmg.Amount * (target.GetCurrDefense() / 100);
+        float reduced_dmg = dmg.Amount * (target.GetCurrStats(StatsType.DEFENSE) / 100);
         dmg.Amount = dmg.Amount - reduced_dmg;
 
         //OC.ON_HEALTH_UPDATE += OC.HealHP;
-        //OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
+        //OC.ON_HEALTH_UPDATE(new Value(OC.GetCurrLPH(), 1));
         //OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;

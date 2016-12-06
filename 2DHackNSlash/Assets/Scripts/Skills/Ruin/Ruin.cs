@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using GreedyNameSpace;
 public class Ruin : PassiveSkill {
     [HideInInspector]
     public float TriggerChance;
@@ -73,12 +73,7 @@ public class Ruin : PassiveSkill {
     }
 
     void ApplyRuinDebuff(ObjectController target) {
-        ModData RuinDebuffMod =  ScriptableObject.CreateInstance<ModData>();
-        RuinDebuffMod.Name = SD.Name+"Debuff";
-        RuinDebuffMod.Duration = Duration;
-        RuinDebuffMod.ModMoveSpd = MOVESPD_DEC_Percentage;
-        GameObject RuinDebuffObject =  Instantiate(Resources.Load("DebuffPrefabs/" + RuinDebuffMod.Name)) as GameObject;
-        RuinDebuffObject.name = SD.Name + "Debuff";
-        RuinDebuffObject.GetComponent<Debuff>().ApplyDebuff(RuinDebuffMod, target);
+        RuinDebuff RD = RuinDebuff.Generate(MOVESPD_DEC_Percentage,Duration);
+        RD.ApplyDebuff(target);
     }
 }

@@ -4,11 +4,7 @@ using UnityEngine.UI;
 
 public abstract class Buff : MonoBehaviour {
     [HideInInspector]
-    public ModData MD;
-    [HideInInspector]
     public float Duration = 0;
-
-    protected float ModAmount;
 
     protected ObjectController target;
 
@@ -24,9 +20,8 @@ public abstract class Buff : MonoBehaviour {
     }
 
 
-    virtual public void ApplyBuff(ModData MD, ObjectController target) {
+    virtual public void ApplyBuff(ObjectController target) {
         this.target = target;
-        this.MD = MD;
         gameObject.transform.SetParent(target.Buffs_T());
         gameObject.transform.localPosition = Vector3.zero;
     }

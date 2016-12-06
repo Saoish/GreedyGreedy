@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using GreedyNameSpace;
 public class Grit : PassiveSkill {
     float HP_INC_Percentage;
 
@@ -32,6 +32,6 @@ public class Grit : PassiveSkill {
     }
 
     public override void ApplyPassive() {
-        OC.SetMaxHealth(OC.GetMaxHealth() + OC.GetMaxHealth() * (HP_INC_Percentage / 100));
+        OC.AddMaxStats(StatsType.HEALTH, OC.GetMaxStats(StatsType.HEALTH) * (HP_INC_Percentage / 100));
     }
 }

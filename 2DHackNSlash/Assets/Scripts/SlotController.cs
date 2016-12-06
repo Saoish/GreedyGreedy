@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System;
-
+using GreedyNameSpace;
 public class SlotController : MonoBehaviour {
     int SlotIndex;
 
@@ -93,13 +93,13 @@ public class SlotController : MonoBehaviour {
 
 
     void InstaniateEquipment() {
-        if (PlayerData.Class == "Warrior") {
+        if (PlayerData.Class == Class.Warrior) {
             BaseModel = Instantiate(Resources.Load("BaseModelPrefabs/Red Ghost"), transform) as GameObject;
             BaseModel.name = "Red Ghost";
             BaseModel.transform.position = transform.position + BaseModel.transform.position;
-        } else if (PlayerData.Class == "Mage") {
+        } else if (PlayerData.Class == Class.Mage) {
 
-        } else if (PlayerData.Class == "Rogue") {
+        } else if (PlayerData.Class == Class.Rogue) {
 
         }
         foreach (var e in PlayerData.Equipments) {

@@ -1,29 +1,25 @@
 ﻿using UnityEngine;
 using System.Collections;
+using GreedyNameSpace;
 
 [System.Serializable]
-public class Equipment :ScriptableObject{
-    public int Rarity;//0 common and so on
+public class Equipment{
+    public Rarity Rarity;//0 common and so on
+
     public string Name;
-    public string Class;//For non-trinket equipment only
-    public string Type;
+    public Class Class;//For non-trinket equipment only
+    public EquipType EquipType;
+
+    public int Itemlvl;
     public int LvlReq;
+    public EquipSet Set; //NumofTime been rerolled
+    public int Reforged = 0; //NumofTime been reforged
+    public Stats Stats;
 
-    public float AddHealth;
-    public float AddMana;
-    public float AddAD;
-    public float AddMD;
-    public float AddAttkSpd;
-    public float AddMoveSpd;
-    public float AddDefense;
+    public string Description; //For run time fecthing
 
-    public float AddCritChance; //Percantage
-    public float AddCritDmgBounus; //Percantage
-
-    public float AddLPH;
-    public float AddManaRegen;
-
-    public int Reroll; //NumofTime been rerolled
-    public int Reforged; //NumofTime been reforged
+    public Equipment() {
+        Stats = new Stats(InitStatsType.EQUIP);
+    }
 
 }

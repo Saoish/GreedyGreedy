@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using GreedyNameSpace;
 
 public class Vigor : PassiveSkill {
 
@@ -34,7 +35,9 @@ public class Vigor : PassiveSkill {
     }
 
     public override void ApplyPassive() {
-        OC.SetMaxAD(OC.GetMaxAD() + OC.GetMaxAD() * (AD_INC_Percentage / 100));
+        float ad_inc_value = OC.GetMaxStats(StatsType.AD) * (AD_INC_Percentage / 100);
+        OC.AddMaxStats(StatsType.AD, ad_inc_value);
+        //OC.SetMaxAD(OC.GetMaxAD() + OC.GetMaxAD() * (AD_INC_Percentage / 100));
     }
 
 }

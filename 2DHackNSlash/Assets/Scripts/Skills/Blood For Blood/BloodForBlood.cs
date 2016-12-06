@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using GreedyNameSpace;
 public class BloodForBlood : PassiveSkill {
 
     float LPH_INC_Perentage;
@@ -58,15 +58,9 @@ public class BloodForBlood : PassiveSkill {
 
     private void BFBPassive(Value health_mod) {
         if (health_mod.Type == 0) {//Damage type
-            if ((OC.GetCurrHealth() - health_mod.Amount) / OC.GetMaxHealth() <= HealthTriggerThreshold / 100) {
+            if ((OC.GetCurrStats(StatsType.HEALTH) - health_mod.Amount) / OC.GetMaxStats(StatsType.HEALTH) <= HealthTriggerThreshold / 100) {
                 if (RealTime_TriggerCD == 0 && !OC.HasBuff(typeof(BloodForBloodBuff))) {
-                    ModData BFB_BuffMod = ScriptableObject.CreateInstance<ModData>();
-                    BFB_BuffMod.Name = "BloodForBloodBuff";
-                    BFB_BuffMod.Duration = Duration;
-                    BFB_BuffMod.ModAD = LPH_INC_Perentage;
-                    GameObject BFB_Buff = Instantiate(Resources.Load("BuffPrefabs/" + BFB_BuffMod.Name)) as GameObject;
-                    BFB_Buff.name = "BloodForBloodBuff";
-                    BFB_Buff.GetComponent<Buff>().ApplyBuff(BFB_BuffMod, OC);
+                    ApplyBloodForBloodBuff();
                     RealTime_TriggerCD = TriggerCD;
                 }
             }
@@ -76,5 +70,10 @@ public class BloodForBlood : PassiveSkill {
 
     private void ResetRealTimeTriggerCD() {
         RealTime_TriggerCD = 0;
+    }
+
+    private void ApplyBloodForBloodBuff() {
+        BloodForBloodBuff BFB_Buff = BloodForBloodBuff.Generate(LPH_INC_Perentage, Duration);
+        BFB_Buff.ApplyBuff(OC);
     }
 }

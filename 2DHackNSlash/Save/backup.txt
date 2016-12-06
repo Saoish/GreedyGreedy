@@ -1,4 +1,6 @@
-0,OPOPOP,Warrior,1,0,0,0,1,1,100,100,0,0,100,100,0,0,200,0,10
+0,OPOPOP,0,1,0,0,0,1,1
+---CategorySeperator---
+100,100,0,0,0,100,100,0,200,0,0,0,10
 ---CategorySeperator---
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
@@ -94,7 +96,9 @@ null
 -EquipSeperator-
 null
 ------SlotSeperator------
-1,null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+1,null,-1,0,0,0,0,0,0
+---CategorySeperator---
+100,100,0,0,0,100,100,0,200,0,0,0,10
 ---CategorySeperator---
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
@@ -190,7 +194,9 @@ null
 -EquipSeperator-
 null
 ------SlotSeperator------
-2,null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+2,null,-1,0,0,0,0,0,0
+---CategorySeperator---
+100,100,0,0,0,100,100,0,200,0,0,0,10
 ---CategorySeperator---
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
@@ -286,7 +292,9 @@ null
 -EquipSeperator-
 null
 ------SlotSeperator------
-3,null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+3,null,-1,0,0,0,0,0,0
+---CategorySeperator---
+100,100,0,0,0,100,100,0,200,0,0,0,10
 ---CategorySeperator---
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
@@ -382,7 +390,9 @@ null
 -EquipSeperator-
 null
 ------SlotSeperator------
-4,null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+4,null,-1,0,0,0,0,0,0
+---CategorySeperator---
+100,100,0,0,0,100,100,0,200,0,0,0,10
 ---CategorySeperator---
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---
@@ -478,7 +488,9 @@ null
 -EquipSeperator-
 null
 ------SlotSeperator------
-5,null,null,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5,null,-1,0,0,0,0,0,0
+---CategorySeperator---
+100,100,0,0,0,100,100,0,200,0,0,0,10
 ---CategorySeperator---
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ---CategorySeperator---

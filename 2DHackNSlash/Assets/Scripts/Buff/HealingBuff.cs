@@ -10,19 +10,26 @@ public class HealingBuff : Buff {
 
     private float HealingTimer = 0f;
 
-    Value heal;
+    Value HealValue;
+
+    float Heal_Percentage;
 	protected override void Update () {
         base.Update();
         HealPerSecond();
 	}
 
-    public override void ApplyBuff(ModData MD, ObjectController target) {
-        base.ApplyBuff(MD, target);
-        ModAmount = MD.ModHealth;
-        heal = Value.CreateValue(ModAmount,1);
-        Duration = MD.Duration;
+    public static HealingBuff Generate(float HealAmount,float Duration) {
+        GameObject HB_OJ = Instantiate(Resources.Load("BuffPrefabs/HealingBuff")) as GameObject;
+        HB_OJ.name = "HealingBuff";
+        HB_OJ.GetComponent<HealingBuff>().Duration = Duration;
+        HB_OJ.GetComponent<HealingBuff>().HealValue = new Value(HealAmount,1);
+        return HB_OJ.GetComponent<HealingBuff>();
+    }
+
+    public override void ApplyBuff(ObjectController target) {
+        base.ApplyBuff(target);
         target.ActiveVFXParticle("HealingBuffVFX");
-        Heal(heal);
+        Heal(HealValue);
     }
 
     protected override void RemoveBuff() {
@@ -42,7 +49,7 @@ public class HealingBuff : Buff {
             HealingTimer += Time.deltaTime;
         }
         else if(HealingTimer >= HealingInterval) {
-            Heal(heal);
+            Heal(HealValue);
             HealingTimer = 0;
         }
     }

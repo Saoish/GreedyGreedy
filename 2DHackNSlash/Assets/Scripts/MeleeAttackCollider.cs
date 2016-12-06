@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using GreedyNameSpace;
 
 public class MeleeAttackCollider : AttackCollider {
     public float AttackRange = 0.1f;//Spawn offset: +x = right, -x = left, +y = up, -y = down
@@ -36,10 +37,10 @@ public class MeleeAttackCollider : AttackCollider {
 	}
 
     void DealMeleeAttackDMG(ObjectController target) {
-        Value dmg = OC.AutoAttackDamageDeal(target.GetCurrDefense());
+        Value dmg = OC.AutoAttackDamageDeal(target.GetCurrStats(StatsType.DEFENSE));
 
         OC.ON_HEALTH_UPDATE += OC.HealHP;
-        OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
+        OC.ON_HEALTH_UPDATE(new Value(dmg.Amount*(OC.GetCurrStats(StatsType.LPH)/100), 1,false,null,false,false));
         OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;

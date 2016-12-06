@@ -23,7 +23,8 @@ public class RedNotification : MonoBehaviour {
         STUNNED,
         SKILL_REQUIREMENT_NOT_MET,
         SKILL_NOT_LEARNED,
-        INVENTORY_FULL
+        INVENTORY_FULL,
+        CANT_EQUIP
     };
     void Awake() {
         Anim = GetComponent<Animator>();
@@ -52,6 +53,8 @@ public class RedNotification : MonoBehaviour {
             message = "You have not learned this skill yet.";
         }else if(type == Type.INVENTORY_FULL) {
             message = "Your inventory is full.";
+        }else if(type == Type.CANT_EQUIP) {
+            message = "You can't equip this item.";
         }
 
 

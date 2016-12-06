@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+using GreedyNameSpace;
 public class IronWill : PassiveSkill {
     float DEF_INC_Percentage;
 
@@ -33,6 +33,6 @@ public class IronWill : PassiveSkill {
     }
 
     public override void ApplyPassive() {
-        OC.SetMaxDefense(OC.GetMaxDefense() + OC.GetMaxDefense() * (DEF_INC_Percentage / 100));
+        OC.AddMaxStats(StatsType.DEFENSE, OC.GetMaxStats(StatsType.DEFENSE) * (DEF_INC_Percentage / 100));
     }
 }

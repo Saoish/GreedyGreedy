@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using GreedyNameSpace;
 
 public abstract class ObjectController : MonoBehaviour {
     protected Rigidbody2D rb;
@@ -52,6 +53,9 @@ public abstract class ObjectController : MonoBehaviour {
 
     protected IndicationController IC;
 
+    protected Stats MaxStats;
+    protected Stats CurrStats;
+
     virtual protected void Awake() {
         transform.Find("Root").gameObject.layer = LayerMask.NameToLayer("KillingGround");
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("KillingGround"), LayerMask.NameToLayer("Loot"));
@@ -65,6 +69,8 @@ public abstract class ObjectController : MonoBehaviour {
         Buffs = transform.Find("Root/Buffs");
         Debuffs = transform.Find("Root/Debuffs");
         RootCollider = transform.Find("Root").GetComponent<Collider2D>();
+        MaxStats = new Stats();
+        CurrStats = new Stats();
     }
 
     virtual protected void Start() {
@@ -79,7 +85,7 @@ public abstract class ObjectController : MonoBehaviour {
 
     void MoveUpdate() {
         if (MoveVector != Vector2.zero) {
-            rb.MovePosition(rb.position + MoveVector * (GetCurrMoveSpd() / 100) * Time.deltaTime);
+            rb.MovePosition(rb.position + MoveVector * (GetCurrStats(StatsType.MOVE_SPEED) / 100) * Time.deltaTime);
         }
     }
 
@@ -198,37 +204,37 @@ public abstract class ObjectController : MonoBehaviour {
         Destroy(VFX_OJ, length);
     }
 
-    abstract public string GetName();
-
 
     //Combat
     public void HealHP(Value heal_hp) {
-        if (GetCurrHealth() < GetMaxHealth() && GetCurrHealth() + heal_hp.Amount <= GetMaxHealth()) {
-            SetCurrHealth(GetCurrHealth()+heal_hp.Amount);
-            IC.PopUpText(heal_hp);
-        } else if (GetCurrHealth() < GetMaxHealth() && GetCurrHealth() + heal_hp.Amount > GetMaxHealth()) {
-            heal_hp.Amount = GetMaxHealth() - GetCurrHealth();
-            SetCurrHealth(GetCurrHealth() + heal_hp.Amount);
-            IC.PopUpText(heal_hp);
+        if (GetCurrStats(StatsType.HEALTH) < GetMaxStats(StatsType.HEALTH) && GetCurrStats(StatsType.HEALTH) + heal_hp.Amount <= GetMaxStats(StatsType.HEALTH)) {
+            AddCurrStats(StatsType.HEALTH, heal_hp.Amount);
+            if(heal_hp.Pop_Update)
+                IC.PopUpText(heal_hp);
+        } else if (GetCurrStats(StatsType.HEALTH) < GetMaxStats(StatsType.HEALTH) && GetCurrStats(StatsType.HEALTH) + heal_hp.Amount > GetMaxStats(StatsType.HEALTH)) {
+            heal_hp.Amount = GetMaxStats(StatsType.HEALTH) - GetCurrStats(StatsType.HEALTH);
+            AddCurrStats(StatsType.HEALTH,heal_hp.Amount);
+            if (heal_hp.Pop_Update)
+                IC.PopUpText(heal_hp);
         }
     }
     public void HealMana(Value heal_mana) {
-        if (GetCurrMana() < GetMaxMana() && GetCurrMana() + heal_mana.Amount <= GetMaxMana()) {
-            SetCurrMana(GetCurrMana()+heal_mana.Amount);
-        } else if (GetCurrMana() < GetMaxMana() && GetCurrMana() + heal_mana.Amount > GetMaxMana()) {
-            heal_mana.Amount = GetMaxMana() - GetCurrMana();
-            SetCurrMana(GetCurrMana()+heal_mana.Amount);
+        if (GetCurrStats(StatsType.MANA) < GetMaxStats(StatsType.MANA) && GetCurrStats(StatsType.MANA) + heal_mana.Amount <= GetMaxStats(StatsType.MANA)) {
+            AddCurrStats(StatsType.MANA,heal_mana.Amount);
+        } else if (GetCurrStats(StatsType.MANA) < GetMaxStats(StatsType.MANA) && GetCurrStats(StatsType.MANA) + heal_mana.Amount > GetMaxStats(StatsType.MANA)) {
+            heal_mana.Amount = GetMaxStats(StatsType.MANA) - GetCurrStats(StatsType.MANA);
+            AddCurrStats(StatsType.MANA,heal_mana.Amount);
         }
     }
 
     public Value AutoAttackDamageDeal(float TargetDefense) {
-        Value dmg = Value.CreateValue(0, 0, false, GetComponent<ObjectController>());
-        if (Random.value < (GetCurrCritChance() / 100)) {
-            dmg.Amount += GetCurrAD() * (GetCurrCritDmgBounus() / 100);
-            dmg.Amount += GetCurrMD() * (GetCurrCritDmgBounus() / 100);
+        Value dmg = new Value(0, 0, false, GetComponent<ObjectController>());
+        if (Random.value < (GetCurrStats(StatsType.CRIT_CHANCE) / 100)) {
+            dmg.Amount += GetCurrStats(StatsType.AD) * (GetCurrStats(StatsType.CRIT_DMG) / 100);
+            dmg.Amount += GetCurrStats(StatsType.MD) * (GetCurrStats(StatsType.CRIT_DMG) / 100);
             dmg.IsCrit = true;
         } else {
-            dmg.Amount = GetCurrAD() + GetCurrMD();
+            dmg.Amount = GetCurrStats(StatsType.AD) + GetCurrStats(StatsType.MD);
             dmg.IsCrit = false;
         }
         float reduced_dmg = dmg.Amount * (TargetDefense / 100);
@@ -239,22 +245,27 @@ public abstract class ObjectController : MonoBehaviour {
     abstract public void DeductHealth(Value dmg);
 
     protected virtual void Die() {
-        SetCurrHealth(0);
+        SetCurrStats(StatsType.HEALTH,0);
         Alive = false;
         RootCollider.enabled = false;
         VisualHolder.gameObject.SetActive(false);
     }
 
     public void DeductMana(Value mana_cost) {
-        if (GetCurrMana() - mana_cost.Amount >= 0)//Double check
-            SetCurrMana(GetCurrMana() - mana_cost.Amount);
+        if (GetCurrStats(StatsType.MANA) - mana_cost.Amount >= 0)//Double check
+            DecCurrStats(StatsType.MANA,mana_cost.Amount);
     }
 
-    protected void ManaRegen() {
+    protected void Regen() {
         if (RegenTimer >= RegenInterval) {
             ON_MANA_UPDATE += HealMana;
-            ON_MANA_UPDATE(Value.CreateValue(GetCurrManaRegen() / 10, 1));
+            ON_MANA_UPDATE(new Value(GetCurrStats(StatsType.MANA_REGEN) / 10, 1,false,null,false,false));
             ON_MANA_UPDATE -= HealMana;
+            if (GetCurrStats(StatsType.HEALTH_REGEN) > 0f) {
+                ON_HEALTH_UPDATE += HealHP;
+                ON_HEALTH_UPDATE(new Value(GetCurrStats(StatsType.HEALTH_REGEN) / 10, 1, false, null, false, false));
+                ON_HEALTH_UPDATE -= HealHP;
+            }
             RegenTimer = 0;
         } else {
             RegenTimer += Time.deltaTime;
@@ -310,75 +321,62 @@ public abstract class ObjectController : MonoBehaviour {
 
     //Animation
     public float GetMovementAnimSpeed() {
-        return (GetCurrMoveSpd() / 100) / (movement_animation_interval);
+        return (GetCurrStats(StatsType.MOVE_SPEED) / 100) / (movement_animation_interval);
     }
     public float GetAttackAnimSpeed() {
-        return (GetCurrAttkSpd() / 100) / (attack_animation_interval);
+        return (GetCurrStats(StatsType.ATTACK_SPEED) / 100) / (attack_animation_interval);
     }
     public float GetPhysicsSpeedFactor() {
         if (!Attacking) {
-            if (GetCurrMoveSpd() < 100)
-                return 1 + GetCurrMoveSpd() / 100;
-            else if (GetCurrMoveSpd() > 100)
-                return 1 - GetCurrMoveSpd() / 100;
+            if (GetCurrStats(StatsType.MOVE_SPEED) < 100)
+                return 1 + GetCurrStats(StatsType.MOVE_SPEED) / 100;
+            else if (GetCurrStats(StatsType.MOVE_SPEED) > 100)
+                return 1 - GetCurrStats(StatsType.MOVE_SPEED) / 100;
             else
                 return 1;
         } else {
-            if (GetCurrAttkSpd() < 100)
-                return 1 + GetCurrAttkSpd() / 100;
-            else if (GetCurrMoveSpd() > 100)
-                return 1 - GetCurrAttkSpd() / 100;
+            if (GetCurrStats(StatsType.ATTACK_SPEED) < 100)
+                return 1 + GetCurrStats(StatsType.ATTACK_SPEED) / 100;
+            else if (GetCurrStats(StatsType.ATTACK_SPEED) > 100)
+                return 1 - GetCurrStats(StatsType.ATTACK_SPEED) / 100;
             else
                 return 1;
         }
     }
 
     //Stats
-    abstract public float GetMaxHealth();
-    abstract public float GetMaxMana();
-    abstract public float GetMaxAD();
-    abstract public float GetMaxMD();
-    abstract public float GetMaxAttkSpd();
-    abstract public float GetMaxMoveSpd();
-    abstract public float GetMaxDefense();
-    abstract public float GetMaxCritChance();
-    abstract public float GetMaxCritDmgBounus();
-    abstract public float GetMaxLPH();
-    abstract public float GetMaxManaRegen();
+    public float GetMaxStats(StatsType type) {
+        return MaxStats.Get(type);
+    }
 
-    abstract public float GetCurrHealth();
-    abstract public float GetCurrMana();
-    abstract public float GetCurrAD();
-    abstract public float GetCurrMD();
-    abstract public float GetCurrAttkSpd();
-    abstract public float GetCurrMoveSpd();
-    abstract public float GetCurrDefense();
-    abstract public float GetCurrCritChance();
-    abstract public float GetCurrCritDmgBounus();
-    abstract public float GetCurrLPH();
-    abstract public float GetCurrManaRegen();
+    public void SetMaxStats(StatsType type, float value) {
+        MaxStats.Set(type, value);
+    }
 
-    abstract public void SetMaxHealth(float health);
-    abstract public void SetMaxMana(float mana);
-    abstract public void SetMaxAD(float ad);
-    abstract public void SetMaxMD(float md);
-    abstract public void SetMaxAttkSpd(float attkspd);
-    abstract public void SetMaxMoveSpd(float movespd);
-    abstract public void SetMaxDefense(float defense);
-    abstract public void SetMaxCritChance(float critchance);
-    abstract public void SetMaxCritDmgBounus(float critdmg);
-    abstract public void SetMaxLPH(float lph);
-    abstract public void SetMaxManaRegen(float mph);
+    public void AddMaxStats(StatsType type, float value) {
+        MaxStats.Add(type, value);
+    }
 
-    abstract public void SetCurrHealth(float health);
-    abstract public void SetCurrMana(float mana);
-    abstract public void SetCurrAD(float ad);
-    abstract public void SetCurrMD(float md);
-    abstract public void SetCurrAttkSpd(float attkspd);
-    abstract public void SetCurrMoveSpd(float movespd);
-    abstract public void SetCurrDefense(float defense);
-    abstract public void SetCurrCritChance(float critchance);
-    abstract public void SetCurrCritDmgBounus(float critdmg);
-    abstract public void SetCurrLPH(float lph);
-    abstract public void SetCurrManaRegen(float mph);
+    public void DecMaxStats(StatsType type, float value) {
+        MaxStats.Dec(type, value);
+    }
+
+    public float GetCurrStats(StatsType type) {
+        return CurrStats.Get(type);
+    }
+
+    public void SetCurrStats(StatsType type, float value) {
+        CurrStats.Set(type, value);
+    }
+
+    public void AddCurrStats(StatsType type, float value) {
+        CurrStats.Add(type, value);
+    }
+
+    public void DecCurrStats(StatsType type, float value) {
+        CurrStats.Dec(type, value);
+    }
+
+    public abstract string GetName();
+
 }

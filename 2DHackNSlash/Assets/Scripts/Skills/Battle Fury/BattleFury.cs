@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using GreedyNameSpace;
 
 public class BattleFury : PassiveSkill {
     public AudioClip BF_SFX;
@@ -98,19 +99,19 @@ public class BattleFury : PassiveSkill {
     }
 
     void DealBFSpingDMG(ObjectController target) {
-        Value dmg = Value.CreateValue(0, -1, false, OC);
-        if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
-            dmg.Amount += OC.GetCurrAD() * (Sping_ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
+        Value dmg = new Value(0, -1, false, OC);
+        if (UnityEngine.Random.value < (OC.GetCurrStats(StatsType.CRIT_CHANCE) / 100)) {
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (Sping_ADScale / 100) * (OC.GetCurrStats(StatsType.CRIT_DMG) / 100);
             dmg.IsCrit = true;
         } else {
-            dmg.Amount += OC.GetCurrAD() * (Sping_ADScale / 100);
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (Sping_ADScale / 100);
             dmg.IsCrit = false;
         }
-        float reduced_dmg = dmg.Amount * (target.GetCurrDefense() / 100);
+        float reduced_dmg = dmg.Amount * (target.GetCurrStats(StatsType.DEFENSE) / 100);
         dmg.Amount = dmg.Amount - reduced_dmg;
 
         //OC.ON_HEALTH_UPDATE += OC.HealHP;
-        //OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
+        //OC.ON_HEALTH_UPDATE(new Value(OC.GetCurrLPH(), 1));
         //OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
         if (dmg.IsCrit) {
@@ -128,13 +129,8 @@ public class BattleFury : PassiveSkill {
 
     //Private
     void ApplyBleedDebuff(ObjectController target) {
-        ModData BleedDebuffMod = ScriptableObject.CreateInstance<ModData>();
-        BleedDebuffMod.Name = "BleedDebuff";
-        BleedDebuffMod.Duration = BleedDuration;
-        BleedDebuffMod.ModHealth = OC.GetCurrAD() * (Dot_ADSCale_Percentage / 100);
-        GameObject BleedDebuffObject = Instantiate(Resources.Load("DebuffPrefabs/" + BleedDebuffMod.Name)) as GameObject;
-        BleedDebuffObject.name = "BleedDebuff";
-        BleedDebuffObject.GetComponent<Debuff>().ApplyDebuff(BleedDebuffMod, target);
+        BleedDebuff BD = BleedDebuff.Generate(OC.GetCurrStats(StatsType.AD) * (Dot_ADSCale_Percentage / 100), BleedDuration);
+        BD.ApplyDebuff(target);
     }
 
     void ApplyBattlFuryPassive(ObjectController target) {

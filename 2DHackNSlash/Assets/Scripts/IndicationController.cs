@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using GreedyNameSpace;
 
 public class IndicationController : MonoBehaviour {
     //public int OrderInLayers = 10;
@@ -58,8 +59,8 @@ public class IndicationController : MonoBehaviour {
     }
 
     public void UpdateHealthBar() {
-        float CurrHealth = OC.GetCurrHealth();
-        float MaxHealth = OC.GetMaxHealth();
+        float CurrHealth = OC.GetCurrStats(StatsType.HEALTH);
+        float MaxHealth = OC.GetMaxStats(StatsType.HEALTH);
         if(CurrHealth / MaxHealth>=0)
             HealthMask.transform.localScale = new Vector2(CurrHealth / MaxHealth, 1);//Moving mask
         else

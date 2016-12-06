@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+using GreedyNameSpace;
 public class Fury : ActiveSkill {
     [HideInInspector]
     public float Duration;
@@ -61,7 +61,7 @@ public class Fury : ActiveSkill {
 
     public override void Active() {
         OC.ON_MANA_UPDATE += OC.DeductMana;
-        OC.ON_MANA_UPDATE(Value.CreateValue(ManaCost));
+        OC.ON_MANA_UPDATE(new Value(ManaCost));
         OC.ON_MANA_UPDATE -= OC.DeductMana;
         ApplyFuryBuff();
         StartCoroutine(RunFuryParticleVFX(Duration));
@@ -70,13 +70,8 @@ public class Fury : ActiveSkill {
 
     private void ApplyFuryBuff() {
         // **Note** Could possibly need to check if OC has the buff already for network
-        ModData FuryBuffMod = ScriptableObject.CreateInstance<ModData>();
-        FuryBuffMod.Name = "FuryBuff";
-        FuryBuffMod.Duration = Duration;
-        FuryBuffMod.ModAttSpd = AttkSpd_INC_Percentage;
-        GameObject FuryBuffObject = Instantiate(Resources.Load("BuffPrefabs/" + FuryBuffMod.Name)) as GameObject;
-        FuryBuffObject.name = "FuryBuff";
-        FuryBuffObject.GetComponent<Buff>().ApplyBuff(FuryBuffMod, OC);
+        FuryBuff FB = FuryBuff.Generate(AttkSpd_INC_Percentage, Duration);
+        FB.ApplyBuff(OC);
         RealTime_CD = CD;
     }
 

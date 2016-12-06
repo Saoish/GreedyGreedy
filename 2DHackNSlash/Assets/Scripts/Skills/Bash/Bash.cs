@@ -79,12 +79,7 @@ public class Bash : PassiveSkill {
 
 
     private void ApplyStunDebuff(ObjectController target) {
-        ModData StunDebuffMod = ScriptableObject.CreateInstance<ModData>();
-        StunDebuffMod.Name = "StunDebuff";
-        StunDebuffMod.Duration = StunDuration;
-        GameObject StunDebuffObject = Instantiate(Resources.Load("DebuffPrefabs/" + StunDebuffMod.Name)) as GameObject;
-        StunDebuffObject.name = StunDebuffMod.Name;
-        StunDebuffObject.GetComponent<Debuff>().ApplyDebuff(StunDebuffMod, target);
-
+        StunDebuff SD = StunDebuff.Generate(StunDuration);
+        SD.ApplyDebuff(target);
     }
 }

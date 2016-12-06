@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using GreedyNameSpace;
 
 public class MainPlayer : PlayerController {
 
@@ -12,10 +13,13 @@ public class MainPlayer : PlayerController {
 
     Camera MainCamera;
 
+    public Stats s;
+
     protected override void Awake() {
         base.Awake();
         foreach(GameObject to in TestObjects) {
-            to.GetComponent<EquipmentController>().InstantiateLoot(transform);
+            if(to!=null)
+                to.GetComponent<EquipmentController>().InstantiateLoot(transform,new Vector2(1,1),0);
         }
         MPUI = transform.Find("MainPlayerUI").GetComponent<MainPlayerUI>();
         PlayerData = SaveLoadManager.LoadPlayerInfo(SaveLoadManager.SlotIndexToLoad);
@@ -45,7 +49,7 @@ public class MainPlayer : PlayerController {
             MoveVector = Vector2.zero;
             return;
         } else {
-            if (WC!=null && GetCurrMana() - WC.ManaCost < 0) {
+            if (WC!=null && GetCurrStats(StatsType.MANA) - WC.ManaCost < 0) {
                 AttackVector = Vector2.zero;
                 if (ControllerManager.AttackVector != Vector2.zero)
                     RedNotification.Push(RedNotification.Type.NO_MANA);
@@ -102,31 +106,31 @@ public class MainPlayer : PlayerController {
     }
 
     public void AddStatPoint(string Stat) {
-        if (Stat == "Health")
-            PlayerData.BaseHealth += StatModule.Health_Weight;
-        else if (Stat == "Mana")
-            PlayerData.BaseMana += StatModule.Mana_Weight;
-        else if (Stat == "AD")
-            PlayerData.BaseAD += StatModule.AD_Weight;
-        else if (Stat == "MD")
-            PlayerData.BaseMD += StatModule.MD_Weight;
-        else if (Stat == "AttkSpd")
-            PlayerData.BaseAttkSpd += StatModule.AttkSpd_Weight;
-        else if (Stat == "MoveSpd")
-            PlayerData.BaseMoveSpd += StatModule.MoveSpd_Weight;
-        else if (Stat == "Defense")
-            PlayerData.BaseDefense += StatModule.Defense_Weight;
-        else if (Stat == "CritChance")
-            PlayerData.BaseCritChance += StatModule.CritChance_Weight;
-        else if (Stat == "CritDmgBounus")
-            PlayerData.BaseCritDmgBounus += StatModule.CritDmgBounus_Weight;
-        else if (Stat == "LPH")
-            PlayerData.BaseLPH += StatModule.LPH_Weight;
-        else if (Stat == "ManaRegen")
-            PlayerData.BaseManaRegen += StatModule.ManaRegen_Weight;
-        PlayerData.StatPoints--;
-        SaveLoadManager.SaveCurrentPlayerInfo();
-        UpdateStats();
+        //if (Stat == "Health")
+        //    PlayerData.BaseHealth += StatModule.Health_Weight;
+        //else if (Stat == "Mana")
+        //    PlayerData.BaseMana += StatModule.Mana_Weight;
+        //else if (Stat == "AD")
+        //    PlayerData.BaseAD += StatModule.AD_Weight;
+        //else if (Stat == "MD")
+        //    PlayerData.BaseMD += StatModule.MD_Weight;
+        //else if (Stat == "AttkSpd")
+        //    PlayerData.BaseAttkSpd += StatModule.AttkSpd_Weight;
+        //else if (Stat == "MoveSpd")
+        //    PlayerData.BaseMoveSpd += StatModule.MoveSpd_Weight;
+        //else if (Stat == "Defense")
+        //    PlayerData.BaseDefense += StatModule.Defense_Weight;
+        //else if (Stat == "CritChance")
+        //    PlayerData.BaseCritChance += StatModule.CritChance_Weight;
+        //else if (Stat == "CritDmgBounus")
+        //    PlayerData.BaseCritDmgBounus += StatModule.CritDmgBounus_Weight;
+        //else if (Stat == "LPH")
+        //    PlayerData.BaseLPH += StatModule.LPH_Weight;
+        //else if (Stat == "ManaRegen")
+        //    PlayerData.BaseManaRegen += StatModule.ManaRegen_Weight;
+        //PlayerData.StatPoints--;
+        //SaveLoadManager.SaveCurrentPlayerInfo();
+        //UpdateStats();
     }
 
     //Skills Handling
@@ -189,7 +193,7 @@ public class MainPlayer : PlayerController {
         return FirstAvailbleInventorySlot() == PlayerData.Inventory.Length;
     }
 
-    public Equipment GetEquippedItem(string Slot) {
+    public Equipment GetEquippedItem(EquipType Slot) {
         return PlayerData.Equipments[Slot];
     }
     public Equipment GetInventoryItem(int Slot) {
@@ -199,7 +203,7 @@ public class MainPlayer : PlayerController {
     public bool Compatible(Equipment E) {
         if (E == null)
             return false;
-        if (E.Class == "All")//Trinket
+        if (E.Class == Class.All)//Trinket
             return PlayerData.lvl >= E.LvlReq;
         return (PlayerData.lvl >= E.LvlReq && PlayerData.Class == E.Class);
     }
@@ -213,14 +217,14 @@ public class MainPlayer : PlayerController {
     }
 
     public void Equip(Equipment E) {
-        PlayerData.Equipments[E.Type] = E;
+        PlayerData.Equipments[E.EquipType] = E;
         GameObject equipPrefab = EquipmentController.ObtainPrefab(E, transform);
-        EquipPrefabs[E.Type] = equipPrefab;
+        EquipPrefabs[E.EquipType] = equipPrefab;
         UpdateStats();
         SaveLoadManager.SaveCurrentPlayerInfo();
     }
 
-    public void UnEquip(string Slot) {
+    public void UnEquip(EquipType Slot) {
         Destroy(EquipPrefabs[Slot]);
         PlayerData.Equipments[Slot] = null;
         UpdateStats();

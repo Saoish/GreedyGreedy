@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using GreedyNameSpace;
 
 public class ActiveSkillButtonController : MonoBehaviour {
     MainPlayer MPC;
@@ -162,7 +163,7 @@ public class ActiveSkillButtonController : MonoBehaviour {
     }
 
     void UpdateRedMask() {
-        if (MPC.GetCurrMana() - ActiveSkill.ManaCost < 0) {
+        if (MPC.GetCurrStats(StatsType.MANA) - ActiveSkill.ManaCost < 0) {
             Red_Mask_OJ.SetActive(true);
         } else
             Red_Mask_OJ.SetActive(false);

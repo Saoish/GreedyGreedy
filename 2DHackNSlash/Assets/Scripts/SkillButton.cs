@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
+using GreedyNameSpace;
 
 public class SkillButton : MonoBehaviour {
     public GameObject SkillInfo;
@@ -90,7 +91,7 @@ public class SkillButton : MonoBehaviour {
             RedNotification.Push(RedNotification.Type.NO_SKILL_POINT);
         } else if (!MeetRequirement())
             RedNotification.Push(RedNotification.Type.SKILL_REQUIREMENT_NOT_MET);
-        else if (Skill.SD && Skill.SD.lvl == 5) {
+        else if (Skill.SD!=null && Skill.SD.lvl == 5) {
             RedNotification.Push(RedNotification.Type.MAX_SKILL_LVL);
         } else {
             MPC.LvlUpSkill(SkillIndex);
@@ -102,7 +103,7 @@ public class SkillButton : MonoBehaviour {
     }
 
     public void Assign() {
-        if (!Skill.SD)
+        if (Skill.SD==null)
             RedNotification.Push(RedNotification.Type.SKILL_NOT_LEARNED);
         else
             EnableActiveSlotsAssigning();
@@ -228,7 +229,7 @@ public class SkillButton : MonoBehaviour {
     }
 
     void FetchPathName() {
-        if (MPC.GetClass() == "Warrior") {
+        if (MPC.GetClass() == Class.Warrior) {
             if (SP == SkillPosition.LT1 || SP == SkillPosition.LT2 || SP == SkillPosition.LT3)
                 PathName = "Berserker";
             else

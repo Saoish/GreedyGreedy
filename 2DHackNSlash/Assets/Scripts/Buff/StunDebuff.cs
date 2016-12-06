@@ -3,15 +3,22 @@ using System.Collections;
 using System;
 
 public class StunDebuff : Debuff {
+
     protected override void Update() {
         base.Update();
     }
+    
+    public static StunDebuff Generate(float Duration) {
+        GameObject SD_OJ = Instantiate(Resources.Load("DebuffPrefabs/StunDebuff")) as GameObject;
+        SD_OJ.name = "StunDebuff";
+        SD_OJ.GetComponent<StunDebuff>().Duration = Duration;
+        return SD_OJ.GetComponent<StunDebuff>();
+    }
 
-    public override void ApplyDebuff(ModData MD, ObjectController target) {
-        base.ApplyDebuff(MD, target);
+    public override void ApplyDebuff(ObjectController target) {
+        base.ApplyDebuff(target);
         target.Stunned = true;
         //target.MountainlizeRigibody();
-        Duration = MD.Duration;
         target.ActiveVFXParticle("StunDebuffVFX");
     }
 

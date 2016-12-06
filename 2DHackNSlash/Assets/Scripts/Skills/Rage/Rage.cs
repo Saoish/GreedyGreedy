@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using GreedyNameSpace;
 public class Rage : PassiveSkill {
 
     float AD_INC_Percentage;
@@ -59,21 +59,22 @@ public class Rage : PassiveSkill {
     }
 
     private void RagePassive(Value health_mod) {
-        if ((OC.GetCurrHealth() - health_mod.Amount) / OC.GetMaxHealth() <= HealthTriggerThreshold / 100) {
-            if (RealTime_TriggerCD == 0 && !OC.HasBuff(typeof(RageBuff))) {
-                ModData RageBuffMod = ScriptableObject.CreateInstance<ModData>();
-                RageBuffMod.Name = "RageBuff";
-                RageBuffMod.Duration = Duration;
-                RageBuffMod.ModAD = AD_INC_Percentage;
-                GameObject RageBuff = Instantiate(Resources.Load("BuffPrefabs/" + RageBuffMod.Name)) as GameObject;
-                RageBuff.name = "RageBuff";
-                RageBuff.GetComponent<Buff>().ApplyBuff(RageBuffMod, OC);
-                RealTime_TriggerCD = TriggerCD;
+        if (health_mod.Type == 0) {//Damage type
+            if ((OC.GetCurrStats(StatsType.HEALTH) - health_mod.Amount) / OC.GetMaxStats(StatsType.HEALTH) <= HealthTriggerThreshold / 100) {
+                if (RealTime_TriggerCD == 0 && !OC.HasBuff(typeof(RageBuff))) {
+                    ApplyRageBuff();
+                    RealTime_TriggerCD = TriggerCD;
+                }
             }
         }
     }
 
     private void ResetRealTimeTriggerCD() {
         RealTime_TriggerCD = 0;
+    }
+
+    private void ApplyRageBuff() {
+        RageBuff RB = RageBuff.Generate(AD_INC_Percentage, Duration);
+        RB.ApplyBuff(OC);
     }
 }

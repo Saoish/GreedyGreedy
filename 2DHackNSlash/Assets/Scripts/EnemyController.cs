@@ -2,52 +2,34 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using GreedyNameSpace;
+using System;
 
 public abstract class EnemyController : ObjectController {
+    public string Name;
+
     public bool LootDrop = true;
 
     public AudioClip hurt;
 
     public int exp;
 
-    public string Name;
     public int lvl;
 
-    public float MaxHealth;
-    public float MaxMana = 100;
-    public float MaxAD;
-    public float MaxMD;
-    public float MaxAttkSpd; //Percantage
-    public float MaxMoveSpd; //Percantage
-    public float MaxDefense; //Percantage
+    public float HEALTH = 100;
+    public float MANA = 100;
+    public float AD;
+    public float MD;
+    public float ATTACK_SPEED; //Percantage
+    public float MOVE_SPEED; //Percantage
+    public float DEFENSE; //Percantage
 
-    public float MaxCritChance = 30f; //Percantage
-    public float MaxCritDmgBounus = 200f; //Percantage
-    public float MaxLPH;
-    public float MaxManaRegen = 5;
-
-    [HideInInspector]
-    public float CurrHealth;
-    [HideInInspector]
-    public float CurrMana;
-    [HideInInspector]
-    public float CurrAD;
-    [HideInInspector]
-    public float CurrMD;
-    [HideInInspector]
-    public float CurrAttkSpd;
-    [HideInInspector]
-    public float CurrMoveSpd;
-    [HideInInspector]
-    public float CurrDefense;
-    [HideInInspector]
-    public float CurrCritChance;
-    [HideInInspector]
-    public float CurrCritDmgBounus;
-    [HideInInspector]
-    public float CurrLPH;
-    [HideInInspector]
-    public float CurrManaRegen;
+    public float CRIT_CHANCE = 10f; //Percantage
+    public float CRIT_DMG = 200f; //Percantage
+    public float LPH;
+    public float HEALTH_REGEN = 0;
+    public float MANA_REGEN = 10;
+    public float CDR = 0;
 
     private Animator Anim;
 
@@ -62,27 +44,17 @@ public abstract class EnemyController : ObjectController {
     // Use this for initialization
     protected override void Start() {
         base.Start();
-        CurrHealth = MaxHealth;
-        CurrMana = MaxMana;
-        CurrAD = MaxAD;
-        CurrMD = MaxMD;
-        CurrAttkSpd = MaxAttkSpd;
-        CurrMoveSpd = MaxMoveSpd;
-        CurrDefense = MaxDefense;
+        InitMaxStats();
+        InitCurrStats();
 
-        CurrCritChance = MaxCritChance;
-        CurrCritDmgBounus = MaxCritDmgBounus;
-
-        CurrLPH = MaxLPH;
-        CurrManaRegen = MaxManaRegen;
-	}
+    }
 	
 	// Update is called once per frame
 	protected override void Update () {
         base.Update();
         ControlUpdate();
         AnimUpdate();
-        ManaRegen();
+        Regen();
     }
 
     void ControlUpdate() {
@@ -102,26 +74,47 @@ public abstract class EnemyController : ObjectController {
         }
     }
 
+    //Initialization
+    void InitMaxStats() {
+        MaxStats.Set(StatsType.HEALTH, HEALTH);
+        MaxStats.Set(StatsType.MANA, MANA);
+        MaxStats.Set(StatsType.AD, AD);
+        MaxStats.Set(StatsType.MD, MD);
+        MaxStats.Set(StatsType.ATTACK_SPEED, ATTACK_SPEED);
+        MaxStats.Set(StatsType.MOVE_SPEED, MOVE_SPEED);
+        MaxStats.Set(StatsType.DEFENSE, DEFENSE);
+        MaxStats.Set(StatsType.CRIT_CHANCE, CRIT_CHANCE);
+        MaxStats.Set(StatsType.CRIT_DMG, CRIT_DMG);
+        MaxStats.Set(StatsType.LPH, LPH);
+        MaxStats.Set(StatsType.HEALTH_REGEN, HEALTH_REGEN);
+        MaxStats.Set(StatsType.MANA_REGEN, MANA_REGEN);
+        MaxStats.Set(StatsType.CDR, CDR);
+    }
+
+    void InitCurrStats() {
+        for (int i = 0; i < Stats.Size; i++) {
+            CurrStats.Set(i, MaxStats.Get(i));
+        }
+    }
+
     //----------public
     //Combat
     override public void DeductHealth(Value dmg) {
+        if(dmg.Pop_Update)
+            IC.PopUpText(dmg);
         if (dmg.IsCrit) {
             Anim.SetFloat("PhysicsSpeedFactor", GetPhysicsSpeedFactor());
             Anim.Play("crit");
-            if (dmg.Type != -1)
-                AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
-        } else {
-            if(dmg.Type!=-1)
-                AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
         }
-        if (CurrHealth - dmg.Amount <= 0 && Alive) {
-            IC.PopUpText(dmg);
+        if(dmg.SFX_Update)
+                AudioSource.PlayClipAtPoint(hurt, transform.position, GameManager.SFX_Volume);
+        
+        if (CurrStats.Get(StatsType.HEALTH) - dmg.Amount <= 0 && Alive) {
             ON_DEATH_UPDATE += Die;
             ON_DEATH_UPDATE();
             ON_DEATH_UPDATE -= Die;
         } else {
-            CurrHealth -= dmg.Amount;
-            IC.PopUpText(dmg);
+            CurrStats.Dec(StatsType.HEALTH, dmg.Amount);
         }
     }
 
@@ -166,160 +159,6 @@ public abstract class EnemyController : ObjectController {
             GameObject.Find("MainPlayer").GetComponent<MainPlayer>().AddEXP(exp);
         }      
     }
-
-
-
-
-
-
-
-
-
-
-    override public float GetMaxHealth() {
-        return MaxHealth;
-    }
-    override public float GetMaxMana() {
-        return MaxMana;
-    }
-    override public float GetMaxAD() {
-        return MaxAD;
-    }
-    override public float GetMaxMD() {
-        return MaxMD;
-    }
-    override public float GetMaxAttkSpd() {
-        return MaxAttkSpd;
-    }
-    override public float GetMaxMoveSpd() {
-        return MaxMoveSpd;
-    }
-    override public float GetMaxCritChance() {
-        return MaxCritChance;
-    }
-    override public float GetMaxCritDmgBounus() {
-        return MaxCritDmgBounus;
-    }
-    override public float GetMaxLPH() {
-        return MaxLPH;
-    }
-    override public float GetMaxManaRegen() {
-        return MaxManaRegen;
-    }
-    override public float GetMaxDefense() {
-        return MaxDefense;
-    }
-
-
-
-
-
-    override public float GetCurrHealth() {
-        return CurrHealth;
-    }
-    override public float GetCurrMana() {
-        return CurrMana;
-    }
-    override public float GetCurrAD() {
-        return CurrAD;
-    }
-    override public float GetCurrMD() {
-        return CurrMD;
-    }
-    override public float GetCurrAttkSpd() {
-        return CurrAttkSpd;
-    }
-    override public float GetCurrMoveSpd() {
-        return CurrMoveSpd;
-    }
-    override public float GetCurrCritChance() {
-        return CurrCritChance;
-    }
-    override public float GetCurrCritDmgBounus() {
-        return CurrCritDmgBounus;
-    }
-    override public float GetCurrLPH() {
-        return CurrLPH;
-    }
-    override public float GetCurrManaRegen() {
-        return CurrManaRegen;
-    }
-    override public float GetCurrDefense() {
-        return CurrDefense;
-    }
-
-
-
-    override public void SetMaxHealth(float health) {
-        MaxHealth = health;
-    }
-    override public void SetMaxMana(float mana) {
-        MaxMana = mana;
-    }
-    override public void SetMaxAD(float ad) {
-        MaxAD = ad;
-    }
-    override public void SetMaxMD(float md) {
-        MaxMD = md;
-    }
-    override public void SetMaxAttkSpd(float attkspd) {
-        MaxAttkSpd = attkspd;
-    }
-    override public void SetMaxMoveSpd(float movespd) {
-        MaxMoveSpd = movespd;
-    }
-    override public void SetMaxCritChance(float critchance) {
-        MaxCritChance = critchance;
-    }
-    override public void SetMaxCritDmgBounus(float critdmg) {
-        MaxCritDmgBounus = critdmg;
-    }
-    override public void SetMaxLPH(float lph) {
-        MaxLPH = lph;
-    }
-    override public void SetMaxManaRegen(float mph) {
-        MaxManaRegen = mph;
-    }
-    override public void SetMaxDefense(float defense) {
-        MaxDefense = defense;
-    }
-
-
-    override public void SetCurrHealth(float health) {
-        CurrHealth = health;
-    }
-    override public void SetCurrMana(float mana) {
-        CurrMana = mana;
-    }
-    override public void SetCurrAD(float ad) {
-        CurrAD = ad;        
-    }
-    override public void SetCurrMD(float md) {
-        CurrMD = md;
-    }
-    override public void SetCurrAttkSpd(float attkspd) {
-        CurrAttkSpd = attkspd;
-    }
-    override public void SetCurrMoveSpd(float movespd) {
-        CurrMoveSpd = movespd;
-    }
-    override public void SetCurrCritChance(float critchance) {
-        CurrCritChance = critchance;
-    }
-    override public void SetCurrCritDmgBounus(float critdmg) {
-        CurrCritDmgBounus = critdmg;
-    }
-    override public void SetCurrLPH(float lph) {
-        CurrLPH = lph;
-    }
-    override public void SetCurrManaRegen(float mph) {
-        CurrManaRegen = mph;
-    }
-    override public void SetCurrDefense(float defense) {
-        CurrDefense = defense;
-    }
-
-
 
     public override string GetName() {
         return Name;

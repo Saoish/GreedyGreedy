@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using GreedyNameSpace;
 public class AncientSlimeRoom : MapController {
     public AudioClip Roar;
     private int WaveSlimesKilled;
@@ -129,13 +129,8 @@ public class AncientSlimeRoom : MapController {
     void HealPlayer() {
         if(MPC == null)
             MPC = GameObject.Find("MainPlayer").GetComponent<MainPlayer>();
-        ModData HeallingBuffMod = ScriptableObject.CreateInstance<ModData>();
-        HeallingBuffMod.Name = "HealingBuff";
-        HeallingBuffMod.Duration = 5f;
-        HeallingBuffMod.ModHealth = MPC.GetMaxHealth() * (5f / 100);
-        GameObject HealingBuffObject = Instantiate(Resources.Load("BuffPrefabs/" + HeallingBuffMod.Name)) as GameObject;
-        HealingBuffObject.name = "HealingBuff";
-        HealingBuffObject.GetComponent<Buff>().ApplyBuff(HeallingBuffMod, MPC);
+        HealingBuff HB = HealingBuff.Generate(MPC.GetMaxStats(StatsType.HEALTH) * 0.1f, 5f);
+        HB.ApplyBuff(MPC);
     }
 
     void StartFilling() {

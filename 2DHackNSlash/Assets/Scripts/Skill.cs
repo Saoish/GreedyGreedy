@@ -16,7 +16,8 @@ public abstract class Skill : MonoBehaviour {
         gameObject.layer = LayerMask.NameToLayer("Skill");
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Skill"), LayerMask.NameToLayer("Loot"));
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Skill"), LayerMask.NameToLayer("LootBox"));
-        SD = ScriptableObject.CreateInstance<SkillData>();
+        //SD = ScriptableObject.CreateInstance<SkillData>();
+        SD = new SkillData();
         SD.Name = Name;
         SD.Description = Description;
         //if (transform.GetComponent<SpriteRenderer>())

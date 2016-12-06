@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using GreedyNameSpace;
 public class PhantomCharge : ActiveSkill {
     public AudioClip SFX;
     public AudioClip Hit;
@@ -95,7 +95,7 @@ public class PhantomCharge : ActiveSkill {
         AudioSource.PlayClipAtPoint(SFX, transform.position, GameManager.SFX_Volume);
 
         OC.ON_MANA_UPDATE += OC.DeductMana;
-        OC.ON_MANA_UPDATE(Value.CreateValue(ManaCost));
+        OC.ON_MANA_UPDATE(new Value(ManaCost));
         OC.ON_MANA_UPDATE -= OC.DeductMana;
 
         RealTime_CD = CD;
@@ -111,19 +111,19 @@ public class PhantomCharge : ActiveSkill {
             ApplyStunDebuff(target);
         }
 
-        Value dmg = Value.CreateValue(0, 0, false, OC);
-        if (UnityEngine.Random.value < (OC.GetCurrCritChance() / 100)) {
-            dmg.Amount += OC.GetCurrAD() * (ADScale / 100) * (OC.GetCurrCritDmgBounus() / 100);
+        Value dmg = new Value(0, 0, false, OC);
+        if (UnityEngine.Random.value < (OC.GetCurrStats(StatsType.CRIT_CHANCE) / 100)) {
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (ADScale / 100) * (OC.GetCurrStats(StatsType.CRIT_DMG) / 100);
             dmg.IsCrit = true;
         } else {
-            dmg.Amount += OC.GetCurrAD() * (ADScale / 100);
+            dmg.Amount += OC.GetCurrStats(StatsType.AD) * (ADScale / 100);
             dmg.IsCrit = false;
         }
-        float reduced_dmg = dmg.Amount * (target.GetCurrDefense() / 100);
+        float reduced_dmg = dmg.Amount * (target.GetCurrStats(StatsType.DEFENSE) / 100);
         dmg.Amount = dmg.Amount - reduced_dmg;
 
         //OC.ON_HEALTH_UPDATE += OC.HealHP;
-        //OC.ON_HEALTH_UPDATE(Value.CreateValue(OC.GetCurrLPH(), 1));
+        //OC.ON_HEALTH_UPDATE(new Value(OC.GetCurrLPH(), 1));
         //OC.ON_HEALTH_UPDATE -= OC.HealHP;
 
         target.ON_HEALTH_UPDATE += target.DeductHealth;
@@ -133,14 +133,14 @@ public class PhantomCharge : ActiveSkill {
 
     void OnTriggerEnter2D(Collider2D collider) {
         if (collider.gameObject.layer == LayerMask.NameToLayer("Melee")) {//Ignore melee collider)
-            if (!collider.transform.IsChildOf(OC.transform))
+            //if (!collider.transform.IsChildOf(OC.transform))
                 return;
         }
         if (OC.GetType().IsSubclassOf(typeof(PlayerController))) {
             if (collider.tag == "Enemy") {
-                if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
-                    return;
-                }
+                //if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                //    return;
+                //}
                 ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                 //target.MountainlizeMass();
                 OC.ON_DMG_DEAL += StunAndDealChargeDmg;
@@ -150,9 +150,9 @@ public class PhantomCharge : ActiveSkill {
                 AudioSource.PlayClipAtPoint(Hit, transform.position, GameManager.SFX_Volume);
             } else if (collider.tag == "Player") {
                 if (collider.transform.parent.GetComponent<ObjectController>().GetType() == typeof(FriendlyPlayer)) {
-                    if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
-                        return;
-                    }
+                    //if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                    //    return;
+                    //}
                     ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                     target.MountainlizeRigibody();
                     OC.ON_DMG_DEAL += StunAndDealChargeDmg;
@@ -167,9 +167,9 @@ public class PhantomCharge : ActiveSkill {
 
         else {
             if (collider.tag == "Player") {
-                if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
-                    return;
-                }
+                //if (HittedStack.Count != 0 && HittedStack.Contains(collider)) {//Prevent duplicated attacks
+                //    return;
+                //}
                 ObjectController target = collider.transform.parent.GetComponent<ObjectController>();;
                 //target.MountainlizeMass();
                 OC.ON_DMG_DEAL += StunAndDealChargeDmg;
@@ -183,7 +183,7 @@ public class PhantomCharge : ActiveSkill {
         OC.NormalizeDrag();
         OC.ZerolizeForce();
         transform.GetComponent<Collider2D>().enabled = false;
-        HittedStack.Clear();
+        //HittedStack.Clear();
         OC.ActiveVFXParticalWithStayTime("PhantomChargeEndVFX", EndStayTime);
         StartCoroutine(DisableSmokePS(SmokeStayTime));
     }
@@ -195,12 +195,7 @@ public class PhantomCharge : ActiveSkill {
 
 
     private void ApplyStunDebuff(ObjectController target) {
-        ModData StunDebuffMod = ScriptableObject.CreateInstance<ModData>();
-        StunDebuffMod.Name = "StunDebuff";
-        StunDebuffMod.Duration = StunDuration;
-        GameObject StunDebuffObject = Instantiate(Resources.Load("DebuffPrefabs/" + StunDebuffMod.Name)) as GameObject;
-        StunDebuffObject.name = StunDebuffMod.Name;
-        StunDebuffObject.GetComponent<Debuff>().ApplyDebuff(StunDebuffMod, target);
-
+        StunDebuff SD = StunDebuff.Generate(StunDuration);
+        SD.ApplyDebuff(target);
     }
 }

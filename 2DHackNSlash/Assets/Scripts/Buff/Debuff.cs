@@ -4,11 +4,7 @@ using UnityEngine.UI;
 
 public abstract class Debuff : MonoBehaviour {
     [HideInInspector]
-    public ModData MD;
-    [HideInInspector]
     public float Duration = 0;
-
-    protected float ModAmount;
 
     protected ObjectController target;
 
@@ -24,16 +20,8 @@ public abstract class Debuff : MonoBehaviour {
         }
     }
 
-    virtual public void ApplyDebuff(ModData MD,ObjectController target) {
+    virtual public void ApplyDebuff(ObjectController target) {
         this.target = target;
-        this.MD = MD;
-        gameObject.transform.SetParent(target.Debuffs_T());
-        gameObject.transform.localPosition = Vector3.zero;
-    }
-
-    virtual public void ApplyDebuff(ModData MD, ObjectController target,Value debuff_dmg) {
-        this.target = target;
-        this.MD = MD;
         gameObject.transform.SetParent(target.Debuffs_T());
         gameObject.transform.localPosition = Vector3.zero;
     }

@@ -53,18 +53,14 @@ public class Retaliation : PassiveSkill {
     private void RetaliationPassive(Value dmg) {
         if (dmg.SourceOC != null) {
             if (UnityEngine.Random.value < (TriggerChance / 100)) {
-                Value reflected_dmg = Value.CreateValue(dmg.Amount * (Reflected_DMG_Percentage / 100), 0, dmg.IsCrit,null);//No trace back
-                ApplyRetaliationDebuff(dmg.SourceOC,reflected_dmg);
+                float reflected_dmg_amount = dmg.Amount * (Reflected_DMG_Percentage / 100);//No trace back
+                ApplyRetaliationDebuff(dmg.SourceOC,reflected_dmg_amount,dmg.IsCrit);
             }
         }
     }
 
-    private void ApplyRetaliationDebuff(ObjectController target,Value reflected_dmg) {
-        ModData RetaliationDebuffMod = ScriptableObject.CreateInstance<ModData>();
-        RetaliationDebuffMod.Name = "RetaliationDebuff";
-        RetaliationDebuffMod.Duration = 1;
-        GameObject RetaliationDebuffObject = Instantiate(Resources.Load("DebuffPrefabs/" + RetaliationDebuffMod.Name)) as GameObject;
-        RetaliationDebuffObject.name = "RetaliationDebuff";
-        RetaliationDebuffObject.GetComponent<Debuff>().ApplyDebuff(RetaliationDebuffMod, target,reflected_dmg);
+    private void ApplyRetaliationDebuff(ObjectController target,float reflected_dmg_amount,bool IsCrit) {
+        RetaliationDebuff RD = RetaliationDebuff.Generate(reflected_dmg_amount, IsCrit);
+        RD.ApplyDebuff(target);
     }
 }

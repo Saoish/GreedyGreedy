@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+using GreedyNameSpace;
 public class Cripple : PassiveSkill {
 
     float TriggerChance;
@@ -70,13 +70,7 @@ public class Cripple : PassiveSkill {
     }
 
     void ApplyCrippleDebuff(ObjectController target) {
-        ModData CrippleDebuffMod = ScriptableObject.CreateInstance<ModData>();
-        CrippleDebuffMod.Name = "CrippleDebuff";
-        CrippleDebuffMod.ModAD = DMG_DEC_Percentage;
-        CrippleDebuffMod.ModMD = DMG_DEC_Percentage;
-        CrippleDebuffMod.Duration = Duration;
-        GameObject CrippleDebuffObject = Instantiate(Resources.Load("DebuffPrefabs/" + CrippleDebuffMod.Name)) as GameObject;
-        CrippleDebuffObject.name = "CrippleDebuff";
-        CrippleDebuffObject.GetComponent<Debuff>().ApplyDebuff(CrippleDebuffMod, target);
+        CrippleDebuff cripple_debuff = CrippleDebuff.Generate(DMG_DEC_Percentage, Duration);
+        cripple_debuff.ApplyDebuff(target);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using GreedyNameSpace;
 
 public class Path_R : MonoBehaviour {
 
@@ -29,7 +30,7 @@ public class Path_R : MonoBehaviour {
     }
 
     void UpdatePathInfo() {
-        if (MPC.GetClass() == "Warrior") {
+        if (MPC.GetClass() == Class.Warrior) {
             PathInfo.color = MyColor.Grey;
             if (GetPathTotal() != 0)
                 PathInfo.text = "Mountain (" + GetPathTotal() + ")";

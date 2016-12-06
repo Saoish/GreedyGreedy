@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+using GreedyNameSpace;
 public class IronWeaponMastery : PassiveSkill {
-    float DEF_DEC_Percentage;
+    float DEF_INC_Percentage;
 
     float DEF_Amount_INC;
 
@@ -33,9 +33,9 @@ public class IronWeaponMastery : PassiveSkill {
                 IL = GetComponent<IronWeaponMastery5>();
                 break;
         }
-        DEF_DEC_Percentage = IL.DEF_INC_Percentage;
+        DEF_INC_Percentage = IL.DEF_INC_Percentage;
 
-        Description = "Increase your max defensive by "+DEF_DEC_Percentage+"% when you have a shield equipped.";
+        Description = "Increase your max defensive by "+DEF_INC_Percentage+"% when you have a shield equipped.";
     }
 
     protected override void Start() {
@@ -51,8 +51,8 @@ public class IronWeaponMastery : PassiveSkill {
         if (!WC) {
             return;
         }
-        if (WC.Type ==2) {
-            OC.SetMaxDefense(OC.GetMaxDefense() + OC.GetMaxDefense() * (DEF_DEC_Percentage / 100));
+        if (WC.Type == WeaponType.SwordShield) {
+            OC.AddMaxStats(StatsType.DEFENSE, OC.GetMaxStats(StatsType.DEFENSE) * (DEF_INC_Percentage / 100));
         }
     }
 }

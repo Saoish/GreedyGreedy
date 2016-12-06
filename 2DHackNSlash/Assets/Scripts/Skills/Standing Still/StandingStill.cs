@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-
+using GreedyNameSpace;
 public class StandingStill : ActiveSkill {
     public float Duration = 10;
     float Heal_MaxHP_Percentage;
@@ -49,16 +49,17 @@ public class StandingStill : ActiveSkill {
 
     public override void Active() {
         OC.ON_MANA_UPDATE += OC.DeductMana;
-        OC.ON_MANA_UPDATE(Value.CreateValue(ManaCost));
+        OC.ON_MANA_UPDATE(new Value(ManaCost));
         OC.ON_MANA_UPDATE -= OC.DeductMana;
 
         ActiveHeal();
         ApplyHealingBuff();
+        RealTime_CD = CD;
     }
 
     
     private void ActiveHeal() {
-        Value ActiveHeal = Value.CreateValue(OC.GetMaxHealth() * (Heal_MaxHP_Percentage/100), 1);
+        Value ActiveHeal = new Value(OC.GetMaxStats(StatsType.HEALTH) * (Heal_MaxHP_Percentage/100), 1);
         OC.ON_HEALTH_UPDATE += OC.HealHP;
         OC.ON_HEALTH_UPDATE(ActiveHeal);
         OC.ON_HEALTH_UPDATE -= OC.HealHP;
@@ -66,13 +67,7 @@ public class StandingStill : ActiveSkill {
     }
 
     private void ApplyHealingBuff() {
-        ModData HeallingBuffMod = ScriptableObject.CreateInstance<ModData>();
-        HeallingBuffMod.Name = "HealingBuff";
-        HeallingBuffMod.Duration = Duration;
-        HeallingBuffMod.ModHealth = OC.GetMaxHealth() * (DotHeal_MaxHP_Percentage / 100);
-        GameObject HealingBuffObject = Instantiate(Resources.Load("BuffPrefabs/" + HeallingBuffMod.Name)) as GameObject;
-        HealingBuffObject.name = "HealingBuff";
-        HealingBuffObject.GetComponent<Buff>().ApplyBuff(HeallingBuffMod, OC);
-        RealTime_CD = CD;
+        HealingBuff HB = HealingBuff.Generate(OC.GetMaxStats(StatsType.HEALTH) * (DotHeal_MaxHP_Percentage / 100), Duration);
+        HB.ApplyBuff(OC);
     }
 }
