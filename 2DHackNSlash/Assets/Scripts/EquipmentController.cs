@@ -161,19 +161,19 @@ public class EquipmentController : MonoBehaviour {
         Text E_NameText = Loot.transform.Find("LootBox/UI/Name").GetComponent<Text>();
         switch (Loot.GetComponent<EquipmentController>().Rarity) {
             case Rarity.Common:
-                E_NameText.color = MyColor.White;
+                E_NameText.color = MyColor.Common;
                 break;
             case Rarity.Fine:
-                E_NameText.color = MyColor.Cyan;
+                E_NameText.color = MyColor.Fine;
                 break;
-            case Rarity.Perfect:
-                E_NameText.color = MyColor.Yellow;
-                break;
-            case Rarity.Mythic:
-                E_NameText.color = MyColor.Purple;
+            case Rarity.Pristine:
+                E_NameText.color = MyColor.Pristine;
                 break;
             case Rarity.Legendary:
-                E_NameText.color = MyColor.Orange;
+                E_NameText.color = MyColor.Legendary;
+                break;
+            case Rarity.Mythic:
+                E_NameText.color = MyColor.Mythic;
                 break;
         }
         E_NameText.text = E.Name;
@@ -194,19 +194,19 @@ public class EquipmentController : MonoBehaviour {
 
         switch (Loot.GetComponent<EquipmentController>().E.Rarity) {
             case Rarity.Common:
-                E_NameText.color = MyColor.White;
+                E_NameText.color = MyColor.Common;
                 break;
             case Rarity.Fine:
-                E_NameText.color = MyColor.Cyan;
+                E_NameText.color = MyColor.Fine;
                 break;
-            case Rarity.Perfect:
-                E_NameText.color = MyColor.Yellow;
-                break;
-            case Rarity.Mythic:
-                E_NameText.color = MyColor.Purple;
+            case Rarity.Pristine:
+                E_NameText.color = MyColor.Pristine;
                 break;
             case Rarity.Legendary:
-                E_NameText.color = MyColor.Orange;
+                E_NameText.color = MyColor.Legendary;
+                break;
+            case Rarity.Mythic:
+                E_NameText.color = MyColor.Mythic;
                 break;
         }
         E_NameText.text = E.Name;
@@ -265,11 +265,11 @@ public class EquipmentController : MonoBehaviour {
     Rarity GetRandomRarity(float RarityMod) {
         float R_Rate = UnityEngine.Random.value;
         if (R_Rate <= (RarityMod / 100) + ((float)RarityRate.Legendary / 100)) {
-            return Rarity.Legendary;
-        } else if (R_Rate <= (RarityMod / 100) + ((float)RarityRate.Mythic / 100)) {
             return Rarity.Mythic;
+        } else if (R_Rate <= (RarityMod / 100) + ((float)RarityRate.Mythic / 100)) {
+            return Rarity.Legendary;
         } else if (R_Rate <= (RarityMod / 100) + ((float)RarityRate.Perfect / 100)) {
-            return Rarity.Perfect;
+            return Rarity.Pristine;
         } else if(R_Rate <= (RarityMod / 100) + ((float)RarityRate.Fine / 100)) {
             return Rarity.Fine;
         } else {
@@ -299,7 +299,7 @@ public class EquipmentController : MonoBehaviour {
     float GenerateStats(Equipment _E, EquipmentField _EF) {
         float LowerBound = Mathf.Max(_EF.stats_range.y * (float)_E.Rarity / 10, _EF.stats_range.x);
         //Debug.Log(LowerBound);
-        float HigherBound = _E.Rarity == Rarity.Legendary ? _EF.stats_range.y : (_EF.stats_range.y - _EF.stats_range.x) * (((float)_E.Rarity + 2) / 2) * 0.2f + _EF.stats_range.x;
+        float HigherBound = _E.Rarity == Rarity.Mythic ? _EF.stats_range.y : (_EF.stats_range.y - _EF.stats_range.x) * (((float)_E.Rarity + 2) / 2) * 0.2f + _EF.stats_range.x;
         //Debug.Log(HigherBound);
         float Stats = Random.Range(LowerBound, HigherBound);
         if (_E.Itemlvl < Patch.MaxItemlvl)

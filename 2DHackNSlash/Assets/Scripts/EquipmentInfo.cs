@@ -66,19 +66,19 @@ public class EquipmentInfo : MonoBehaviour {
     private void SetName(Equipment E) {
         switch (E.Rarity) {
             case Rarity.Common:
-                Name.color = MyColor.White;
+                Name.color = MyColor.Common;
                 break;
             case Rarity.Fine:
-                Name.color = MyColor.Cyan;
+                Name.color = MyColor.Fine;
                 break;
-            case Rarity.Perfect:
-                Name.color = MyColor.Yellow;
-                break;
-            case Rarity.Mythic:
-                Name.color = MyColor.Purple;
+            case Rarity.Pristine:
+                Name.color = MyColor.Pristine;
                 break;
             case Rarity.Legendary:
-                Name.color = MyColor.Orange;
+                Name.color = MyColor.Legendary;
+                break;
+            case Rarity.Mythic:
+                Name.color = MyColor.Mythic;
                 break;
         }
         Name.text = E.Name;
@@ -101,19 +101,19 @@ public class EquipmentInfo : MonoBehaviour {
     private void SetItemLvl(Equipment E) {
         switch (E.Rarity) {
             case Rarity.Common:
-                Itemlvl.color = MyColor.White;
+                Itemlvl.color = MyColor.Common;
                 break;
             case Rarity.Fine:
-                Itemlvl.color = MyColor.Cyan;
+                Itemlvl.color = MyColor.Fine;
                 break;
-            case Rarity.Perfect:
-                Itemlvl.color = MyColor.Yellow;
-                break;
-            case Rarity.Mythic:
-                Itemlvl.color = MyColor.Purple;
+            case Rarity.Pristine:
+                Itemlvl.color = MyColor.Pristine;
                 break;
             case Rarity.Legendary:
-                Itemlvl.color = MyColor.Orange;
+                Itemlvl.color = MyColor.Legendary;
+                break;
+            case Rarity.Mythic:
+                Itemlvl.color = MyColor.Mythic;
                 break;
         }
         Itemlvl.text = "Item level " + E.Itemlvl.ToString();

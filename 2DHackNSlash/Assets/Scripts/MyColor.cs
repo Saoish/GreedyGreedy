@@ -12,4 +12,10 @@ public static class MyColor{
     static public Color Grey = Color.grey;
     static public Color Purple = new Color(1f, 0, 1f, 1f);
     static public Color Pink = new Color(1f, 0.4f, 0.7f, 1f);
+
+    static public Color Common = Color.white;
+    static public Color Fine = Color.cyan;
+    static public Color Pristine = Color.yellow;
+    static public Color Legendary = MyColor.Orange;
+    static public Color Mythic = MyColor.Purple;
 }

@@ -12,7 +12,7 @@ namespace GreedyNameSpace {
         public static int SkillTreeSize = 18;
         public static int SkillSlots = 4;
         public static int CharacterSlots = 6;
-        public static int MaxItemlvl = LvlCap + (int)Rarity.Legendary;
+        public static int MaxItemlvl = LvlCap + (int)Rarity.Mythic;
     }
     public enum Class{
         Warrior,
@@ -39,9 +39,9 @@ namespace GreedyNameSpace {
     public enum Rarity {
         Common = 0,
         Fine = 2,
-        Perfect = 4,
-        Mythic = 6,
-        Legendary = 8
+        Pristine = 4,
+        Legendary = 6,
+        Mythic = 8
     }
     public enum RarityRate {
         Common = 100,

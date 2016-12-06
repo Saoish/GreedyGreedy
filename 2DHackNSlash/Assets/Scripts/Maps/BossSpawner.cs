@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class BossSpawner : Spawner {
-
+    //public AudioClip test;
     // Use this for initialization
     void Start() {
+        //AudioSource.PlayClipAtPoint(test, transform.position, GameManager.SFX_Volume);
+        //GetComponent<AudioSource>().Play();
     }
 
     // Update is called once per frame
