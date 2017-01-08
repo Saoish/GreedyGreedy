@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 5a929e794c5084be7b1da28f438a1152
+timeCreated: 1481072122
+licenseType: Free
+ShaderImporter:
+  defaultTextures:
+  - _MainTex: {instanceID: 0}
+  - _CelRamp: {fileID: 2800000, guid: 1a308a7d4fdf7464694ec4546932e373, type: 3}
+  - _BumpMap: {instanceID: 0}
+  - _EmissionMap: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

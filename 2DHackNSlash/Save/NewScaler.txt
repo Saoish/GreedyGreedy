@@ -1,5 +1,0 @@
-Stamina: 2 HP & 0.3% Defense
-Essence: 1 Mana & 0.2 Mana Regen
-Strength: 1 AD
-Intelligence: 1 MD
-Agility: 0.3%CC & 2.5%Crit DMG 
