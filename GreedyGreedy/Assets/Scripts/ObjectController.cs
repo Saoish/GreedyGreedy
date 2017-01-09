@@ -71,6 +71,10 @@ public abstract class ObjectController : MonoBehaviour {
 
     protected Stats CurrStats;
 
+    //Networking Stuff
+    [HideInInspector]
+    public LerpQueue Lerps;
+
     virtual protected void Awake() {
         transform.Find("Root").gameObject.layer = LayerMask.NameToLayer(CollisionLayer.KillingGround);
         Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer(CollisionLayer.KillingGround), LayerMask.NameToLayer(CollisionLayer.Loot));
@@ -85,7 +89,7 @@ public abstract class ObjectController : MonoBehaviour {
 
         CurrStats = new Stats();
         Actives = new List<ActiveSkill>();
-        Passives = new List<PassiveSkill>();
+        Passives = new List<PassiveSkill>();        
     }
 
     virtual protected void Start() {

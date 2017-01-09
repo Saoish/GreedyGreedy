@@ -17,7 +17,15 @@ public class MainPlayer : Player {
 
     Camera MainCamera;
 
-    private Vector2 FilteredMoveVector;
+    //Networking triggers
+    public bool ExpectingMoveVector = false;
+    public bool ExpectingAttackVector = false;
+    public bool ExpectingDirection = false;
+    //Network Postion Synching
+    float PositionSyncInterval = 1f;    
+    float PositionSyncCounter = 0;
+    Vector2 LastRegisteredPosition = Vector2.zero;
+
 
     public static void Instantiate(int ClientID,PlayerData PlayerData, Vector2 Position) {
         GameObject PlayerOJ = Resources.Load("PlayerPrefabs/MainPlayer") as GameObject;
@@ -26,6 +34,7 @@ public class MainPlayer : Player {
         PlayerOJ.name = "MainPlayer";
         CacheManager.MP = PlayerOJ.GetComponent<MainPlayer>();
         //return PlayerOJ.GetComponent<MainPlayer>();    
+        PlayerOJ.GetComponent<MainPlayer>().Lerps = new LerpQueue(PlayerOJ.GetComponent<MainPlayer>());
         CacheManager.CacheInstantiatedPlayer(ClientID, PlayerOJ.GetComponent<MainPlayer>());        
     }
 
@@ -78,10 +87,28 @@ public class MainPlayer : Player {
     }
 
     protected override void Update() {
-        Client.Send(Protocols.UpdatePlayerPosition, new PositionData(Client.ClientID, Position));
+        //Client.Send(Protocols.UpdatePlayerPosition, new PositionData(Client.ClientID, Position));
+        //SyncPositionUpdate();
         base.Update();        
         InteractionUpdate();        
+    }   
+
+    protected override void FixedUpdate() {
+        base.FixedUpdate();
+        if (Position != LastRegisteredPosition) {
+            Client.Send(Protocols.UpdatePlayerPosition, new PositionData(Client.ClientID, Position));
+            LastRegisteredPosition = Position;
+        }
     }
+
+    //private void SyncPositionUpdate() {
+    //    if (PositionSyncCounter < PositionSyncInterval) {
+    //        PositionSyncCounter += Time.deltaTime;
+    //    } else {
+    //        Client.Send(Protocols.UpdatePlayerPosition, new PositionData(Client.ClientID, Position));
+    //        PositionSyncCounter = 0;
+    //    }
+    //}
 
     protected override void Die() {
         base.Die();
@@ -91,16 +118,30 @@ public class MainPlayer : Player {
         Scene.LoadWithDelay(ID.Developing, 5f);        
     }
 
-    protected override void FixedUpdate() {
-        base.FixedUpdate();                
-    }
-
     protected override void ControlUpdate() {
         if (Client.Connected) {
             NetworkControlUpdate();
         } else {
             SinglePlayerControlUpdate();
         }
+    }
+
+    Vector2 Raw(Vector2 vector) {
+        Vector2 filtered_vector; 
+        if (vector.x != 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y)) {
+            if (vector.x > 0)
+                filtered_vector = new Vector2(1, 0);
+            else
+                filtered_vector = new Vector2(-1, 0);
+        }else if(vector.y!=0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x)) {
+            if (vector.y > 0)
+                filtered_vector = new Vector2(0, 1);
+            else
+                filtered_vector = new Vector2(0, -1);
+        } else {//abs x == abs y
+            filtered_vector = vector;
+        }
+        return filtered_vector;
     }
 
     //These two function will be deleted
@@ -114,22 +155,30 @@ public class MainPlayer : Player {
             Direction = ControllerManager.Direction;
         } else {
             if (GetWC() != null && GetCurrStats(STATSTYPE.ESSENSE) - GetWC().EssenseCost < 0) {
-                AttackVector = Vector2.zero;
+                if (AttackVector != Vector2.zero) {                    
+                    Client.Send(Protocols.UpdatePlayerAttackVector, new AttackData(Client.ClientID, Vector2.zero));
+                    AttackVector = Vector2.zero;
+                    ExpectingAttackVector = true;                    
+                }
                 if (ControllerManager.AttackVector != Vector2.zero)
                     RedNotification.Push(RedNotification.Type.NO_MANA);
             } else {
-                if (AttackVector != ControllerManager.AttackVector)
-                    Client.Send(Protocols.UpdatePlayerAttackVector, new AttackData(Client.ClientID, ControllerManager.AttackVector));
+                if (!ExpectingAttackVector && AttackVector != Raw(ControllerManager.AttackVector)) {
+                    Client.Send(Protocols.UpdatePlayerAttackVector, new AttackData(Client.ClientID, Raw(ControllerManager.AttackVector)));
+                    ExpectingAttackVector = true;
+                }
             }
             if (HasForce()) {
                 MoveVector = Vector2.zero;
             } else {
-                if (MoveVector != ControllerManager.MoveVector) {
-                    Client.Send(Protocols.UpdatePlayerMoveVector, new MovementData(Client.ClientID, ControllerManager.MoveVector));                    
+                if (!ExpectingMoveVector && MoveVector != ControllerManager.MoveVector) {
+                    Client.Send(Protocols.UpdatePlayerMoveVector, new MovementData(Client.ClientID, ControllerManager.MoveVector));
+                    ExpectingMoveVector = true;
                 }
             }
-            if (Direction != ControllerManager.Direction) {
+            if (!ExpectingDirection && Direction != ControllerManager.Direction) {
                 Client.Send(Protocols.UpdatePlayerDirection, new DirectionData(Client.ClientID, ControllerManager.Direction));
+                ExpectingDirection = true;
             }
         }
     }

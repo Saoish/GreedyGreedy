@@ -6,6 +6,7 @@ using Networking;
 namespace Networking.Data {
 
     public enum Protocols {
+        Test,
         //Server Protocols
         RegisterUser,
         UserLogin,

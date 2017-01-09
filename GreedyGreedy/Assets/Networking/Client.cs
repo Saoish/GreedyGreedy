@@ -15,7 +15,7 @@ namespace Networking {
         public bool RunningWithServerIP = false;
 
         private static Package Package;                        
-        public static bool Connected;        
+        public static bool Connected;
 
         public static int HostID = 0;//Always 0, server's identity
         public static int ClientID = -1; //Fetch from server, for network identity, -1 is not identified
@@ -29,24 +29,20 @@ namespace Networking {
         //EC2 Static address
         //string ip = "52.36.226.238";
         static string ip = String.Empty;
-        static int port = 27550;
+        //static string ip = "192.168.1.9";
+        static int port = 8080;
 
         public static Client instance;
 
         //---The following part for LAN hole punching
-        int BroadcastKey = 999;
-        int BroadcastVersion = 1000;
-        int BroadcastSubVersion = 1001;
-        string BroadcastCipher = "#FASF#F@S@#RSR!REWGW_@WF!W";
-        void SetupLANCredentials() {
+        int BroadcastKey = 955;
+        int BroadcastVersion = 1;
+        int BroadcastSubVersion = 1;    
+
+        void SetupCredentials() {
             byte error;
-            NetworkTransport.SetBroadcastCredentials(clientSocket, BroadcastKey, BroadcastVersion, BroadcastSubVersion, out error);
+            NetworkTransport.SetBroadcastCredentials(clientSocket, BroadcastKey, BroadcastVersion, BroadcastSubVersion, out error);            
         }
-        //void StartBroadCasting() {
-        //    byte error;
-        //    byte[] scream_buffer = Serializer.Serialize(BroadcastCipher);
-        //    NetworkTransport.StartBroadcastDiscovery(clientSocket, port, BroadcastKey, BroadcastVersion, BroadcastSubVersion, scream_buffer, scream_buffer.Length, 1000, out error);
-        //}
         //void StopBroadCasting() {
         //    NetworkTransport.StopBroadcastDiscovery();
         //}
@@ -74,9 +70,10 @@ namespace Networking {
                 ip = Network.player.ipAddress;
             } else {
                 clientSocket = NetworkTransport.AddHost(topology,port);
-            }           
-            SetupLANCredentials();            
-        }       
+                RootButtons.cg.interactable = false;
+            }
+            SetupCredentials();            
+        }
 
         // Update is called once per frame
         void Update() {
@@ -92,7 +89,7 @@ namespace Networking {
                 return;
             byte error;
             Debug.Log(ip);
-            connectionID = NetworkTransport.Connect(clientSocket, ip, port,0, out error);            
+            connectionID = NetworkTransport.Connect(clientSocket, ip, port, 0, out error);            
         }
 
         static void _Send(byte[] binary_data, int channel = 0) {//Default by TCP channel
@@ -106,15 +103,16 @@ namespace Networking {
         void Process() {
             //int HostID = 0;
             //int ClientID;
-
-            int Channel;
-            int DataSize;
+            //int rec_hostID = 0;
+            int rec_connectionID;
+            int rec_channelID;            
             byte[] buffer = new byte[1024];
+            int buffer_length;
             byte error;
 
             NetworkEventType networkEvent = NetworkEventType.DataEvent;
-            do {                
-                networkEvent = NetworkTransport.ReceiveFromHost(HostID, out connectionID, out Channel, buffer, 1024, out DataSize, out error);                
+            do {                                
+                networkEvent = NetworkTransport.ReceiveFromHost(HostID, out rec_connectionID, out rec_channelID, buffer, 1024, out buffer_length, out error);
                 switch (networkEvent) {
                     case NetworkEventType.ConnectEvent:// Server received connect event    
                         Connected = true;
@@ -125,7 +123,7 @@ namespace Networking {
                             Decipher d = Serializer.UnSeal(HostID, buffer);
                             SendMessage(d.protocol, d);
                         } catch {
-                            AppendBuffer(buffer, DataSize);
+                            AppendBuffer(buffer, buffer_length);
                         }      
                         break;
                     case NetworkEventType.DisconnectEvent:// Client received disconnect event
@@ -136,11 +134,12 @@ namespace Networking {
                         Debug.Log("Disconnected.");
                         ClientID = -1;
                         break;
-                    case NetworkEventType.BroadcastEvent://This block should be removed for network version                        
-                        if (ip != String.Empty)
+                    case NetworkEventType.BroadcastEvent://This block should be removed for network version                             
+                        if (Connected || ip != String.Empty)
                             return;                        
-                        NetworkTransport.GetBroadcastConnectionMessage(HostID, buffer, 1024, out DataSize, out error);                        
+                        NetworkTransport.GetBroadcastConnectionMessage(HostID, buffer, 1024, out buffer_length, out error);                        
                         ip = Serializer.DeSerialize<string>(buffer);
+                        RootButtons.cg.interactable = true;
                         break;
                 }
             } while (networkEvent != NetworkEventType.Nothing);
@@ -166,7 +165,9 @@ namespace Networking {
 
 
 
-
+        private void Test(Decipher decipher) {
+            Debug.Log("Got IP");
+        }
 
 
         //Client Protocols
@@ -233,27 +234,39 @@ namespace Networking {
         private void UpdatePlayerMoveVector(Decipher decipher) {
             MovementData temp = JsonUtility.FromJson<MovementData>(decipher.content);
             if (CacheManager.Players[temp.ClientID].PC) {
-                CacheManager.Players[temp.ClientID].PC.MoveVector = temp.MoveVector;                
+                CacheManager.Players[temp.ClientID].PC.MoveVector = temp.MoveVector;
+                if (CacheManager.Players[temp.ClientID].PC == CacheManager.MP)
+                    CacheManager.MP.ExpectingMoveVector = false;
             }
         }
 
         private void UpdatePlayerAttackVector(Decipher decipher) {
             AttackData temp = JsonUtility.FromJson<AttackData>(decipher.content);
-            if (CacheManager.Players[temp.ClientID].PC)                
+            if (CacheManager.Players[temp.ClientID].PC) {
                 CacheManager.Players[temp.ClientID].PC.AttackVector = temp.AttackVector;
+                if (CacheManager.Players[temp.ClientID].PC == CacheManager.MP)
+                    CacheManager.MP.ExpectingAttackVector = false;
+            }
         }
 
         private void UpdatePlayerDirection(Decipher decipher) {
-            DirectionData temp = JsonUtility.FromJson<DirectionData>(decipher.content);            
-            if (CacheManager.Players[temp.ClientID].PC)                
+            DirectionData temp = JsonUtility.FromJson<DirectionData>(decipher.content);
+            if (CacheManager.Players[temp.ClientID].PC) {
                 CacheManager.Players[temp.ClientID].PC.Direction = temp.Direction;
+                if (CacheManager.Players[temp.ClientID].PC == CacheManager.MP)
+                    CacheManager.MP.ExpectingDirection = false;
+            }
         }
 
         private void UpdatePlayerPosition(Decipher decipher) {
             PositionData temp = JsonUtility.FromJson<PositionData>(decipher.content);
             if (CacheManager.Players[temp.ClientID].PC) {
-                if(Mathf.Abs(Vector2.Distance(temp.Position,CacheManager.Players[temp.ClientID].PC.Position))>0.2f)
+                //CacheManager.Players[temp.ClientID].PC.Lerps.Add(temp.Position);
+                //CacheManager.Players[temp.ClientID].PC.Position = temp.Position;
+                if (Mathf.Abs(Vector2.Distance(temp.Position, CacheManager.Players[temp.ClientID].PC.Position)) > 0.1f) {
+                    //CacheManager.Players[temp.ClientID].PC.Position = Vector2.Lerp(CacheManager.Players[temp.ClientID].PC.Position, temp.Position, 1f);
                     CacheManager.Players[temp.ClientID].PC.Position = temp.Position;
+                }
             }
         }
 

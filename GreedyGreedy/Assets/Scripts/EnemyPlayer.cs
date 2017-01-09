@@ -8,7 +8,7 @@ public class EnemyPlayer : Player {
         PlayerOJ.GetComponent<EnemyPlayer>().PlayerData = PlayerData;
         PlayerOJ = Instantiate(PlayerOJ, Position, Quaternion.identity) as GameObject;
         PlayerOJ.name = "EnemyPlayer";
-        //return PlayerOJ.GetComponent<EnemyPlayer>();
+        PlayerOJ.GetComponent<EnemyPlayer>().Lerps = new LerpQueue(PlayerOJ.GetComponent<EnemyPlayer>());
         CacheManager.CacheInstantiatedPlayer(ClientID, PlayerOJ.GetComponent<EnemyPlayer>());
     }
 

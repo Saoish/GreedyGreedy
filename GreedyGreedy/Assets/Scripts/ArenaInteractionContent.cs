@@ -26,7 +26,8 @@ public class ArenaInteractionContent : InteractionContent {
     }
 
     protected override void OnDisable() {    
-        CachedSelected = EventSystem.current.currentSelectedGameObject;
+        if(EventSystem.current)
+            CachedSelected = EventSystem.current.currentSelectedGameObject;
         ControllerManager.SyncActions = true;        
     }    
 

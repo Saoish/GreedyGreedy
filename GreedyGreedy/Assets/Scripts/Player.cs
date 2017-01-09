@@ -22,11 +22,11 @@ public abstract class Player : ObjectController {
 
     List<Bounus> Bounuses = new List<Bounus>();
 
-    //public abstract PlayerController Instantiate(PlayerData PlayerData);
+
 
     protected override void Awake() {
         base.Awake();
-        MaxStats = new Stats();    
+        MaxStats = new Stats();        
     }
 
     protected override void Start() {
